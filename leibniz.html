@@ -49,17 +49,8 @@
   <nav class="light-blue lighten-1" role="navigation">
     <div class="nav-wrapper container">
       <a id="logo-container" href="/" class="brand-logo">
-        Open Data Reconciliation
+        Open Data Reconciliation - Leibniz
       </a>
-
-      <ul class="right hide-on-med-and-down">
-        <li><a href="/auth">Accedi</a></li>
-      </ul>
-
-      <ul id="nav-mobile" class="side-nav">
-        <li><a href="/auth">Accedi</a></li>
-      </ul>
-      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
     </div>
   </nav>
 
@@ -174,14 +165,14 @@
 
     $('#forMeIsNo').click(function(){
         $('body').removeClass('loaded');
-        $.ajax("/leibniz/forMeIsNo/"+ leib + "/alessio/").done(function() {
+        $.ajax("/leibniz/forMeIsNo/"+ leib + "/").done(function() {
             generate();
         });
     });
 
     var saveGuess = function (q) {
         $('body').removeClass('loaded');
-        $.ajax("/leibniz/forMeIsYes/"+ leib + "/" + q + "/alessio/").done(function() {
+        $.ajax("/leibniz/forMeIsYes/"+ leib + "/" + q + "/").done(function() {
             generate();
         });
     }

@@ -228,14 +228,14 @@ app.use('/',express.static('.'));
         });
     });
 
-    app.get('/leibniz/forMeIsNo/:leib/:user/', isLoggedIn, function (request, response) {
-        leibniz.launchSparqlUpdateLeibniz(leibniz.forMeIsNo(request.params.leib, request.params.user), function () {
+    app.get('/leibniz/forMeIsNo/:leib/', isLoggedIn, function (request, response) {
+        leibniz.launchSparqlUpdateLeibniz(leibniz.forMeIsNo(request.params.leib, request.user._id), function () {
             response.send("ok");
         });
     });
 
-    app.get('/leibniz/forMeIsYes/:leib/:wikidata/:user/', isLoggedIn, function (request, response) {
-        leibniz.launchSparqlUpdateLeibniz(leibniz.forMeIsYes(request.params.leib, request.params.wikidata, request.params.user), function () {
+    app.get('/leibniz/forMeIsYes/:leib/:wikidata/', isLoggedIn, function (request, response) {
+        leibniz.launchSparqlUpdateLeibniz(leibniz.forMeIsYes(request.params.leib, request.params.wikidata, request.user._id), function () {
             response.send("ok");
         });
     });
@@ -265,14 +265,14 @@ app.use('/',express.static('.'));
         });
     });
 
-    app.get('/cobis/forMeIsNo/:leib/:user/', isLoggedIn, function (request, response) {
-        cobis.launchSparqlUpdate(cobis.forMeIsNo(request.params.leib, request.params.user), function () {
+    app.get('/cobis/forMeIsNo/:cobis/', isLoggedIn, function (request, response) {
+        cobis.launchSparqlUpdate(cobis.forMeIsNo(request.params.cobis, request.user._id), function () {
             response.send("ok");
         });
     });
 
-    app.get('/cobis/forMeIsYes/:leib/:wikidata/:user/', isLoggedIn, function (request, response) {
-        cobis.launchSparqlUpdate(cobis.forMeIsYes(request.params.leib, request.params.wikidata, request.params.user), function () {
+    app.get('/cobis/forMeIsYes/:cobis/:wikidata/', isLoggedIn, function (request, response) {
+        cobis.launchSparqlUpdate(cobis.forMeIsYes(request.params.leib, request.params.wikidata, request.user._id), function () {
             response.send("ok");
         });
     });

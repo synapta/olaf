@@ -48,13 +48,13 @@ exports.noWikidataHints = function (s) {
 }
 
 exports.forMeIsNo = function (s, user) {
-    return "<http://synapta.it/cobis/author/" + s + "> <https://synapta.it/onto/forMeIsNo> <user/" + user + "> .";
+    return "<http://synapta.it/cobis/author/" + s + "> <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> .";
 }
 
 exports.forMeIsYes = function (s, q, user) {
     return "<http://synapta.it/cobis/author/" + s + "> <https://synapta.it/onto/assert> " +
     "[ <https://synapta.it/onto/sameAs> <https://wikidata.org/wiki/" + q +"> ;" +
-      "<https://synapta.it/onto/by> <user/" + user + "> ] .";
+      "<https://synapta.it/onto/by> <https://synapta.it/user/" + user + "> ] .";
 }
 
 exports.launchSparql = function (query, callback) {
