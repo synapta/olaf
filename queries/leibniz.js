@@ -1,16 +1,18 @@
 var http = require('http');
 
-exports.getRemains = function () {
+exports.getRemains = function (user) {
     return encodeURIComponent(
         "SELECT (COUNT(DISTINCT(?s)) as ?n) " +
         "WHERE {" +
             "?s <http://www.w3.org/2000/01/rdf-schema#label> ?l " +
             "MINUS {?s <https://synapta.it/onto/noWikidatHints> ?o}" +
+            "MINUS {?s <https://synapta.it/onto/assert> ?assert . " +
+                    "?assert <https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">}" +
         "}"
     )
 }
 
-exports.getRandomLeibnizItem = function (max) {
+exports.getRandomLeibnizItem = function (max, user) {
     return encodeURIComponent(
         "SELECT ?s ?label ?birth ?death " +
         "WHERE {" +
@@ -19,6 +21,8 @@ exports.getRandomLeibnizItem = function (max) {
              "WHERE {" +
                  "?s <http://www.w3.org/2000/01/rdf-schema#label> ?l " +
                  "MINUS {?s <https://synapta.it/onto/noWikidatHints> ?o}" +
+                 "MINUS {?s <https://synapta.it/onto/assert> ?assert . " +
+                         "?assert <https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">}" +
              "} " +
              "GROUP BY ?s " +
              "OFFSET " + Math.floor(Math.random() * (max - 0)) + " LIMIT 1" +

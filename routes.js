@@ -205,8 +205,8 @@ app.use('/',express.static('.'));
 
     /* QUERY */
     app.get('/leibniz', isLoggedIn, function (request, response) {
-        leibniz.launchSparqlLeibniz(leibniz.getRemains, function (total) {
-            leibniz.launchSparqlLeibniz(leibniz.getRandomLeibnizItem(total.n.value), function (seed) {
+        leibniz.launchSparqlLeibniz(leibniz.getRemains(request.user._id), function (total) {
+            leibniz.launchSparqlLeibniz(leibniz.getRandomLeibnizItem(total.n.value, request.user._id), function (seed) {
                 console.log(seed.s.value)
                 wikidata.getWikidataHints(seed.label.value, seed, function (hints) {
                     if (hints === "rlm") {
@@ -242,8 +242,8 @@ app.use('/',express.static('.'));
 
 
     app.get('/cobis', isLoggedIn, function (request, response) {
-        cobis.launchSparql(cobis.getRemains, function (total) {
-            cobis.launchSparql(cobis.getRandomCobisItem (total.n.value), function (seed) {
+        cobis.launchSparql(cobis.getRemains(request.user._id), function (total) {
+            cobis.launchSparql(cobis.getRandomCobisItem (total.n.value, request.user._id), function (seed) {
                 wikidata.getWikidataHints(seed.agentLabel.value, seed, function (hints) {
                     if (hints === "rlm") {
                         setTimeout(function () {

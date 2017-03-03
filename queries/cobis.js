@@ -1,17 +1,19 @@
 var http = require('http');
 
-exports.getRemains = function () {
+exports.getRemains = function (user) {
     return encodeURIComponent(
       "prefix skos: <http://www.w3.org/2004/02/skos/core#>" +
       "SELECT (COUNT(DISTINCT(?s)) as ?n) " +
       "WHERE {" +
           "?s skos:semanticRelation ?l " +
           "MINUS {?s <https://synapta.it/onto/noWikidatHints> ?o}" +
+          "MINUS {?s <https://synapta.it/onto/assert> ?assert . " +
+                  "?assert <https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">}" +
       "}"
     )
 }
 
-exports.getRandomCobisItem = function (max) {
+exports.getRandomCobisItem = function (max, user) {
     var rnd = Math.floor(Math.random() * (max - 0))
     return encodeURIComponent(
         "prefix void: <http://rdfs.org/ns/void#>" +
@@ -23,24 +25,16 @@ exports.getRandomCobisItem = function (max) {
 
         "SELECT ?agent ?agentClass ?agentLabel ?dataset ?date ?description " +
         "WHERE {" +
-            "{" +
-              "SELECT DISTINCT ?agent" +
-              "WHERE {" +
-                "?agent skos:semanticRelation ?l ; " +
-                       "a bf:Person ." +
-                "MINUS {?agent <https://synapta.it/onto/noWikidatHints> ?o}" +
-              "}" +
-              "OFFSET " + rnd + " LIMIT 1" +
-            "}" +
-
             "?agent a ?agentClass ; " +
                    "rdfs:label ?agentLabel ; " +
                    "void:inDataset ?dataset ; " +
                    "skos:semanticRelation ?link ." +
             "OPTIONAL {?agent cobis:datazione ?date }" +
             "OPTIONAL {?agent schema:description ?description }" +
+            "MINUS {?agent <https://synapta.it/onto/assert> ?assert . " +
+                    "?assert <https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">}" +
         "} " +
-        "LIMIT 1"
+        "OFFSET " + rnd + " LIMIT 1"
     );
 }
 
@@ -59,7 +53,6 @@ exports.forMeIsYes = function (s, q, user) {
 }
 
 exports.launchSparql = function (query, callback) {
-    console.log(query)
 
     var result = "";
 
