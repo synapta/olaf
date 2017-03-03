@@ -244,7 +244,6 @@ app.use('/',express.static('.'));
     app.get('/cobis', isLoggedIn, function (request, response) {
         cobis.launchSparql(cobis.getRemains, function (total) {
             cobis.launchSparql(cobis.getRandomCobisItem (total.n.value), function (seed) {
-                console.log(seed.agentLabel.value)
                 wikidata.getWikidataHints(seed.agentLabel.value, seed, function (hints) {
                     if (hints === "rlm") {
                         setTimeout(function () {

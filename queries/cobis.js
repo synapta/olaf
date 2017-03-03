@@ -19,11 +19,12 @@ exports.getRandomCobisItem = function (max) {
         "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
         "prefix cobis: <http://synapta.it/cobis/>" +
         "prefix schema: <http://schema.org/>" +
+        "prefix bf: <http://bibframe.org/vocab/>" +
 
         "SELECT ?agent ?agentClass ?agentLabel ?dataset ?date ?description " +
         "WHERE {" +
             "{" +
-              "SELECT ?agent" +
+              "SELECT DISTINCT ?agent" +
               "WHERE {" +
                 "?agent skos:semanticRelation ?l ." +
                 "MINUS {?agent <https://synapta.it/onto/noWikidatHints> ?o}" +
@@ -33,7 +34,7 @@ exports.getRandomCobisItem = function (max) {
             "}" +
 
             "?agent a ?agentClass ;" +
-                   "rdfs:label ?agentLabel ;" +
+                   "rdfs:label bf:Person ;" +
                    "void:inDataset ?dataset ;" +
                    "skos:semanticRelation ?link ." +
             "OPTIONAL {?agent cobis:datazione ?date }" +
