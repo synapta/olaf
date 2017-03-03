@@ -7,7 +7,8 @@ exports.getRemains = function (user) {
       "WHERE {" +
           "?s skos:semanticRelation ?l " +
           "MINUS {?s <https://synapta.it/onto/noWikidatHints> ?o}" +
-          "MINUS {?s <https://synapta.it/onto/assert> ?assert . " +
+          "MINUS {?s <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> . " +
+                  "?s <https://synapta.it/onto/assert> ?assert . " +
                   "?assert <https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">}" +
       "}"
     )
@@ -31,7 +32,8 @@ exports.getRandomCobisItem = function (max, user) {
                    "skos:semanticRelation ?link ." +
             "OPTIONAL {?agent cobis:datazione ?date }" +
             "OPTIONAL {?agent schema:description ?description }" +
-            "MINUS {?agent <https://synapta.it/onto/assert> ?assert . " +
+            "MINUS {?agent <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> . " +
+                    "?agent <https://synapta.it/onto/assert> ?assert . " +
                     "?assert <https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">}" +
         "} " +
         "OFFSET " + rnd + " LIMIT 1"
