@@ -3,16 +3,16 @@ var http = require('http');
 exports.getRemains = function () {
     return encodeURIComponent(
       "prefix skos: <http://www.w3.org/2004/02/skos/core#>" +
-      "SELECT (COUNT(DISTINCT(?s)) as ?n)" +
+      "SELECT (COUNT(DISTINCT(?s)) as ?n) " +
       "WHERE {" +
-          "?s skos:semanticRelation ?l" +
+          "?s skos:semanticRelation ?l " +
+          "MINUS {?s <https://synapta.it/onto/noWikidatHints> ?o}" +
       "}"
     )
 }
 
 exports.getRandomCobisItem = function (max) {
     var rnd = Math.floor(Math.random() * (max - 0))
-    console.log(rnd)
     return encodeURIComponent(
         "prefix void: <http://rdfs.org/ns/void#>" +
         "prefix skos: <http://www.w3.org/2004/02/skos/core#>" +
@@ -26,16 +26,16 @@ exports.getRandomCobisItem = function (max) {
             "{" +
               "SELECT DISTINCT ?agent" +
               "WHERE {" +
-                "?agent skos:semanticRelation ?l ." +
+                "?agent skos:semanticRelation ?l ; " +
+                       "a bf:Person ." +
                 "MINUS {?agent <https://synapta.it/onto/noWikidatHints> ?o}" +
               "}" +
-              "OFFSET " + rnd +
-              "LIMIT 1" +
+              "OFFSET " + rnd + " LIMIT 1" +
             "}" +
 
-            "?agent a ?agentClass ;" +
-                   "rdfs:label bf:Person ;" +
-                   "void:inDataset ?dataset ;" +
+            "?agent a ?agentClass ; " +
+                   "rdfs:label ?agentLabel ; " +
+                   "void:inDataset ?dataset ; " +
                    "skos:semanticRelation ?link ." +
             "OPTIONAL {?agent cobis:datazione ?date }" +
             "OPTIONAL {?agent schema:description ?description }" +
@@ -59,6 +59,7 @@ exports.forMeIsYes = function (s, q, user) {
 }
 
 exports.launchSparql = function (query, callback) {
+    console.log(query)
 
     var result = "";
 
