@@ -54,7 +54,7 @@ exports.launchSparqlLeibniz = function (query, callback) {
     var options = {
         host: "localhost",
         path: "/blazegraph/namespace/leibniz/sparql?query=" + (typeof(query) === "function" ? query() : query) + "&format=json",
-        port: "9999",
+        port: "9998",
         method: "GET"
     };
 
@@ -84,7 +84,7 @@ exports.launchSparqlUpdateLeibniz = function (query, callback) {
     var options = {
         host: "localhost",
         path: "/blazegraph/namespace/leibniz/sparql",
-        port: "9999",
+        port: "9998",
         method: "POST",
         headers: {
           "Content-Type": "application/x-turtle",

@@ -62,9 +62,9 @@ exports.launchSparql = function (query, callback) {
     var result = "";
 
     var options = {
-        host: "artemis.synapta.io",
-        path: "/blazegraph/namespace/AUTHORITY-GRAPH/sparql?query=" + (typeof(query) === "function" ? query() : query) + "&format=json",
-        port: "9000",
+        host: "localhost",
+        path: "/blazegraph/namespace/agent/sparql?query=" + (typeof(query) === "function" ? query() : query) + "&format=json",
+        port: "9998",
         method: "GET"
     };
 
@@ -92,9 +92,9 @@ exports.launchSparqlUpdate = function (query, callback) {
     var result = "";
 
     var options = {
-        host: "artemis.synapta.io",
-        path: "/blazegraph/namespace/AUTHORITY-GRAPH/sparql",
-        port: "9000",
+        host: "localhost",
+        path: "/blazegraph/namespace/agent/sparql",
+        port: "9998",
         method: "POST",
         headers: {
           "Content-Type": "application/x-turtle",
