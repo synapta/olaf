@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+    <title>Authentication</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <style>
+        body         { padding-top:80px; }
+        .vrblock {
+            width: 10%;
+            text-align: center;
+            position: relative;
+            height: 100%;
+        }
+        .wrapper {
+    position: relative;
+    height: 200px;
+    margin: 10px;
+}
+
+.line {
+    position: absolute;
+    left: 49%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #ccc;
+    z-index: 1;
+}
+
+.wordwrapper {
+    text-align: center;
+    height: 12px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    margin-top: -12px;
+    z-index: 2;
+}
+
+.word {
+    color: #ccc;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 3px;
+    font: bold 12px arial,sans-serif;
+    background: #fff;
+}
+
+fieldset {
+    border: 1px solid #ccc;
+}
+legend {
+    color: #ccc;
+    padding: 1em;
+}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+      <div class="col s12 m12">
+        <div class="card-panel">
+
+          <div class="col s12 m6">
+            <fieldset>
+              <legend align="right">login</legend>
+              <form action="/login" method="post">
+                  <div class="form-group">
+                      <label>Email</label>
+                      <input type="text" class="form-control" name="email">
+                  </div>
+                  <div class="form-group">
+                      <label>Password</label>
+                      <input type="password" class="form-control" name="password">
+                  </div>
+
+                  <button type="submit" class="btn btn-warning btn-lg">Login</button>
+              </form>
+            </fieldset>
+          </div>
+
+          <div class="block vrblock col s12 m1">
+            <div class="wrapper">
+                <div class="wordwrapper">
+                    <div class="word">or</div>
+                </div>
+            </div>
+          </div>
+
+          <div class="col s12 m5" align="center">
+            <fieldset>
+              <legend>signup</legend>
+                <p>Don't have an account?</p>
+                <a href="/signup" class="btn btn-default"><span class="fa fa-user"></span> Local Signup</a>
+              <br/><br/><br/><br/>
+            </fieldset>
+          </div>
+
+          <div style="clear:both;"></div>
+
+          <div class="col s12 m12" align="center">
+              <br/>
+              <p>Don't want to create one more account?
+                <br>You can Login with</p>
+              <br/>
+
+              <a href="/auth/facebook" class="btn indigo"><span class="fa fa-facebook"></span> Facebook</a>
+              <a href="/auth/twitter" class="btn blue lighten-1"><span class="fa fa-twitter"></span> Twitter</a>
+              <a href="/auth/google" class="btn red darken-1"><span class="fa fa-google"></span> Google</a>
+          </div>
+
+          <div style="clear:both;"></div>
+
+        </div>
+      </div>
+    </div>
+
+
+</div>
+</body>
+</html>

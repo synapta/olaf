@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>Open data reconciliation - Synapta</title>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link rel="stylesheet" href="css/loader.css">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <style>
+    body {
+      height:100%;
+      min-height:100%;
+    }
+    .card .card-content {
+      padding-top: 0px;
+      padding-bottom: 0px;
+    }
+    .card .card-action {
+      padding-top: 0px;
+      padding-bottom: 0px;
+    }
+    .card.horizontal .card-image img {
+      max-height: 282px;
+    }
+    .row {
+      margin-bottom: 0px;
+    }
+    #loader-wrapper {
+      position: fixed;
+      height: 100%;
+      width: 100%;
+      top:0;
+      left: 0;
+      z-index:9999;
+      background-color: rgba(255, 255, 255, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <div id="loader-wrapper">
+    <div id="loader"></div>
+  </div>
+
+  <nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container">
+      <a id="logo-container" href="/" class="brand-logo">
+        Open Data Reconciliation
+      </a>
+
+      <ul class="right hide-on-med-and-down">
+        <li><a href="#">Accedi</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="side-nav">
+        <li><a href="#">Accedi</a></li>
+      </ul>
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section">
+
+      <div class="row">
+        <div class="col s12 m6">
+          <div class="card-panel green darken-3">
+            <span class="white-text" >
+              <h4 id="mainLabel"></h4>
+            </span>
+          </div>
+        </div>
+        <div class="col s12 m6">
+          <div class="card-panel green darken-3">
+            <span class="white-text">
+              <ul>
+                <li id="birthDate"></li>
+                <li id="deathDate"></li>
+              </ul>
+            </span>
+          </div>
+        </div>
+      </div>
+      <center><a class="waves-effect waves-light btn grey darken-1" id="skipass">Salta</a>
+      <a class="waves-effect waves-light btn orange darken-1" id="forMeIsNo">Nessuno di questi</a></center>
+      <hr/>
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <footer class="page-footer light-blue lighten-1">
+    <div class="footer-copyright">
+      <div class="container" align="center">
+        Made with ❤ and <b>linked data</b> by <a href="https://synapta.it/"><img src="img/synapta-logo-h.svg" height="23px" style="vertical-align: text-bottom;"/></a>
+      </div>
+    </div>
+  </footer>
+
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+  <script>
+    wikidata = "";
+    leib = "";
+    var generate = function () {
+      $.getJSON('/leibniz', function(data) {
+        if (data.retry === true) {
+            generate();
+            return;
+        }
+
+        leib = data.seed.s.value.replace("http://localhost:9999/blazegraph/namespace/leibniz/leibniz/","");
+        $("#mainLabel").html(data.seed.label.value);
+        if (data.seed.birth)
+        $("#birthDate").html("Data di nascita: " + data.seed.birth.value);
+        if (data.seed.death)
+        $("#deathDate").html("Data di morte: " + data.seed.death.value);
+        if (!data.seed.birth && !data.seed.death) {
+            $("#birthDate").html("Nessuna info sulle date di nascita o morte.");
+            $("#deathDate").html("Tuttavia ricorda che Leibniz è vissuto tra il 1646 e il 1716...")
+        }
+        var cards = "";
+        for (var i = 0; i < data.hints.length; i++) {
+            if (i === 0 || i % 2 === 0) {
+                cards += '<div class="row">';
+            }
+            cards += '<div class="col s12 m6"><div class="card horizontal"><div class="card-image">'
+            if (data.hints[i].immagine) {
+                cards += '<img src="' + data.hints[i].immagine.value + '">'
+            } else {
+                cards += '<img src="">'
+            }
+            cards += '</div><div class="card-stacked"><div class="card-content">'
+            if (data.hints[i].label)
+            cards += '<h5>' + data.hints[i].label.value + '</h5>'
+            if (data.hints[i].desc)
+            cards += '<p>' + data.hints[i].desc.value + '</p>'
+            cards += '<ul>'
+            if (data.hints[i].birthDate) {
+                var bdate = new Date(data.hints[i].birthDate.value);
+                cards += '<li>Nascita: ' + bdate.getFullYear() + '-' + (bdate.getMonth()+1) + '-' + bdate.getDate();
+            }
+            if (data.hints[i].deathDate) {
+                var ddate = new Date(data.hints[i].deathDate.value);
+                cards += '<li>Morte: ' + ddate.getFullYear() + '-' + (ddate.getMonth()+1) + '-' + ddate.getDate();
+            }
+            cards += '</ul></div><div class="card-action">'
+            cards += '<ul><li><a href="https://wikidata.org/wiki/' + data.hints[i].wikidata + '">Wikidata</a>'
+            if (data.hints[i].itwiki)
+            cards += '<li><a href="' + data.hints[i].itwiki.value + '">Wikipedia in italiano</a>'
+            if (data.hints[i].enwiki)
+            cards += '<li><a href="' + data.hints[i].enwiki.value + '">Wikipedia in inglese</a>'
+            cards += '</ul></div><a class="waves-effect waves-light btn green" onclick="saveGuess(\'' + data.hints[i].wikidata + '\')">Sono io!</a></div></div></div>'
+            if (i % 2 === 1) {
+                cards += '</div>';
+            }
+        }
+        $("#result").html(cards);
+        $('body').addClass('loaded');
+      });
+    }
+    generate();
+
+    $('#skipass').click(function(){
+        $('body').removeClass('loaded');
+        generate();
+    });
+
+    $('#forMeIsNo').click(function(){
+        $('body').removeClass('loaded');
+        $.ajax("/leibniz/forMeIsNo/"+ leib + "/alessio/").done(function() {
+            generate();
+        });
+    });
+
+    var saveGuess = function (q) {
+        $('body').removeClass('loaded');
+        $.ajax("/leibniz/forMeIsYes/"+ leib + "/" + q + "/alessio/").done(function() {
+            generate();
+        });
+    }
+  </script>
+
+  </body>
+</html>
