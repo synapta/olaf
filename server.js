@@ -1,102 +1,47 @@
-var express = require('express');
-var wikidata = require('./wikidata.js');
-var cobis = require('./queries/cobis.js');
-var leibniz = require('./queries/leibniz.js');
-var morgan = require('morgan');
-var bodyParser = require('body-parser');
-var MongoClient = require('mongodb').MongoClient;
+// server.js
 
+// set up ======================================================================
+// get all the tools we need
+var express  = require('express');
+var app      = express();
+var port     = process.env.PORT || 8080;
+var mongoose = require('mongoose');
+var passport = require('passport');
+var flash    = require('connect-flash');
 
-var app = express();
-//NEXT TWO LINES FOR READ BODY FROM POST
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json());
-app.use(morgan('common'));
+var morgan       = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser   = require('body-parser');
+var session      = require('express-session');
 
-app.use('/',express.static('.'));
+var configDB = require('./config/database.js');
 
-/* QUERY */
-app.get('/leibniz', function (request, response) {
-    leibniz.launchSparqlLeibniz(leibniz.getRemains, function (total) {
-        leibniz.launchSparqlLeibniz(leibniz.getRandomLeibnizItem(total.n.value), function (seed) {
-            console.log(seed.s.value)
-            wikidata.getWikidataHints(seed.label.value, seed, function (hints) {
-                if (hints === "rlm") {
-                    setTimeout(function () {
-                        response.send({"retry":true});
-                    }, 1000)
-                } else if (hints) {
-                   response.send(hints);
-                } else {
-                   console.log("no hints")
-                   leibniz.launchSparqlUpdateLeibniz(leibniz.noWikidataHints(seed.s.value), function () {
-                       setTimeout(function () {
-                           response.send({"retry":true});
-                       }, 1000)
-                   });
-                }
-            });
-        });
-    });
-});
+// configuration ===============================================================
+mongoose.connect(configDB.url); // connect to our database
 
-app.get('/leibniz/forMeIsNo/:leib/:user/', function (request, response) {
-    leibniz.launchSparqlUpdateLeibniz(leibniz.forMeIsNo(request.params.leib, request.params.user), function () {
-        response.send("ok");
-    });
-});
+require('./config/passport')(passport); // pass passport for configuration
 
-app.get('/leibniz/forMeIsYes/:leib/:wikidata/:user/', function (request, response) {
-    leibniz.launchSparqlUpdateLeibniz(leibniz.forMeIsYes(request.params.leib, request.params.wikidata, request.params.user), function () {
-        response.send("ok");
-    });
-});
+// set up our express application
+app.use(morgan('dev')); // log every request to the console
+app.use(cookieParser()); // read cookies (needed for auth)
+app.use(bodyParser.json()); // get information from html forms
+app.use(bodyParser.urlencoded({ extended: true }));
 
+app.set('view engine', 'ejs'); // set up ejs for templating
 
-app.get('/cobis', function (request, response) {
-    cobis.launchSparql(cobis.getRemains, function (total) {
-        cobis.launchSparql(cobis.getRandomCobisItem (total.n.value), function (seed) {
-            console.log(seed.agentLabel.value)
-            wikidata.getWikidataHints(seed.agentLabel.value, seed, function (hints) {
-                if (hints === "rlm") {
-                    setTimeout(function () {
-                        response.send({"retry":true});
-                    }, 1000)
-                } else if (hints) {
-                   response.send(hints);
-                } else {
-                   console.log("no hints")
-                   cobis.launchSparqlUpdate(cobis.noWikidataHints(seed.agent.value), function () {
-                       setTimeout(function () {
-                           response.send({"retry":true});
-                       }, 1000)
-                   });
-                }
-            });
-        });
-    });
-});
+// required for passport
+app.use(session({
+    secret: 'ilovescotchscotchyscotchscotch', // session secret
+    resave: true,
+    saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
 
-app.get('/cobis/forMeIsNo/:leib/:user/', function (request, response) {
-    cobis.launchSparqlUpdate(cobis.forMeIsNo(request.params.leib, request.params.user), function () {
-        response.send("ok");
-    });
-});
+// routes ======================================================================
+require('./routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
-app.get('/cobis/forMeIsYes/:leib/:wikidata/:user/', function (request, response) {
-    cobis.launchSparqlUpdate(cobis.forMeIsYes(request.params.leib, request.params.wikidata, request.params.user), function () {
-        response.send("ok");
-    });
-});
-
-
-
-app.use(function(req, res) {
-    res.status(404);
-});
-
-var server = app.listen(8081, function() {
-    var host = server.address().address;
-    var port = server.address().port;
-    console.log('Server listening at http://%s:%s', host, port);
-});
+// launch ======================================================================
+app.listen(port);
+console.log('The magic happens on port ' + port);
