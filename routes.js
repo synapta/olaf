@@ -272,7 +272,7 @@ app.use('/',express.static('.'));
     });
 
     app.get('/cobis/forMeIsYes/:cobis/:wikidata/', isLoggedIn, function (request, response) {
-        cobis.launchSparqlUpdate(cobis.forMeIsYes(request.params.leib, request.params.wikidata, request.user._id), function () {
+        cobis.launchSparqlUpdate(cobis.forMeIsYes(request.params.cobis, request.params.wikidata, request.user._id), function () {
             response.send("ok");
         });
     });
