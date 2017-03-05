@@ -106,7 +106,7 @@
             return;
         }
 
-        leib = data.seed.s.value.replace("http://localhost:9999/blazegraph/namespace/leibniz/leibniz/","");
+        leib = data.seed.s.value.replace("http://localhost:9998/blazegraph/namespace/leibniz/leibniz/","");
         $("#mainLabel").html(data.seed.label.value);
         if (data.seed.birth)
         $("#birthDate").html("Data di nascita: " + data.seed.birth.value);
