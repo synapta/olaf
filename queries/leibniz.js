@@ -6,8 +6,8 @@ exports.getRemains = function (user) {
         "WHERE {" +
             "?s <http://www.w3.org/2000/01/rdf-schema#label> ?l " +
             "MINUS {?s <https://synapta.it/onto/noWikidatHints> ?o}" +
-            "MINUS {?s <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> . " +
-                    "?s <https://synapta.it/onto/assert> ?assert . " +
+            "MINUS {?s <https://synapta.it/onto/forMeIsNo> ?u}" +
+            "MINUS {?s <https://synapta.it/onto/assert> ?assert . " +
                     "?assert <https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">}" +
         "}"
     )
@@ -22,8 +22,8 @@ exports.getRandomLeibnizItem = function (max, user) {
              "WHERE {" +
                  "?s <http://www.w3.org/2000/01/rdf-schema#label> ?l " +
                  "MINUS {?s <https://synapta.it/onto/noWikidatHints> ?o}" +
-                 "MINUS {?s <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> . " +
-                         "?s <https://synapta.it/onto/assert> ?assert . " +
+                 "MINUS {?s <https://synapta.it/onto/forMeIsNo> ?u}" +
+                 "MINUS {?s <https://synapta.it/onto/assert> ?assert . " +
                          "?assert <https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">}" +
              "} " +
              "GROUP BY ?s " +
