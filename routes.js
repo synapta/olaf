@@ -266,8 +266,17 @@ app.use('/',express.static('.'));
 
     app.get('/cobis/titles', function (request, response) {
         console.log(request.query)
-        cobis.launchSparqlTitle(cobis.getCobisTitles(request.query.agent), request.query.dataset, function (data) {
-          response.send(data);
+        cobis.launchSparqlMultiple(cobis.getCobisDatasets(request.query.agent), "http://artemis.synapta.io:9998/blazegraph/namespace/agent/sparql", function(datasetList) {
+          datasetList.forEach(function(element, index, array){
+            console.log(datasetList)
+            var titleList = []
+            cobis.launchSparqlMultiple(cobis.getCobisTitles(datasetList[index].agent), datasetList[index].dataset, function(data){
+              titleList.push(data)
+              if (index === array.length - 1) {
+                response.send(data);
+              }
+            });
+          });
         });
     });
 
