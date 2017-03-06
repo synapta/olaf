@@ -71,6 +71,8 @@
               <ul>
                 <li id="class"></li>
                 <li id="date"></li>
+                <li id="description"></li>
+                <li id="title"></li>
               </ul>
             </span>
           </div>
@@ -114,6 +116,16 @@
         $("#date").html("Datazione: " + data.seed.date.value);
         if (data.seed.description)
         $("#description").html(data.seed.description.value);
+        
+        $.getJSON('/cobis/titles?dataset=' + encodeURIComponent(data.seed.dataset.value) + '&agent='  + encodeURIComponent(data.seed.originalURI.value), function(titleData) {
+          console.log(titleData)
+          titleBody = ""
+          for (var i in titleData) {
+            titleBody += titleData[i].relation + " " + titleData[i].title + "\n"; 
+          }
+          console.log(titleBody)
+          $("#title").html(titleBody);
+        });
 
         var cards = "";
         for (var i = 0; i < data.hints.length; i++) {

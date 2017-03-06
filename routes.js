@@ -264,6 +264,13 @@ app.use('/',express.static('.'));
         });
     });
 
+    app.get('/cobis/titles', function (request, response) {
+        console.log(request.query)
+        cobis.launchSparqlTitle(cobis.getCobisTitles(request.query.agent), request.query.dataset, function (data) {
+          response.send(data);
+        });
+    });
+
     app.get('/cobis/forMeIsNo/:cobis/', isLoggedIn, function (request, response) {
         cobis.launchSparqlUpdate(cobis.forMeIsNo(request.params.cobis, request.user._id), function () {
             response.send("ok");
