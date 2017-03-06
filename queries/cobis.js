@@ -55,6 +55,20 @@ exports.getCobisTitles = function (agentURI) {
     );
 }
 
+exports.getCobisDatasets = function (agentURI) {
+    return encodeURIComponent(
+        "prefix bf: <http://bibframe.org/vocab/>" +
+
+        "SELECT ?dataset ?originalURI " +
+        "WHERE {" +
+            "<" + agentURI + "> void:inDataset ?dataset; " +
+                   "cobis:originalURI ?originalURI . " +
+        "} " 
+    );
+}
+
+
+
 exports.noWikidataHints = function (s) {
     return "<" + s + "> <https://synapta.it/onto/noWikidatHints> 'true' .";
 }
@@ -100,7 +114,7 @@ exports.launchSparql = function (query, callback) {
 }
 
 
-exports.launchSparqlTitle = function (query, dataset, callback) {
+exports.launchSparqlMultiple = function (query, dataset, callback) {
 
     var result = "";
     var options = {
@@ -109,7 +123,7 @@ exports.launchSparqlTitle = function (query, dataset, callback) {
         port: url.parse(dataset).port,
         method: "GET"
     };
-   console.log(options)
+    console.log(options)
 
     var req = http.request(options, function(res) {
         res.setEncoding('utf8');
@@ -121,10 +135,11 @@ exports.launchSparqlTitle = function (query, dataset, callback) {
             console.log(result)
             array = []
             for (var i in JSON.parse(result).results.bindings) {
-                array.push({
-                    "relation": JSON.parse(result).results.bindings[i].relation.value,
-                     "title": JSON.parse(result).results.bindings[i].title.value
-                })
+                object = {}
+                for (var j in JSON.parse(result).results.bindingsi[i]) {
+                   object[j] = JSON.parse(result).results.bindings[i][j].value;
+                }
+                array.push(object);
             }
             callback(array);
         });
