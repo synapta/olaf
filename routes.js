@@ -266,14 +266,16 @@ app.use('/',express.static('.'));
 
     app.get('/cobis/titles', function (request, response) {
         console.log(request.query)
-        cobis.launchSparqlMultiple(cobis.getCobisDatasets(request.query.agent), "http://artemis.synapta.io:9998/blazegraph/namespace/agent/sparql", function(datasetList) {
-          datasetList.forEach(function(element, index, array){
-            console.log(datasetList)
-            var titleList = []
-            cobis.launchSparqlMultiple(cobis.getCobisTitles(datasetList[index].agent), datasetList[index].dataset, function(data){
-              titleList.push(data)
-              if (index === array.length - 1) {
-                response.send(data);
+        cobis.launchSparqlMultiple(cobis.getCobisDatasets(request.query.agent), "http://artemis.synapta.io:9000/blazegraph/namespace/AUTHORITY-GRAPH/sparql", function(datasetList) {
+          var titleList = [];
+          datasetList.forEach(function(element, index, datasetList){
+            cobis.launchSparqlMultiple(cobis.getCobisTitles(element.originalURI), element.dataset, function(data){
+              console.log(data)
+              titleList = titleList.concat(data.filter(function (item) {
+                return titleList.indexOf(item) < 0;
+              }))
+              if (index === datasetList.length - 1) {
+                response.send(titleList);
               }
             });
           });

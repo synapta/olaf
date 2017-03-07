@@ -26,18 +26,18 @@ exports.getRandomCobisItem = function (max, user) {
         "prefix schema: <http://schema.org/>" +
         "prefix bf: <http://bibframe.org/vocab/>" +
 
-        "SELECT ?agent ?agentClass ?agentLabel ?dataset ?date ?description ?originalURI " +
+        "SELECT ?agent ?agentClass ?agentLabel ?originalURI ?date ?description " +
         "WHERE {" +
             "?agent a ?agentClass ; " +
                    "rdfs:label ?agentLabel ; " +
-                   "void:inDataset ?dataset ; " +
                    "cobis:originalURI ?originalURI . " +
-            "OPTIONAL {?agent cobis:datazione ?date }" +
-            "?agent schema:description ?description ." +
+            "OPTIONAL {?agent cobis:datazione ?date } " +
+            "OPTIONAL {?agent schema:description ?description } " +
+            "MINUS {?agent owl:sameAs ?sameas . } " +
             "MINUS {?agent <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> . " +
-                    "?agent owl:sameAs ?sameas . " +
                     "?agent <https://synapta.it/onto/assert> ?assert . " +
                     "?assert <https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">}" +
+            "FILTER (contains(str(?originalURI), \"IT_ICCU\"))" +
         "} " +
         "OFFSET " + rnd + " LIMIT 1"
     );
@@ -51,13 +51,16 @@ exports.getCobisTitles = function (agentURI) {
         "WHERE {" +
             "?work ?relation <" + agentURI + "> ; " +
                    "bf:workTitle/bf:titleValue ?title . " +
+        "FILTER(!CONTAINS(STR(?relation), \"http://schema.org\")) " +
         "} " 
     );
 }
 
 exports.getCobisDatasets = function (agentURI) {
     return encodeURIComponent(
+        "prefix void: <http://rdfs.org/ns/void#>" +                                                                
         "prefix bf: <http://bibframe.org/vocab/>" +
+        "prefix cobis: <http://synapta.it/cobis/>" +
 
         "SELECT ?dataset ?originalURI " +
         "WHERE {" +
@@ -89,8 +92,8 @@ exports.launchSparql = function (query, callback) {
 
     var options = {
         host: "artemis.synapta.io",
-        path: "/blazegraph/namespace/agent/sparql?query=" + (typeof(query) === "function" ? query() : query) + "&format=json",
-        port: "9998",
+        path: "/blazegraph/namespace/AUTHORITY-GRAPH/sparql?query=" + (typeof(query) === "function" ? query() : query) + "&format=json",
+        port: "9000",
         method: "GET"
     };
 
@@ -136,10 +139,11 @@ exports.launchSparqlMultiple = function (query, dataset, callback) {
             array = []
             for (var i in JSON.parse(result).results.bindings) {
                 object = {}
-                for (var j in JSON.parse(result).results.bindingsi[i]) {
+                for (var j in JSON.parse(result).results.bindings[i]) {
                    object[j] = JSON.parse(result).results.bindings[i][j].value;
                 }
                 array.push(object);
+                console.log(array)
             }
             callback(array);
         });
@@ -158,9 +162,9 @@ exports.launchSparqlUpdate = function (query, callback) {
     var result = "";
 
     var options = {
-        host: "localhost",
-        path: "/blazegraph/namespace/agent/sparql",
-        port: "9998",
+        host: "artemis.synapta.io",
+        path: "/blazegraph/namespace/AUTHORITY-GRAPH/sparql",
+        port: "9000",
         method: "POST",
         headers: {
           "Content-Type": "application/x-turtle",
