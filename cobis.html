@@ -117,7 +117,7 @@
         if (data.seed.description)
         $("#description").html(data.seed.description.value);
         
-        $.getJSON('/cobis/titles?dataset=' + encodeURIComponent(data.seed.dataset.value) + '&agent='  + encodeURIComponent(data.seed.originalURI.value), function(titleData) {
+        $.getJSON('/cobis/titles?&agent='  + encodeURIComponent(data.seed.agent.value), function(titleData) {
           console.log(titleData)
           titleBody = ""
           for (var i in titleData) {
