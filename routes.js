@@ -270,7 +270,6 @@ app.use('/',express.static('.'));
           var titleList = [];
           datasetList.forEach(function(element, index, datasetList){
             cobis.launchSparqlMultiple(cobis.getCobisTitles(element.originalURI), element.dataset, function(data){
-              console.log(data)
               titleList = titleList.concat(data.filter(function (item) {
                 return titleList.indexOf(item) < 0;
               }))
