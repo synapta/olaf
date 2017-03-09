@@ -52,13 +52,13 @@ exports.getCobisTitles = function (agentURI) {
             "?work ?relation <" + agentURI + "> ; " +
                    "bf:workTitle/bf:titleValue ?title . " +
         "FILTER(!CONTAINS(STR(?relation), \"http://schema.org\")) " +
-        "} LIMIT 10" 
+        "} LIMIT 10"
     );
 }
 
 exports.getCobisDatasets = function (agentURI) {
     return encodeURIComponent(
-        "prefix void: <http://rdfs.org/ns/void#>" +                                                                
+        "prefix void: <http://rdfs.org/ns/void#>" +
         "prefix bf: <http://bibframe.org/vocab/>" +
         "prefix cobis: <http://synapta.it/cobis/>" +
 
@@ -67,7 +67,7 @@ exports.getCobisDatasets = function (agentURI) {
             "<" + agentURI + "> cobis:isPresentIn ?appearence. " +
              "?appearence void:inDataset ?dataset. " +
              "?appearence cobis:originalURI ?originalURI . " +
-        "} LIMIT 10 " 
+        "} LIMIT 10 "
     );
 }
 

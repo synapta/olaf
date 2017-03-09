@@ -103,7 +103,7 @@
   <script>
     wikidata = "";
     cobis = "";
-    
+
     var generate = function () {
       $.getJSON('/cobis', function(data) {
         console.log(data)
@@ -119,12 +119,12 @@
         $("#date").html("Datazione: " + data.seed.date.value);
         if (data.seed.description)
         $("#description").html(data.seed.description.value);
-        
+
         $.getJSON('/cobis/titles?&agent='  + encodeURIComponent(data.seed.agent.value), function(titleData) {
           console.log(titleData)
           titleBody = ""
           for (var i = 0; i < Math.min(5, titleData.length); i++) {
-            titleBody += "<p>" + titleData[i].title + "</p> \n"; 
+            titleBody += "<p>" + titleData[i].title + "</p> \n";
           }
           console.log(titleBody)
           $("#title").html(titleBody);
