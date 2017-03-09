@@ -30,7 +30,7 @@ exports.getRandomCobisItem = function (max, user) {
         "WHERE {" +
             "?agent a ?agentClass ; " +
                    "rdfs:label ?agentLabel ; " +
-                   "cobis:originalURI ?originalURI . " +
+                   "cobis:isPresentIn/cobis:originalURI ?originalURI . " +
             "OPTIONAL {?agent cobis:datazione ?date } " +
             "OPTIONAL {?agent schema:description ?description } " +
             "MINUS {?agent owl:sameAs ?sameas . } " +
@@ -52,7 +52,7 @@ exports.getCobisTitles = function (agentURI) {
             "?work ?relation <" + agentURI + "> ; " +
                    "bf:workTitle/bf:titleValue ?title . " +
         "FILTER(!CONTAINS(STR(?relation), \"http://schema.org\")) " +
-        "} " 
+        "} LIMIT 10" 
     );
 }
 
@@ -64,9 +64,10 @@ exports.getCobisDatasets = function (agentURI) {
 
         "SELECT ?dataset ?originalURI " +
         "WHERE {" +
-            "<" + agentURI + "> void:inDataset ?dataset; " +
-                   "cobis:originalURI ?originalURI . " +
-        "} " 
+            "<" + agentURI + "> cobis:isPresentIn ?appearence. " +
+             "?appearence void:inDataset ?dataset. " +
+             "?appearence cobis:originalURI ?originalURI . " +
+        "} LIMIT 10 " 
     );
 }
 
