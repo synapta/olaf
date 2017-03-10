@@ -62,15 +62,19 @@
           <div class="card-panel green darken-3">
             <span class="white-text" >
               <h4 id="mainLabel"></h4>
-            </span>
+              <h5 id="class"></h5>
+              <ul>
+                <li id="date"></li>
+                <li id="description"></li>
+              </ul>
+           </span>
           </div>
         </div>
         <div class="col s12 m6">
           <div class="card-panel green darken-3">
             <span class="white-text">
               <ul>
-                <li id="class"></li>
-                <li id="date"></li>
+                <li id="title"></li>
               </ul>
             </span>
           </div>
@@ -99,6 +103,7 @@
   <script>
     wikidata = "";
     cobis = "";
+
     var generate = function () {
       $.getJSON('/cobis', function(data) {
         console.log(data)
@@ -109,11 +114,21 @@
 
         cobis = data.seed.agent.value.replace("http://synapta.it/cobis/author/","");
         $("#mainLabel").html(data.seed.agentLabel.value);
-        $("#class").html(data.seed.agentClass.value);
+        $("#class").html(data.seed.agentClass.value.replace("http://bibframe.org/vocab/", ""));
         if (data.seed.date)
         $("#date").html("Datazione: " + data.seed.date.value);
         if (data.seed.description)
         $("#description").html(data.seed.description.value);
+
+        $.getJSON('/cobis/titles?&agent='  + encodeURIComponent(data.seed.agent.value), function(titleData) {
+          console.log(titleData)
+          titleBody = ""
+          for (var i = 0; i < Math.min(5, titleData.length); i++) {
+            titleBody += "<p>" + titleData[i].title + "</p> \n";
+          }
+          console.log(titleBody)
+          $("#title").html(titleBody);
+        });
 
         var cards = "";
         for (var i = 0; i < data.hints.length; i++) {
