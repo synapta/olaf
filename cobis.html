@@ -115,8 +115,10 @@
         cobis = data.seed.agent.value.replace("http://synapta.it/cobis/author/","");
         $("#mainLabel").html(data.seed.agentLabel.value);
         $("#class").html(data.seed.agentClass.value.replace("http://bibframe.org/vocab/", ""));
-        if (data.seed.date)
+        $("#date").html("");
+        if (data.seed.date) 
         $("#date").html("Datazione: " + data.seed.date.value);
+        $("#description").html("");
         if (data.seed.description)
         $("#description").html(data.seed.description.value);
 
@@ -179,14 +181,14 @@
 
     $('#forMeIsNo').click(function(){
         $('body').removeClass('loaded');
-        $.ajax("/cobis/forMeIsNo/"+ cobis + "/").done(function() {
+        $.ajax("/cobis/forMeIsNo/"+ encodeURIComponent(cobis) + "/").done(function() {
             generate();
         });
     });
 
     var saveGuess = function (q) {
         $('body').removeClass('loaded');
-        $.ajax("/cobis/forMeIsYes/"+ cobis + "/" + q + "/").done(function() {
+        $.ajax("/cobis/forMeIsYes/"+ encodeURIComponent(cobis) + "/" + q + "/").done(function() {
             generate();
         });
     }
