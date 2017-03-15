@@ -78,11 +78,11 @@ exports.noWikidataHints = function (s) {
 }
 
 exports.forMeIsNo = function (s, user) {
-    return "<http://synapta.it/cobis/agent/" + s + "> <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> .";
+    return "<" + s + "> <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> .";
 }
 
 exports.forMeIsYes = function (s, q, user) {
-    return "<http://synapta.it/cobis/agent/" + s + "> <https://synapta.it/onto/assert> " +
+    return "<" + s + "> <https://synapta.it/onto/assert> " +
     "[ <https://synapta.it/onto/sameAs> <https://wikidata.org/wiki/" + q +"> ;" +
       "<https://synapta.it/onto/by> <https://synapta.it/user/" + user + "> ] .";
 }
@@ -105,7 +105,6 @@ exports.launchSparql = function (query, callback) {
         });
 
         res.on('end', function() {
-            console.log(result)
             callback(JSON.parse(result).results.bindings[0]);
         });
     });
@@ -127,7 +126,6 @@ exports.launchSparqlMultiple = function (query, dataset, callback) {
         port: url.parse(dataset).port,
         method: "GET"
     };
-    console.log(options)
 
     var req = http.request(options, function(res) {
         res.setEncoding('utf8');
@@ -136,7 +134,6 @@ exports.launchSparqlMultiple = function (query, dataset, callback) {
         });
 
         res.on('end', function() {
-            console.log(result)
             array = []
             for (var i in JSON.parse(result).results.bindings) {
                 object = {}
@@ -144,7 +141,6 @@ exports.launchSparqlMultiple = function (query, dataset, callback) {
                    object[j] = JSON.parse(result).results.bindings[i][j].value;
                 }
                 array.push(object);
-                console.log(array)
             }
             callback(array);
         });
