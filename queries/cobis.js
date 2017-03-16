@@ -9,8 +9,8 @@ exports.getRemains = function (user) {
           "?s schema:description ?description . " +
           "MINUS {?s <http://www.w3.org/2002/07/owl#sameAs> ?sameAs}" +
           "MINUS {?s <https://synapta.it/onto/noWikidatHints> ?o}" +
-          "MINUS {?s <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> . " +
-                  "?s <https://synapta.it/onto/assert> ?assert . " +
+          "MINUS {?s <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> . }" +
+          "MINUS {?s <https://synapta.it/onto/assert> ?assert . " +
                   "?assert <https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">}" +
       "}"
     )
@@ -34,8 +34,8 @@ exports.getRandomCobisItem = function (max, user) {
             "OPTIONAL {?agent cobis:datazione ?date } " +
             "OPTIONAL {?agent schema:description ?description } " +
             "MINUS {?agent owl:sameAs ?sameas . } " +
-            "MINUS {?agent <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> . " +
-                    "?agent <https://synapta.it/onto/assert> ?assert . " +
+            "MINUS {?agent <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> . }" +
+            "MINUS {?agent <https://synapta.it/onto/assert> ?assert . " +
                     "?assert <https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">}" +
             "FILTER (contains(str(?originalURI), \"IT_ICCU\"))" +
         "} " +
