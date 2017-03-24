@@ -105,7 +105,6 @@
 
     var generate = function () {
       $.getJSON('/cobis', function(data) {
-        console.log(data)
         if (data.retry === true) {
             generate();
             return;
@@ -128,7 +127,6 @@
             titleBody += "<p>" + titleData[i].title + "</p> \n";
           }
           $("#title").html("");
-          console.log(titleBody)
           $("#title").html(titleBody);
         });
 

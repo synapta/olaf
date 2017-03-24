@@ -47,12 +47,10 @@ exports.getCobisTitles = function (agentURI) {
     return encodeURIComponent(
         "prefix bf: <http://bibframe.org/vocab/>" +
 
-        "SELECT ?relation ?title " +
+        "SELECT DISTINCT ?title " +
         "WHERE {" +
-            "?work ?relation <" + agentURI + "> ; " +
-                   "bf:workTitle/bf:titleValue ?title . " +
-        "FILTER(!CONTAINS(STR(?relation), \"http://schema.org\")) " +
-        "} LIMIT 10"
+            "?work bf:workTitle/bf:titleValue ?title . " +
+        "} LIMIT 5"
     );
 }
 
