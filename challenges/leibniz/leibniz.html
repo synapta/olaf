@@ -3,13 +3,12 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
-  <title>Open data reconciliation - Synapta</title>
+  <title>Olaf Linked Authority File</title>
 
   <!-- CSS  -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-  <link rel="stylesheet" href="css/loader.css">
+  <link href="/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="/css/loader.css" type="text/css" rel="stylesheet" >
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <style>
     body {
@@ -49,7 +48,7 @@
   <nav class="light-blue lighten-1" role="navigation">
     <div class="nav-wrapper container">
       <a id="logo-container" href="/" class="brand-logo">
-        Open Data Reconciliation - CoBiS
+        Olaf Linked Authority File - Leibniz
       </a>
     </div>
   </nav>
@@ -62,19 +61,15 @@
           <div class="card-panel green darken-3">
             <span class="white-text" >
               <h4 id="mainLabel"></h4>
-              <h5 id="class"></h5>
-              <ul>
-                <li id="date"></li>
-                <li id="description"></li>
-              </ul>
-           </span>
+            </span>
           </div>
         </div>
         <div class="col s12 m6">
           <div class="card-panel green darken-3">
             <span class="white-text">
               <ul>
-                <li id="title"></li>
+                <li id="birthDate"></li>
+                <li id="deathDate"></li>
               </ul>
             </span>
           </div>
@@ -97,42 +92,29 @@
 
 
   <!--  Scripts-->
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="js/materialize.js"></script>
-  <script src="js/init.js"></script>
+  <script src="/js/jquery-2.1.1.min.js"></script>
+  <script src="/js/materialize.js"></script>
+  <script src="/js/init.js"></script>
   <script>
     wikidata = "";
-    cobis = "";
-
+    leib = "";
     var generate = function () {
-      $.getJSON('/cobis', function(data) {
-        console.log(data)
+      $.getJSON('/leibniz', function(data) {
         if (data.retry === true) {
             generate();
             return;
         }
 
-        cobis = data.seed.agent.value.replace("http://synapta.it/cobis/author/","");
-        $("#mainLabel").html(data.seed.agentLabel.value);
-        $("#class").html(data.seed.agentClass.value.replace("http://bibframe.org/vocab/", ""));
-        $("#date").html("");
-        if (data.seed.date) 
-        $("#date").html("Datazione: " + data.seed.date.value);
-        $("#description").html("");
-        if (data.seed.description)
-        $("#description").html(data.seed.description.value);
-
-        $.getJSON('/cobis/titles?&agent='  + encodeURIComponent(data.seed.agent.value), function(titleData) {
-          console.log(titleData)
-          titleBody = ""
-          for (var i = 0; i < Math.min(5, titleData.length); i++) {
-            titleBody += "<p>" + titleData[i].title + "</p> \n";
-          }
-          $("#title").html("");
-          console.log(titleBody)
-          $("#title").html(titleBody);
-        });
-
+        leib = data.seed.s.value.replace("http://localhost:9998/blazegraph/namespace/leibniz/leibniz/","");
+        $("#mainLabel").html(data.seed.label.value);
+        if (data.seed.birth)
+        $("#birthDate").html("Data di nascita: " + data.seed.birth.value);
+        if (data.seed.death)
+        $("#deathDate").html("Data di morte: " + data.seed.death.value);
+        if (!data.seed.birth && !data.seed.death) {
+            $("#birthDate").html("Nessuna info sulle date di nascita o morte.");
+            $("#deathDate").html("Tuttavia ricorda che Leibniz è vissuto tra il 1646 e il 1716...")
+        }
         var cards = "";
         for (var i = 0; i < data.hints.length; i++) {
             if (i === 0 || i % 2 === 0) {
@@ -182,14 +164,14 @@
 
     $('#forMeIsNo').click(function(){
         $('body').removeClass('loaded');
-        $.ajax("/cobis/forMeIsNo/"+ encodeURIComponent(cobis) + "/").done(function() {
+        $.ajax("/leibniz/forMeIsNo/"+ leib + "/").done(function() {
             generate();
         });
     });
 
     var saveGuess = function (q) {
         $('body').removeClass('loaded');
-        $.ajax("/cobis/forMeIsYes/"+ encodeURIComponent(cobis) + "/" + q + "/").done(function() {
+        $.ajax("/leibniz/forMeIsYes/"+ leib + "/" + q + "/").done(function() {
             generate();
         });
     }

@@ -9,11 +9,11 @@ app.use('/',express.static('.'));
     });
 
     app.get('/connect-cobis', isLoggedIn, function(req, res) {
-        res.sendFile(__dirname + '/cobis.html');
+        res.sendFile(__dirname + '/challenges/cobis/cobis.html');
     });
 
     app.get('/connect-leibniz', isLoggedIn, function(req, res) {
-        res.sendFile(__dirname + '/leibniz.html');
+        res.sendFile(__dirname + '/challenges/leibniz/leibniz.html');
     });
 
     // show the home page (will also have our login links)
@@ -198,9 +198,9 @@ app.use('/',express.static('.'));
     });
 
 
-    var wikidata = require('./wikidata.js');
-    var cobis = require('./queries/cobis.js');
-    var leibniz = require('./queries/leibniz.js');
+    var wikidata = require('./authorities/wikidata.js');
+    var cobis = require('./challenges/cobis/cobis.js');
+    var leibniz = require('./challenges/leibniz/leibniz.js');
 
 
     /* QUERY */
