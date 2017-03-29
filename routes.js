@@ -16,6 +16,10 @@ app.use('/',express.static('.'));
         res.sendFile(__dirname + '/challenges/leibniz/leibniz.html');
     });
 
+    app.get('/search', function(req, res) {
+        res.sendFile(__dirname + '/search.html');
+    });
+
     // show the home page (will also have our login links)
     app.get('/auth', function(req, res) {
         res.render('index.ejs');
@@ -199,11 +203,34 @@ app.use('/',express.static('.'));
 
 
     var wikidata = require('./authorities/wikidata.js');
+    var dbpedia = require('./authorities/dbpedia.js');
     var cobis = require('./challenges/cobis/cobis.js');
     var leibniz = require('./challenges/leibniz/leibniz.js');
 
 
     /* QUERY */
+    app.get('/search/:label', function (request, response) {
+      console.log("Asking Wikidata");
+      wikidata.getWikidataHints(request.params.label, request.params.label, function (hints) {
+          if (hints === null) {
+             response.send({"no-results":true});
+          } else if (hints) {
+             response.send(hints);
+          }
+      });
+    });
+
+    app.get('/dbpedia/abstract/:label', function (request, response) {
+      console.log("Asking DBpedia");
+      dbpedia.getAbstract(request.params.label, function (abstract) {
+          if (abstract !== "error") {
+             response.send({"abstract":abstract});
+          } else {
+             response.send({"abstract":false});
+          }
+      });
+    });
+
     app.get('/leibniz', isLoggedIn, function (request, response) {
         leibniz.launchSparqlLeibniz(leibniz.getRemains(request.user._id), function (total) {
             leibniz.launchSparqlLeibniz(leibniz.getRandomLeibnizItem(total.n.value, request.user._id), function (seed) {

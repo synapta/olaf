@@ -1,11 +1,12 @@
 var https = require("https");
 
+
 var detailsPersona = function (q) {
     return encodeURIComponent(
       "PREFIX wdt: <http://www.wikidata.org/prop/direct/>" +
       "PREFIX wd: <http://www.wikidata.org/entity/>" +
 
-      "SELECT ?label ?altLabel ?desc ?birthDate ?deathDate ?immagine ?itwiki ?enwiki " +
+      "SELECT ?label ?altLabel ?desc ?birthDate ?deathDate ?immagine ?opera ?itwiki ?enwiki " +
       "WHERE {" +
         "OPTIONAL {" +
           "wd:" + q + " wdt:P569 ?birthDate ." +
@@ -37,7 +38,7 @@ var detailsPersona = function (q) {
 }
 
 exports.getWikidataHints = function (term, seed, callback) {
-    https.get('https://www.wikidata.org/w/api.php?action=query&list=search&format=json&srsearch=' + encodeURIComponent(term), function(res){
+    https.get('https://www.wikidata.org/w/api.php?action=query&list=search&format=json&srlimit=6&srsearch=' + encodeURIComponent(term), function(res){
         var body = '';
 
         res.on('data', function(chunk){
@@ -51,10 +52,15 @@ exports.getWikidataHints = function (term, seed, callback) {
 
             if (responseArray.length === 0) {
                 callback(null);
+                return;
             }
+
+            console.log("Asking Wikidata SPARQL");
             for (var i = 0; i < responseArray.length; i++) {
-                getPersonaDetails(responseArray[i].title, function (data) {
-                    fullData.push(data);
+                getPersonaDetails(responseArray[i].title, i, function (data) {
+                    if (data !== "rlm")
+                        fullData.push(data);
+
                     if (--endCall === 0) {
                         var finalData = {}
                         finalData.seed = seed;
@@ -69,7 +75,7 @@ exports.getWikidataHints = function (term, seed, callback) {
     });
 }
 
-var getPersonaDetails = function (q, callback) {
+var getPersonaDetails = function (q, index, callback) {
     https.get("https://query.wikidata.org/bigdata/namespace/wdq/sparql?query="+detailsPersona(q)+"&format=json", function(res){
         var body = '';
 
@@ -85,6 +91,7 @@ var getPersonaDetails = function (q, callback) {
             try {
                 var responseArray = JSON.parse(body).results.bindings;
                 responseArray[0].wikidata = q;
+                responseArray[0].index = index;
             } catch (e) {
                 callback("rlm");
                 return;
