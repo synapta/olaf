@@ -268,7 +268,7 @@ app.use('/',express.static('.'));
         cobis.launchSparqlMultiple(cobis.getCobisDatasets(request.query.agent), "http://artemis.synapta.io:9000/blazegraph/namespace/AUTHORITY-GRAPH/sparql", function(datasetList) {
           var titleList = [];
           datasetList.forEach(function(element, index, datasetList){
-            cobis.launchSparqlMultiple(cobis.getCobisTitles(element.originalURI), element.dataset, function(data){
+            cobis.launchSparqlMultiple(cobis.getCobisTitles(request.query.agent), element.dataset, function(data){
               titleList = titleList.concat(data.filter(function (item) {
                 return titleList.indexOf(item) < 0;
               }))
