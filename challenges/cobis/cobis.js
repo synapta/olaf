@@ -26,18 +26,17 @@ exports.getRandomCobisItem = function (max, user) {
         "prefix schema: <http://schema.org/>" +
         "prefix bf: <http://bibframe.org/vocab/>" +
 
-        "SELECT ?agent ?agentClass ?agentLabel ?originalURI ?date ?description " +
+        "SELECT ?agent ?agentClass ?agentLabel ?date ?description " +
         "WHERE {" +
             "?agent a ?agentClass ; " +
                    "rdfs:label ?agentLabel ; " +
-                   "cobis:isPresentIn/cobis:originalURI ?originalURI . " +
             "OPTIONAL {?agent cobis:datazione ?date } " +
             "OPTIONAL {?agent schema:description ?description } " +
             "MINUS {?agent owl:sameAs ?sameas . } " +
             "MINUS {?agent <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> . }" +
             "MINUS {?agent <https://synapta.it/onto/assert> ?assert . " +
                     "?assert <https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">}" +
-            "FILTER (contains(str(?originalURI), \"IT_ICCU\"))" +
+            "FILTER (contains(str(?agent), \"IT_ICCU\"))" +
         "} " +
         "OFFSET " + rnd + " LIMIT 1"
     );
@@ -60,11 +59,9 @@ exports.getCobisDatasets = function (agentURI) {
         "prefix bf: <http://bibframe.org/vocab/>" +
         "prefix cobis: <http://synapta.it/cobis/>" +
 
-        "SELECT ?dataset ?originalURI " +
+        "SELECT ?dataset " +
         "WHERE {" +
-            "<" + agentURI + "> cobis:isPresentIn ?appearence. " +
-             "?appearence void:inDataset ?dataset. " +
-             "?appearence cobis:originalURI ?originalURI . " +
+            "<" + agentURI + "> void:inDataset ?dataset. " +
         "} LIMIT 10 "
     );
 }
