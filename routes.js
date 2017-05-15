@@ -203,6 +203,8 @@ app.use('/',express.static('.'));
 
 
     var wikidata = require('./authorities/wikidata.js');
+    var viaf = require('./authorities/viaf.js');
+
     var dbpedia = require('./authorities/dbpedia.js');
     var cobis = require('./challenges/cobis/cobis.js');
     var leibniz = require('./challenges/leibniz/leibniz.js');
@@ -277,7 +279,9 @@ app.use('/',express.static('.'));
                             response.send({"retry":true});
                         }, 1000)
                     } else if (hints) {
-                       response.send(hints);
+                       viaf.getViafHints(seed.agentLabel.value, hints, function (hintsWithViaf) {
+                          response.send(hintsWithViaf);
+                        });
                     } else {
                        console.log("no hints")
                        cobis.launchSparqlUpdate(cobis.noWikidataHints(seed.agent.value), function () {
