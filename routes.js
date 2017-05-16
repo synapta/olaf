@@ -217,7 +217,10 @@ app.use('/',express.static('.'));
           if (hints === null) {
              response.send({"no-results":true});
           } else if (hints) {
-             response.send(hints);
+             viaf.getViafHints(request.params.label, hints, function (hintsAndViaf){
+                response.send(hintsAndViaf);
+             })
+
           }
       });
     });

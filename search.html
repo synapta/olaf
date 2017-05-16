@@ -163,6 +163,52 @@
                 cards += '</div>';
             }
         }
+        for (var i = 0; i < data.viaf.length; i++) {
+            if (i === 0 || i % 2 === 0) {
+                cards += '<div class="row">';
+            }
+            cards += '<div class="col s12 m6"><div class="card horizontal"><div class="card-image">'
+            if (data.viaf[i].immagine) {
+                cards += '<img src="' + data.viaf[i].immagine.value + '">'
+            } else {
+                cards += '<img src="">'
+            }
+            cards += '</div><div class="card-stacked"><div class="card-content">'
+            if (data.viaf[i].displayForm) {
+                cards += '<h5>' + data.viaf[i].displayForm + '</h5>'
+            }
+            cards += '<p>' + "VIAF ID: " + data.viaf[i].viafid + '</p>'
+            if (data.viaf[i].bnf) {
+                cards += '<p>' + "BNF ID: " + data.viaf[i].bnf + '</p>'
+            }
+            if (data.viaf[i].lc) {
+                cards += '<p>' + "LoC ID: " + data.viaf[i].lc + '</p>'
+            }
+            if (data.viaf[i].iccu) {
+                cards += '<p>' + "ICCU ID: " + data.viaf[i].iccu + '</p>'
+            }
+            /*cards += '<ul>'
+            if (data.hints[i].birthDate) {
+                var bdate = new Date(data.hints[i].birthDate.value);
+                cards += '<li>Nascita: ' + bdate.getFullYear() + '-' + (bdate.getMonth()+1) + '-' + bdate.getDate();
+            }
+            if (data.hints[i].deathDate) {
+                var ddate = new Date(data.hints[i].deathDate.value);
+                cards += '<li>Morte: ' + ddate.getFullYear() + '-' + (ddate.getMonth()+1) + '-' + ddate.getDate();
+            }
+            cards += '</ul>'*/
+            if (data.viaf[i].viafid) {
+                var wikiname = data.viaf[i].viafid.replace("https://it.wikipedia.org/wiki/","").replace(/%20/g,"_");
+                cards += '<p id="abstract-info'+hashCode(wikiname)+'"></p>'
+            }
+            cards += '</ul></div><div class="card-action">'
+            cards += '<ul><li><a href="http://viaf.org/viaf/' + data.viaf[i].viafid + '">Viaf</a>'
+            cards += '</ul></div></div>'
+            cards += '</div></div>'
+            if (i % 2 === 1) {
+                cards += '</div>';
+            }
+        }
         $("#result").html(cards);
         $('body').addClass('loaded');
       });
