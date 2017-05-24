@@ -298,6 +298,31 @@ app.use('/',express.static('.'));
         });
     });
 
+
+    app.get('/cobis/agent/:id', function (request, response) {
+        cobis.launchSparql(cobis.getSpecificCobisAgent (request.params.id), function (seed) {
+            wikidata.getWikidataHints(seed.agentLabel.value, seed, function (hints) {
+                if (hints === "rlm") {
+                    setTimeout(function () {
+                        response.send({"retry":true});
+                    }, 1000)
+                } else if (hints) {
+                   viaf.getViafHints(seed.agentLabel.value, hints, function (hintsWithViaf) {
+                      response.send(hintsWithViaf);
+                    });
+                } else {
+                   console.log("no hints")
+                   cobis.launchSparqlUpdate(cobis.noWikidataHints(seed.agent.value), function () {
+                       setTimeout(function () {
+                           response.send({"retry":true});
+                       }, 1000)
+                   });
+                }
+            });
+        });
+    });
+
+
     app.get('/cobis/titles', function (request, response) {
         cobis.launchSparqlMultiple(cobis.getCobisDatasets(request.query.agent), "http://artemis.synapta.io:9000/blazegraph/namespace/AUTHORITY-GRAPH/sparql", function(datasetList) {
           var titleList = [];

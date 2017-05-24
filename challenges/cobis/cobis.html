@@ -100,11 +100,22 @@
   <script src="/js/materialize.js"></script>
   <script src="/js/init.js"></script>
   <script>
+    function getParameterByName(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+
     wikidata = "";
     cobis = "";
+    var cobisAPI = '/cobis';
+
+    if (getParameterByName('static') !== null) {
+        cobisAPI += "/" + getParameterByName('static');
+    }
+
 
     var generate = function () {
-      $.getJSON('/cobis', function(data) {
+      $.getJSON(cobisAPI, function(data) {
         if (data.retry === true) {
             generate();
             return;

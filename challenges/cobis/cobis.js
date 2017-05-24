@@ -42,6 +42,26 @@ exports.getRandomCobisItem = function (max, user) {
     );
 }
 
+exports.getSpecificCobisAgent = function (id) {
+    return encodeURIComponent(
+        "prefix void: <http://rdfs.org/ns/void#>" +
+        "prefix owl: <http://www.w3.org/2002/07/owl#>" +
+        "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
+        "prefix cobis: <http://dati.cobis.to.it/vocab/>" +
+        "prefix schema: <http://schema.org/>" +
+        "prefix bf: <http://bibframe.org/vocab/>" +
+
+        "SELECT ?agent ?agentClass ?agentLabel ?date ?description " +
+        "WHERE {" +
+            "BIND (<http://dati.cobis.to.it/agent/" + id + "> as ?agent)" +
+            "?agent a ?agentClass ; " +
+                   "schema:name ?agentLabel . " +
+            "OPTIONAL {?agent cobis:datazione ?date } " +
+            "OPTIONAL {?agent schema:description ?description } " +
+        "} LIMIT 1"
+    );
+}
+
 exports.getCobisTitles = function (agentURI) {
     return encodeURIComponent(
         "prefix bf: <http://bibframe.org/vocab/>" +
@@ -88,8 +108,8 @@ exports.launchSparql = function (query, callback) {
 
     var options = {
         host: "artemis.synapta.io",
-        path: "/blazegraph/namespace/AUTHORITY-GRAPH/sparql?query=" + (typeof(query) === "function" ? query() : query) + "&format=json",
-        port: "9000",
+        path: "/sparql?query=" + (typeof(query) === "function" ? query() : query) + "&format=json",
+        port: "8890",
         method: "GET"
     };
 
@@ -149,14 +169,14 @@ exports.launchSparqlMultiple = function (query, dataset, callback) {
 }
 
 
-exports.launchSparqlUpdate = function (query, callback) {
+exports.launchSparqlUpdate = function (query, callback) { //TODO
 
     var result = "";
 
     var options = {
         host: "artemis.synapta.io",
-        path: "/blazegraph/namespace/AUTHORITY-GRAPH/sparql",
-        port: "9000",
+        path: "/sparql",
+        port: "8890",
         method: "POST",
         headers: {
           "Content-Type": "application/x-turtle",
