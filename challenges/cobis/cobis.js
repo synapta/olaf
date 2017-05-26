@@ -29,7 +29,7 @@ exports.getRandomCobisItem = function (max, user) {
         "SELECT ?agent ?agentClass ?agentLabel ?date ?description " +
         "WHERE {" +
             "?agent a ?agentClass ; " +
-                   "rdfs:label ?agentLabel ; " +
+                   "rdfs:label ?agentLabel . " +
             "OPTIONAL {?agent cobis:datazione ?date } " +
             "OPTIONAL {?agent schema:description ?description } " +
             "MINUS {?agent owl:sameAs ?sameas . } " +
@@ -68,7 +68,8 @@ exports.getCobisTitles = function (agentURI) {
 
         "SELECT DISTINCT ?title " +
         "WHERE {" +
-            "?work bf:workTitle/bf:titleValue ?title . " +
+            "?work ?p <" + agentURI + "> . " +
+            "?work bf:workTitle/bf:label ?title . " +
         "} LIMIT 5"
     );
 }
@@ -89,17 +90,23 @@ exports.getCobisDatasets = function (agentURI) {
 
 
 exports.noWikidataHints = function (s) {
-    return "<" + s + "> <https://synapta.it/onto/noWikidatHints> 'true' .";
+    return encodeURIComponent(
+        "INSERT {<" + s + "> <https://synapta.it/onto/noWikidatHints> 'true' .}"
+    )
 }
 
 exports.forMeIsNo = function (s, user) {
-    return "<" + s + "> <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> .";
+    return encodeURIComponent(
+        "INSERT {<" + s + "> <https://synapta.it/onto/forMeIsNo> <https://synapta.it/user/" + user + "> .}"
+    )
 }
 
 exports.forMeIsYes = function (s, q, user) {
-    return "<" + s + "> <https://synapta.it/onto/assert> " +
-    "[ <https://synapta.it/onto/sameAs> <https://wikidata.org/wiki/" + q +"> ;" +
-      "<https://synapta.it/onto/by> <https://synapta.it/user/" + user + "> ] .";
+    return encodeURIComponent (
+      "INSERT { <" + s + "> <https://synapta.it/onto/assert> _:bn . " +
+      "_:bn <https://synapta.it/onto/sameAs> <https://wikidata.org/wiki/" + q +"> ;" +
+      "<https://synapta.it/onto/by> <https://synapta.it/user/" + user + ">  .}"
+    )
 }
 
 exports.launchSparql = function (query, callback) {
@@ -170,35 +177,24 @@ exports.launchSparqlMultiple = function (query, dataset, callback) {
 
 
 exports.launchSparqlUpdate = function (query, callback) { //TODO
-
     var result = "";
-
-    var options = {
+    var digest = require('http-digest-client')('olaf', 'D3g2tl5@1eQA\\U,');
+    digest.request({
         host: "artemis.synapta.io",
-        path: "/sparql",
+        path: "/sparql-auth?default-graph-uri=http%3A%2F%2Fdati.cobis.to.it%2Folaf%2F&query=" +
+            (typeof(query) === "function" ? query() : query) +
+            "&should-sponge=&format=application%2Fjson&timeout=0&debug=on",
         port: "8890",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-turtle",
-        }
-    };
-
-    var req = http.request(options, function(res) {
-        res.setEncoding('utf8');
-        res.on('data', function(chunk) {
-            result += chunk;
-        });
-
-        res.on('end', function() {
-            console.log(result);
-            callback();
-        });
+        method: "GET"
+    }, function (res) {
+    res.on('data', function (data) {
+        console.log(data.toString());
     });
-
-    req.on('error', function(e) {
-        console.error('problem with request: ' + e.message);
+    res.on('error', function (err) {
+        console.log('oh noes');
     });
-
-    req.write(query)
-    req.end();
+    res.on('end', function() {
+        callback()
+    })
+    });
 }
