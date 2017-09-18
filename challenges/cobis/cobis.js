@@ -29,7 +29,7 @@ exports.getRandomCobisItem = function (max, user) {
         "SELECT ?agent ?agentClass ?agentLabel ?date ?description " +
         "WHERE {" +
             "?agent a ?agentClass ; " +
-                   "rdfs:label ?agentLabel . " +
+                   "skos:prefLabel ?agentLabel . " +
             "OPTIONAL {?agent cobis:datazione ?date } " +
             "OPTIONAL {?agent schema:description ?description } " +
             "MINUS {?agent owl:sameAs ?sameas . } " +

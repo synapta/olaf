@@ -324,18 +324,8 @@ app.use('/',express.static('.'));
 
 
     app.get('/cobis/titles', function (request, response) {
-        cobis.launchSparqlMultiple(cobis.getCobisDatasets(request.query.agent), "http://artemis.synapta.io:9000/blazegraph/namespace/AUTHORITY-GRAPH/sparql", function(datasetList) {
-          var titleList = [];
-          datasetList.forEach(function(element, index, datasetList){
-            cobis.launchSparqlMultiple(cobis.getCobisTitles(request.query.agent), element.dataset, function(data){
-              titleList = titleList.concat(data.filter(function (item) {
-                return titleList.indexOf(item) < 0;
-              }))
-              if (index === datasetList.length - 1) {
-                response.send(titleList);
-              }
-            });
-          });
+        cobis.launchSparqlMultiple(cobis.getCobisTitles(request.query.agent),  "http://artemis.synapta.io:8890/sparql", function(data){
+            response.send(data);
         });
     });
 
