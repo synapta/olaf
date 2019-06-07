@@ -8,13 +8,19 @@
     </div>
     <div class="ui attached segment">
         <div class="ui bulleted list">
-            <div class="item">{{title}}</div>
+            {{#title}}
+                <div class="item">{{.}}</div>
+            {{/title}}
         </div>
     </div>
     <div class="ui attached header">
         <p>Role</p>
     </div>
     <div class="ui bottom attached segment">
-        <p>{{personRole}}</p>
+        <div class="ui bulleted list">
+            {{#personRole}}
+                <div class="item">{{.}}</div>
+            {{/personRole}}
+        </div>
     </div>
 </div>

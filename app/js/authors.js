@@ -132,8 +132,20 @@ $.get('/views/template/author-card.html', (template) => {
         method: 'GET',
         dataType: 'json',
         success: response => {
+
+            console.log(response);
+
+            // Parse titles and roles
+            if(response.title)
+                response.title = response.title.split('###');
+
+            if(response.personRole)
+                response.personRole = response.personRole.split('###');
+
+            //Generate and set output
             let output = Mustache.render(template, response);
-            $('#author-card').html(output).fadeIn(2000)
+            $('#author-card').html(output).fadeIn(2000);
+
         }
     });
 
@@ -192,7 +204,7 @@ function show_matches(matches) {
     $.get('/views/template/matches.html', (template) => {
 
         // Generate container
-        let container = Mustache.render(template, {'action': '/get/' + token + '/prova'});
+        let container = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/' + offset});
         $('#author-container').html(container);
 
         // Populate matches container
