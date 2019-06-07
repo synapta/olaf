@@ -1,0 +1,29 @@
+<div class="ui segment">
+    <div class="ui two column very relaxed grid">
+        <div class="column">
+            <p>Contenuto iniziale</p>
+        </div>
+        <div>
+            <div class="ui selection dropdown">
+                <!--<input  type="text" name="{{label}}">-->
+                <i class="dropdown icon"></i>
+                <div class="default text">{{label}}</div>
+                <div class="menu">
+                    {{#items}}
+                        <div class="item" data-value="{{.}}" data-label="{{label}}">
+                            {{.}}
+                        </div>
+                    {{/items}}
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="ui disabled input focus">
+                <input id="{{label}}" name="{{label}}" type="text" placeholder="No content yet...">
+            </div>
+        </div>
+    </div>
+    <div class="ui vertical divider">
+        after
+    </div>
+</div>

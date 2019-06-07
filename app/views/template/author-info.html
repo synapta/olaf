@@ -1,0 +1,31 @@
+<div class="ui horizontal elements">
+    <div style="border-style: hidden;" class="ui horizontal segments">
+        <div class="ui divided selection list">
+            <!-- 
+            <a class="item">
+                <div class="ui teal horizontal label">Keywords 1</div>
+                <div class="ui blue horizontal label">Keywords2</div><br>
+                <div class="ui violet horizontal label">Keywords3</div>
+                <div class="ui purple tag label">Tags</div>
+            </a>
+            -->
+            <a class="item">
+                {{#keywords1}}
+                <div class="ui teal horizontal label"> {{.}} </div>
+                {{/keywords1}}<br>
+
+                {{#keywords2}}
+                <div class="ui blue horizontal label"> {{.}} </div>
+                {{/keywords2}}<br>
+
+                {{#keywords3}}
+                <div class="ui violet horizontal label">{{.}} </div>
+                {{/keywords3}}<br>
+
+                {{#tags}}
+                <div class="ui purple tag label"> {{.}} </div>
+                {{/tags}}
+            </a>
+        </div>
+    </div>
+</div>

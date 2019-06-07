@@ -1,352 +1,161 @@
-var express  = require('express');
+// Requirements
+const express     = require('express');
+const bodyParser  = require('body-parser');
+const config      = require('./app/js/config.js');
+const nodeRequest = require('request');
+const queries     = require('./query');
 
-module.exports = function(app, passport) {
+// Global variables
 
-app.use('/',express.static('.'));
-// normal routes ===============================================================
-    app.get('/', function(req, res) {
-        res.sendFile(__dirname + '/index.html');
+
+/*var json = {};
+exports.jeyson = json;
+var nomeautore = '';
+var cognomeautore = '';*/
+
+// Token validation
+function validateToken(token) {
+
+    // Get valid tokens
+    let validTokens = ['cobis'];
+
+    // Check if token is valid
+    return validTokens.includes(token);
+
+}
+
+module.exports = function (app) {
+
+    // Setting up express
+    app.use('/', express.static('./app'));
+    app.use(bodyParser.urlencoded({extended: false}));
+    app.use(bodyParser.json());
+
+    // Token middleware
+    app.all(['/api/v1/:token/*', '/get/:token/*'], function (request, response, next) {
+
+        // Get token
+        let token = request.params.token;
+
+        // Validate token
+        if (validateToken(token))
+        // Next route
+            next();
+        else {
+            // Set not allowed response
+            response.status(403);
+            response.send('Not allowed to read this resource.');
+        }
+
     });
 
-    app.get('/connect-cobis', isLoggedIn, function(req, res) {
-        res.sendFile(__dirname + '/challenges/cobis/cobis.html');
+    /*app.get('/search', function (request, response) {
+        // let json = {"nome":"","cognome":"","nome_componenti":"","url":""}
+        let attributi = [
+            'name',
+            'surname',
+            'birth',
+            'death',
+            'main_residence',
+            'professions',
+            'gender',
+            'studies',
+            'place_of_birth',
+            'place_of_death',
+            'component_name',
+            'url'
+        ]
+        console.log(request.query.paperino)
+        response.send(attributi)
+    });*/
+
+    // Frontend
+    app.get('/get/:token/authors/:offset', function (request, response) {
+        response.sendFile('authors.html', {root: __dirname + '/app/views'})
     });
 
-    app.get('/connect-leibniz', isLoggedIn, function(req, res) {
-        res.sendFile(__dirname + '/challenges/leibniz/leibniz.html');
+    app.get('/grid.css', function (req, res) {
+        res.sendFile('/style.css', {
+            root: __dirname + '/node_modules/semantic-ui-grid/grid.css'
+        })
     });
 
-    app.get('/search', function(req, res) {
-        res.sendFile(__dirname + '/search.html');
+    /*
+    app.post('/up/addme', function (request) {
+        let options = request.body.id
+        config.obj["selected"] = request.body.id
+        finaljson = config.makeJson4checkData(options)
+        //finaljson = config.orderFonti(finaljson)
+        console.log(finaljson)
     });
 
-    // show the home page (will also have our login links)
-    app.get('/auth', function(req, res) {
-        res.render('index.ejs');
+    app.post('/up/selected', function (request, res) {
+        let options = request.body["ids[]"]
+        config.obj["selected"] = request.body["ids[]"]
+        finaljson = config.makeJson4checkData(options)
+        console.log(finaljson)
     });
+    app.post('/send/newdata', function (request, res) {
+        let options = request.body
+        console.log("\nsendnewdata\n")
+        console.log(options)
+    });*/
 
-    // PROFILE SECTION =========================
-    app.get('/profile', isLoggedIn, function(req, res) {
-        res.render('profile.ejs', {
-            user : req.user
+    app.get('/api/v1/:token/author-info/:offset', (request, response) => {
+
+        // Compose query
+        let offset = request.params.offset;
+        let query = queries.composeCobisQuery(offset);
+
+        // Make request
+        nodeRequest(query, (err, res, body) => {
+
+            // Handle and send Cobis body
+            let cobisResult = queries.handleCobisBody(JSON.parse(body));
+            console.log(cobisResult);
+            response.json(cobisResult);
+
         });
     });
 
-    // LOGOUT ==============================
-    app.get('/logout', function(req, res) {
-        req.logout();
-        res.redirect('/');
-    });
+    app.get('/api/v1/:token/author-options/:offset', (request, response) => {
 
-// =============================================================================
-// AUTHENTICATE (FIRST LOGIN) ==================================================
-// =============================================================================
+        // Get parameters
+        let name = request.query.name;
+        let surname = request.query.surname;
 
-    // locally --------------------------------
-        // LOGIN ===============================
-        // show the login form
-        app.get('/login', function(req, res) {
-            res.render('login.ejs', { message: req.flash('loginMessage') });
+        // Compose Wikidata query
+        let query = queries.composeQueryWikidata(name, surname);
+
+        // Make request
+        nodeRequest(query, (err, res, body) => {
+            let wikidataResult = queries.handleWikidataBody(JSON.parse(body));
+            console.log(wikidataResult);
+            response.json(wikidataResult);
         });
 
-        // process the login form
-        app.post('/login', passport.authenticate('local-login', {
-            successRedirect : '/profile', // redirect to the secure profile section
-            failureRedirect : '/login', // redirect back to the signup page if there is an error
-            failureFlash : true // allow flash messages
-        }));
-
-        // SIGNUP =================================
-        // show the signup form
-        app.get('/signup', function(req, res) {
-            res.render('signup.ejs', { message: req.flash('signupMessage') });
-        });
-
-        // process the signup form
-        app.post('/signup', passport.authenticate('local-signup', {
-            successRedirect : '/profile', // redirect to the secure profile section
-            failureRedirect : '/signup', // redirect back to the signup page if there is an error
-            failureFlash : true // allow flash messages
-        }));
-
-    // facebook -------------------------------
-
-        // send to facebook to do the authentication
-        app.get('/auth/facebook', passport.authenticate('facebook', { scope : 'email' }));
-
-        // handle the callback after facebook has authenticated the user
-        app.get('/auth/facebook/callback',
-            passport.authenticate('facebook', {
-                successRedirect : '/',
-                failureRedirect : '/auth'
-            }));
-
-    // twitter --------------------------------
-
-        // send to twitter to do the authentication
-        app.get('/auth/twitter', passport.authenticate('twitter', { scope : 'email' }));
-
-        // handle the callback after twitter has authenticated the user
-        app.get('/auth/twitter/callback',
-            passport.authenticate('twitter', {
-                successRedirect : '/',
-                failureRedirect : '/auth'
-            }));
-
-
-    // google ---------------------------------
-
-        // send to google to do the authentication
-        app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
-
-        // the callback after google has authenticated the user
-        app.get('/auth/google/callback',
-            passport.authenticate('google', {
-                successRedirect : '/',
-                failureRedirect : '/auth'
-            }));
-
-// =============================================================================
-// AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) =============
-// =============================================================================
-
-    // locally --------------------------------
-        app.get('/connect/local', function(req, res) {
-            res.render('connect-local.ejs', { message: req.flash('loginMessage') });
-        });
-        app.post('/connect/local', passport.authenticate('local-signup', {
-            successRedirect : '/', // redirect to the secure profile section
-            failureRedirect : '/connect/local', // redirect back to the signup page if there is an error
-            failureFlash : true // allow flash messages
-        }));
-
-    // facebook -------------------------------
-
-        // send to facebook to do the authentication
-        app.get('/connect/facebook', passport.authorize('facebook', { scope : 'email' }));
-
-        // handle the callback after facebook has authorized the user
-        app.get('/connect/facebook/callback',
-            passport.authorize('facebook', {
-                successRedirect : '/',
-                failureRedirect : '/auth'
-            }));
-
-    // twitter --------------------------------
-
-        // send to twitter to do the authentication
-        app.get('/connect/twitter', passport.authorize('twitter', { scope : 'email' }));
-
-        // handle the callback after twitter has authorized the user
-        app.get('/connect/twitter/callback',
-            passport.authorize('twitter', {
-                successRedirect : '/',
-                failureRedirect : '/auth'
-            }));
-
-
-    // google ---------------------------------
-
-        // send to google to do the authentication
-        app.get('/connect/google', passport.authorize('google', { scope : ['profile', 'email'] }));
-
-        // the callback after google has authorized the user
-        app.get('/connect/google/callback',
-            passport.authorize('google', {
-                successRedirect : '/',
-                failureRedirect : '/auth'
-            }));
-
-// =============================================================================
-// UNLINK ACCOUNTS =============================================================
-// =============================================================================
-// used to unlink accounts. for social accounts, just remove the token
-// for local account, remove email and password
-// user account will stay active in case they want to reconnect in the future
-
-    // local -----------------------------------
-    app.get('/unlink/local', isLoggedIn, function(req, res) {
-        var user            = req.user;
-        user.local.email    = undefined;
-        user.local.password = undefined;
-        user.save(function(err) {
-            res.redirect('/profile');
-        });
     });
 
-    // facebook -------------------------------
-    app.get('/unlink/facebook', isLoggedIn, function(req, res) {
-        var user            = req.user;
-        user.facebook.token = undefined;
-        user.save(function(err) {
-            res.redirect('/profile');
-        });
+    /*
+    app.get('/get/fulljson', function (request, response) {
+        let pass = config.objv2
+        response.send(pass)
+    });*/
+
+    /*app.get('/get/attributes', function (request, response) {
+        let pass = config.objv2.attributes
+        response.send(pass)
+    });*/
+
+    /*
+    app.get('/get//options/dim', function (request, response) {
+        let pass = fun.obj["options"]
+        response.send(pass.length.toString())
     });
 
-    // twitter --------------------------------
-    app.get('/unlink/twitter', isLoggedIn, function(req, res) {
-        var user           = req.user;
-        user.twitter.token = undefined;
-        user.save(function(err) {
-            res.redirect('/profile');
-        });
-    });
-
-    // google ---------------------------------
-    app.get('/unlink/google', isLoggedIn, function(req, res) {
-        var user          = req.user;
-        user.google.token = undefined;
-        user.save(function(err) {
-            res.redirect('/profile');
-        });
-    });
-
-
-    var wikidata = require('./authorities/wikidata.js');
-    var viaf = require('./authorities/viaf.js');
-
-    var dbpedia = require('./authorities/dbpedia.js');
-    var cobis = require('./challenges/cobis/cobis.js');
-    var leibniz = require('./challenges/leibniz/leibniz.js');
-
-
-    /* QUERY */
-    app.get('/search/:label', function (request, response) {
-      console.log("Asking Wikidata");
-      wikidata.getWikidataHints(request.params.label, request.params.label, function (hints) {
-          if (hints === null) {
-             response.send({"no-results":true});
-          } else if (hints) {
-             viaf.getViafHints(request.params.label, hints, function (hintsAndViaf){
-                response.send(hintsAndViaf);
-             })
-
-          }
-      });
-    });
-
-    app.get('/dbpedia/abstract/:label', function (request, response) {
-      console.log("Asking DBpedia");
-      dbpedia.getAbstract(request.params.label, function (abstract) {
-          if (abstract !== "error") {
-             response.send({"abstract":abstract});
-          } else {
-             response.send({"abstract":false});
-          }
-      });
-    });
-
-    app.get('/leibniz', isLoggedIn, function (request, response) {
-        leibniz.launchSparqlLeibniz(leibniz.getRemains(request.user._id), function (total) {
-            leibniz.launchSparqlLeibniz(leibniz.getRandomLeibnizItem(total.n.value, request.user._id), function (seed) {
-                console.log(seed.s.value)
-                wikidata.getWikidataHints(seed.label.value, seed, function (hints) {
-                    if (hints === "rlm") {
-                        setTimeout(function () {
-                            response.send({"retry":true});
-                        }, 1000)
-                    } else if (hints) {
-                       response.send(hints);
-                    } else {
-                       console.log("no hints")
-                       leibniz.launchSparqlUpdateLeibniz(leibniz.noWikidataHints(seed.s.value), function () {
-                           setTimeout(function () {
-                               response.send({"retry":true});
-                           }, 1000)
-                       });
-                    }
-                });
-            });
-        });
-    });
-
-    app.get('/leibniz/forMeIsNo/:leib/', isLoggedIn, function (request, response) {
-        leibniz.launchSparqlUpdateLeibniz(leibniz.forMeIsNo(request.params.leib, request.user._id), function () {
-            response.send("ok");
-        });
-    });
-
-    app.get('/leibniz/forMeIsYes/:leib/:wikidata/', isLoggedIn, function (request, response) {
-        leibniz.launchSparqlUpdateLeibniz(leibniz.forMeIsYes(request.params.leib, request.params.wikidata, request.user._id), function () {
-            response.send("ok");
-        });
-    });
-
-
-    app.get('/cobis', isLoggedIn, function (request, response) {
-        cobis.launchSparql(cobis.getRemains(request.user._id), function (total) {
-            cobis.launchSparql(cobis.getRandomCobisItem (total.n.value, request.user._id), function (seed) {
-                wikidata.getWikidataHints(seed.agentLabel.value, seed, function (hints) {
-                    if (hints === "rlm") {
-                        setTimeout(function () {
-                            response.send({"retry":true});
-                        }, 1000)
-                    } else if (hints) {
-                       viaf.getViafHints(seed.agentLabel.value, hints, function (hintsWithViaf) {
-                          response.send(hintsWithViaf);
-                        });
-                    } else {
-                       console.log("no hints")
-                       cobis.launchSparqlUpdate(cobis.noWikidataHints(seed.agent.value), function () {
-                           setTimeout(function () {
-                               response.send({"retry":true});
-                           }, 1000)
-                       });
-                    }
-                });
-            });
-        });
-    });
-
-
-    app.get('/cobis/agent/:id', function (request, response) {
-        cobis.launchSparql(cobis.getSpecificCobisAgent (request.params.id), function (seed) {
-            wikidata.getWikidataHints(seed.agentLabel.value, seed, function (hints) {
-                if (hints === "rlm") {
-                    setTimeout(function () {
-                        response.send({"retry":true});
-                    }, 1000)
-                } else if (hints) {
-                   viaf.getViafHints(seed.agentLabel.value, hints, function (hintsWithViaf) {
-                      response.send(hintsWithViaf);
-                    });
-                } else {
-                   console.log("no hints")
-                   cobis.launchSparqlUpdate(cobis.noWikidataHints(seed.agent.value), function () {
-                       setTimeout(function () {
-                           response.send({"retry":true});
-                       }, 1000)
-                   });
-                }
-            });
-        });
-    });
-
-
-    app.get('/cobis/titles', function (request, response) {
-        cobis.launchSparqlMultiple(cobis.getCobisTitles(request.query.agent),  "http://artemis.synapta.io:8890/sparql", function(data){
-            response.send(data);
-        });
-    });
-
-    app.get('/cobis/forMeIsNo/:cobis/', isLoggedIn, function (request, response) {
-        cobis.launchSparqlUpdate(cobis.forMeIsNo(request.params.cobis, request.user._id), function () {
-            response.send("ok");
-        });
-    });
-
-    app.get('/cobis/forMeIsYes/:cobis/:wikidata/', isLoggedIn, function (request, response) {
-        cobis.launchSparqlUpdate(cobis.forMeIsYes(request.params.cobis, request.params.wikidata, request.user._id), function () {
-            response.send("ok");
-        });
-    });
+    app.get('/get/options', function (request, response) {
+        let pass = config.obj
+        response.send(pass['options'])
+    });*/
 
 };
-
-// route middleware to ensure user is logged in
-function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated())
-        return next();
-
-    res.redirect('/auth');
-}
