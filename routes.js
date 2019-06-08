@@ -5,14 +5,6 @@ const config      = require('./app/js/config.js');
 const nodeRequest = require('request');
 const queries     = require('./query');
 
-// Global variables
-
-
-/*var json = {};
-exports.jeyson = json;
-var nomeautore = '';
-var cognomeautore = '';*/
-
 // Token validation
 function validateToken(token) {
 

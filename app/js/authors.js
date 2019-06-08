@@ -178,9 +178,13 @@ $.get('/views/template/author-options.html', (template) => {
                 dataType: 'json',
                 success: response => {
 
+                    // Render output
                     let output = Mustache.render(template, response);
                     options = response.options;
                     $('#author-options').html(output).fadeIn(2000);
+
+                    // Push state
+                    history.pushState({}, "", window.location.href);
 
                 }
             });
