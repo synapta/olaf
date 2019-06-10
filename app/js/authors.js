@@ -87,7 +87,9 @@ function match_author(element) {
 
     // Get from options
     get_from_options(item, (option) => {
-        show_matches(option);
+        group_labels([option], (grouped_labels) => {
+            show_matches(grouped_labels);
+        });
     });
 
 }
