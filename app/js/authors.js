@@ -1,7 +1,7 @@
 // Global variables
 let options = {};
 let selected_items = {};
-let valid_labels = ["name", "surname", "description", "birthDate", "deathDate", "immagine"];
+//let valid_labels = ["name", "surname", "description", "birthDate", "deathDate", "immagine"];
 
 // Selection handling
 function update_selection(item) {
@@ -22,6 +22,7 @@ function get_from_options(item, callback) {
 
     // Get item from option
     options.forEach((option) => {
+        console.log(item)
         if(option.item.toString() === item.toString())
             callback(option);
     })

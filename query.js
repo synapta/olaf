@@ -1,6 +1,6 @@
 // Parameters
 let queryUrl = 'https://dati.cobis.to.it/sparql?default-graph-uri=&query=';
-let queryFormat   = '&format=json';
+let queryFormat = '&format=json';
 
 let cobisVariables = ['nome', 'descrizione', 'tipologia', 'birthDate', 'deathDate', 'immagine', 'wikidata', 'itwikipedia', 'enwikipedia', 'viafurl'];
 
@@ -143,6 +143,8 @@ let handleWikidataBody = (body) => {
                 wikidataResult[count][key] = binding[key].value
         });
 
+        wikidataResult[count].item = JSON.stringify(wikidataResult[count]);
+
         // Increment counter
         count++;
 
@@ -160,10 +162,13 @@ let handleVIAFBody = (body, viafurls) => {
     if (body.result === null)
         return results
 
+    let parsedcode = [];
+
     body.result.forEach((d) => {
 
         // Populate result
-        if (['uniformtitleexpression'].indexOf(d.nametype) < 0 && viafurls.indexOf('https://viaf.org/viaf/' + d.viafid) === -1) {
+        if (['uniformtitleexpression', 'uniformtitlework'].indexOf(d.nametype) < 0 && viafurls.indexOf('https://viaf.org/viaf/' + d.viafid) === -1 && parsedcode.indexOf(d.viafid) === -1 ) {
+            parsedcode.push(d.viafid);
 
             let item = {};
 
@@ -171,7 +176,10 @@ let handleVIAFBody = (body, viafurls) => {
             item.viafurl = 'https://viaf.org/viaf/' + d.viafid;
             item.tipologia = d.nametype;
             if (d.hasOwnProperty('iccu'))
-              item.sbn = "IT_ICCU_" + d.iccu.substring(0,4).toUpperCase() + "_" + d.iccu.substring(4,10);
+                item.sbn = "IT_ICCU_" + d.iccu.substring(0, 4).toUpperCase() + "_" + d.iccu.substring(4, 10);
+
+            item.item = JSON.stringify(item);
+
             results.push(item)
         }
     });
@@ -214,17 +222,17 @@ exports.handleWikidataBody = (body) => {
 };
 
 exports.composeQueryVIAF = (name, surname) => {
-  return {
-      method: 'GET',
-      url: 'https://www.viaf.org/viaf/AutoSuggest',
-      qs: {
-          query: name + " " + surname
-      },
-      headers: {
-          'cache-control': 'no-cache',
-          'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
-          'user-agent': 'pippo',
-      }
+    return {
+        method: 'GET',
+        url: 'https://www.viaf.org/viaf/AutoSuggest',
+        qs: {
+            query: name + " " + surname
+        },
+        headers: {
+            'cache-control': 'no-cache',
+            'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
+            'user-agent': 'pippo',
+        }
     }
 };
 
