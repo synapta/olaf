@@ -1,22 +1,29 @@
 {
-  "name": "node-authentication",
+  "name": "olaf2",
+  "version": "1.0.0",
+  "description": "",
   "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/synapta/olaf2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/synapta/olaf2/issues"
+  },
+  "homepage": "https://github.com/synapta/olaf2#readme",
   "dependencies": {
-    "bcrypt-nodejs": "latest",
-    "body-parser": "~1.15.2",
-    "connect-flash": "~0.1.1",
-    "cookie-parser": "~1.4.3",
-    "ejs": "~2.5.2",
-    "express": "~4.14.0",
-    "express-session": "~1.14.1",
-    "http-digest-client": "0.0.3",
-    "method-override": "~2.3.6",
-    "mongoose": "~4.6.1",
-    "morgan": "~1.7.0",
-    "passport": "~0.3.2",
-    "passport-facebook": "~2.1.1",
-    "passport-google-oauth": "~1.0.0",
-    "passport-local": "~1.0.0",
-    "passport-twitter": "~1.0.4"
+    "express": "^4.16.4",
+    "jquery": "^3.4.1",
+    "morgan": "^1.9.1",
+    "request": "^2.88.0",
+    "require": "^2.4.20",
+    "semantic-ui-grid": "^2.4.1",
+    "underscore": "^1.9.1"
   }
 }

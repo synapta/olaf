@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Authors</title>
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="/css/lib/semantic242.css"/>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.js"></script>
+    <script src="/js/lib/semantic242.js"></script>
+    <script src="/js/utils/url.js"></script>
+    <script src="/js/authors.js"></script>
+</head>
+<body>
+
+    <!-- Container -->
+    <div class="ui container">
+        <div id="author-card"></div>
+        <div id="author-container">
+            <div class="ui grid">
+                <div class="eight wide column">
+                    <h1 style="margin-bottom: 25px">Options</h1>
+                </div>
+                <div class="eight wide column">
+                    <div class="ui right floated labeled button" tabindex="0">
+                        <div onclick="match_multiple_authors()" class="ui primary button">
+                            Match selected
+                        </div>
+                        <a id="selected-options-counter" class="ui basic primary left pointing label">
+                            0
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div id="author-options"></div>
+        </div>
+    </div>
+
+</body>
+</html>
