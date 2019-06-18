@@ -170,12 +170,12 @@ $.get('/views/template/author-options.html', (template) => {
 
             // Handle response
             let tokens = response.personName.split(', ');
-            let name = 'Mel';
-            let surname = 'Gibson';
+            let name = tokens[1];
+            let surname = tokens[0];
 
             // Query for wikidata options
             $.ajax({
-                url: '/api/v1/' + token + '/author-options/name=' + encodeURI(name) + '&surname=' + encodeURI(surname),
+                url: '/api/v1/' + token + '/author-options/' + offset  + '?name=' + encodeURI(name) + '&surname=' + encodeURI(surname),
                 method: 'GET',
                 dataType: 'json',
                 success: response => {

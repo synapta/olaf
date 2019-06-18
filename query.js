@@ -2,6 +2,10 @@
 let queryUrl = 'https://dati.cobis.to.it/sparql?default-graph-uri=&query=';
 let queryFormat   = '&format=json';
 
+let cobisVariables = ['nome', 'descrizione', 'tipologia', 'birthDate', 'deathDate', 'immagine', 'wikidata', 'itwikipedia', 'enwikipedia', 'viafurl'];
+
+exports.cobisMatchVars = ['wikidata', 'viafurl', 'sbn'];
+
 // Queries
 let cobisQuery = `
     PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
@@ -16,17 +20,17 @@ let cobisQuery = `
             ?instance bf2:instanceOf ?work .
             ?work bf2:contribution ?contribution .
             ?contribution bf2:agent ?personURI .
-    
+
             ?instance bf2:title ?titleURI .
             ?titleURI rdfs:label ?title .
-        
+
             OPTIONAL {?personURI schema:description ?description . }
             OPTIONAL { ?personURI foaf:isPrimaryTopicOf ?link . }
-    
+
             OPTIONAL { ?personURI schema:name ?personName . }
             OPTIONAL { ?contribution bf2:role/rdfs:label ?personRole . }
             MINUS {?personURI owl:sameAs ?wd}
-        } 
+        }
     } GROUP BY ?personURI ?personName
     LIMIT 1
     OFFSET
@@ -35,67 +39,67 @@ let cobisQuery = `
 let wikidataQuery = (name, surname) => {
 
     return `
-        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-        PREFIX wd: <http://www.wikidata.org/entity/>
-        
-        SELECT ?item ?label ?type ?typeLabel ?num ?description ?altLabel  ?birthDate ?deathDate ?immagine ?itwikipedia ?enwikipedia  WHERE {
-        
-        SERVICE wikibase:label { 
-          bd:serviceParam wikibase:language "it,en,fr,de,nl". 
-          ?item rdfs:label ?label .
-          ?type rdfs:label ?typeLabel.
-          ?item skos:altLabel ?altLabel .    
-          ?item schema:description ?description
-        }
-                  
-        SERVICE wikibase:mwapi {
-          bd:serviceParam wikibase:api "EntitySearch" .
-          bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-          bd:serviceParam mwapi:search "Galileo Galilei" .
-          bd:serviceParam mwapi:language "en" .
-          ?item wikibase:apiOutputItem mwapi:item .
-          ?num wikibase:apiOrdinal true .
-        }
-                
-        OPTIONAL {
-          ?item wdt:P569 ?birthDate .
-        }
-        OPTIONAL {
-          ?item wdt:P570 ?deathDate .
-        }
-        OPTIONAL {
-          ?item wdt:P18 ?immagine .
-        }
-        OPTIONAL {
-          ?itwikipedia schema:about ?item   .
-        
-          FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
-        
-          BIND(STR(?itwikipedia) as ?itwiki)
-        }
-        OPTIONAL {
-          ?enwikipedia schema:about ?item   .
-          FILTER(CONTAINS(STR(?enwikipedia), 'en.wikipedia.org'))
-          BIND(STR(?enwikipedia) as ?enwiki)
-        }
-        MINUS{
-          ?item wdt:P31 wd:Q15632617
-        }
-        MINUS{
-          ?item wdt:P31 wd:Q4167410
-        }
-        MINUS{
-          ?item wdt:P31 ?class.
-          ?class wdt:P279* wd:Q838948
-        }
-        MINUS{
-          ?item wdt:P31 ?class.
-          ?class wdt:P279* wd:Q234460
-        }
-        
-        ?item wdt:P31 ?type .
-        } ORDER BY ASC(?num) LIMIT 20
-    `
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+
+SELECT (?item as ?wikidata) ?nome ?tipologia ?num ?descrizione ?altLabel  ?birthDate ?deathDate ?immagine ?itwikipedia ?enwikipedia  ?viafurl
+
+WHERE {
+
+SERVICE wikibase:label {
+  bd:serviceParam wikibase:language "it,en,fr,de,nl".
+  ?item rdfs:label ?nome .
+  ?type rdfs:label ?tipologia.
+  ?item skos:altLabel ?altLabel .
+  ?item schema:description ?descrizione
+}
+SERVICE wikibase:mwapi {
+  bd:serviceParam wikibase:api "EntitySearch" .
+  bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+  bd:serviceParam mwapi:search "${name} ${surname}" .
+  bd:serviceParam mwapi:language "en" .
+  ?item wikibase:apiOutputItem mwapi:item .
+  ?num wikibase:apiOrdinal true .
+}
+OPTIONAL {
+  ?item wdt:P569 ?birthDate .
+}
+OPTIONAL {
+  ?item wdt:P570 ?deathDate .
+}
+OPTIONAL {
+  ?item wdt:P18 ?immagine .
+}
+OPTIONAL {
+  ?itwikipedia schema:about ?item   .
+
+  FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
+}
+OPTIONAL {
+  ?enwikipedia schema:about ?item   .
+  FILTER(CONTAINS(STR(?enwikipedia), 'en.wikipedia.org'))
+}
+OPTIONAL {
+  ?item wdt:P214 ?viaf
+  BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
+}
+MINUS{
+  ?item wdt:P31 wd:Q15632617
+}
+MINUS{
+  ?item wdt:P31 wd:Q4167410
+}
+MINUS{
+  ?item wdt:P31 ?class.
+  ?class wdt:P279* wd:Q838948
+}
+MINUS{
+  ?item wdt:P31 ?class.
+  ?class wdt:P279* wd:Q234460
+}
+
+?item wdt:P31 ?type .
+} ORDER BY ASC(?num) LIMIT 20`
 };
 
 // Cobis queries utils
@@ -116,9 +120,7 @@ let handleCobisBody = (body) => {
 let handleWikidataBody = (body) => {
 
     // Initialize response
-    let wikidataResult = {};
-    wikidataResult.options = [];
-    wikidataResult.vars = body.head.vars;
+    let wikidataResult = [];
 
     // Count bindings
     let count = 0;
@@ -126,19 +128,19 @@ let handleWikidataBody = (body) => {
     body.results.bindings.forEach((binding) => {
 
         // Generate object
-        wikidataResult.options[count] = {};
+        wikidataResult[count] = {};
 
         // Populate wikidataResult
         Object.keys(binding).forEach((key) => {
             // Get dates
             if (key === "birthDate" || key === "deathDate")
-                wikidataResult.options[count][key] = binding[key].value.substr(0, 10);
+                wikidataResult[count][key] = binding[key].value.substr(0, 10);
             // Get image
             else if (key === "immagine")
-                wikidataResult.options[count][key] = binding[key].value.substr(5, binding[key].value.length);
+                wikidataResult[count][key] = binding[key].value.substr(5, binding[key].value.length);
             // Other stuff
             else
-                wikidataResult.options[count][key] = binding[key].value
+                wikidataResult[count][key] = binding[key].value
         });
 
         // Increment counter
@@ -149,6 +151,35 @@ let handleWikidataBody = (body) => {
     return wikidataResult;
 
 };
+
+
+let handleVIAFBody = (body, viafurls) => {
+    // Initialize response
+    let results = [];
+
+    if (body.result === null)
+        return results
+
+    body.result.forEach((d) => {
+
+        // Populate result
+        if (['uniformtitleexpression'].indexOf(d.nametype) < 0 && viafurls.indexOf('https://viaf.org/viaf/' + d.viafid) === -1) {
+
+            let item = {};
+
+            item.nome = d.term;
+            item.viafurl = 'https://viaf.org/viaf/' + d.viafid;
+            item.tipologia = d.nametype;
+            if (d.hasOwnProperty('iccu'))
+              item.sbn = "IT_ICCU_" + d.iccu.substring(0,4).toUpperCase() + "_" + d.iccu.substring(4,10);
+            results.push(item)
+        }
+    });
+
+    return results;
+
+};
+
 
 // Exports
 exports.composeCobisQuery = (offset) => {
@@ -168,7 +199,8 @@ exports.composeQueryWikidata = (name, surname) => {
             'cache-control': 'no-cache',
             Host: 'query.wikidata.org',
             'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
-            Accept: 'application/sparql-results+json'
+            Accept: 'application/sparql-results+json',
+            'user-agent': 'pippo',
         }
     }
 };
@@ -179,4 +211,23 @@ exports.handleCobisBody = (body) => {
 
 exports.handleWikidataBody = (body) => {
     return handleWikidataBody(body);
+};
+
+exports.composeQueryVIAF = (name, surname) => {
+  return {
+      method: 'GET',
+      url: 'https://www.viaf.org/viaf/AutoSuggest',
+      qs: {
+          query: name + " " + surname
+      },
+      headers: {
+          'cache-control': 'no-cache',
+          'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
+          'user-agent': 'pippo',
+      }
+    }
+};
+
+exports.handleVIAFBody = (body, viaflist) => {
+    return handleVIAFBody(body, viaflist);
 };

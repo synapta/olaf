@@ -58,7 +58,6 @@ module.exports = function (app) {
 
             // Handle and send Cobis body
             let cobisResult = queries.handleCobisBody(JSON.parse(body));
-            console.log(cobisResult);
             response.json(cobisResult);
 
         });
@@ -76,14 +75,31 @@ module.exports = function (app) {
         // Make request
         nodeRequest(query, (err, res, body) => {
             let wikidataResult = queries.handleWikidataBody(JSON.parse(body));
-            console.log(wikidataResult);
-            response.json(wikidataResult);
-        });
 
+            let viaflist = [];
+
+            wikidataResult.forEach((d)=>{
+                viaflist.push(d.viafurl);
+            });
+
+            // Compose VIAF query
+            let query = queries.composeQueryVIAF(name, surname);
+
+            // Make request
+            nodeRequest(query, (err, res, body) => {
+
+
+                let viafResult = queries.handleVIAFBody(JSON.parse(body), viaflist);
+
+                response.json({
+                    vars: queries.cobisMatchVars,
+                    options: wikidataResult.concat(viafResult)
+                });
+            });
+        });
     });
 
     app.post('/api/v1/:token/author-matches/:offset', (request, response) => {
         response.json(request.body);
     });
-
 };
