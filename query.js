@@ -2,10 +2,6 @@
 let queryUrl = 'https://dati.cobis.to.it/sparql?default-graph-uri=&query=';
 let queryFormat = '&format=json';
 
-let cobisVariables = ['nome', 'descrizione', 'tipologia', 'birthDate', 'deathDate', 'immagine', 'wikidata', 'itwikipedia', 'enwikipedia', 'viafurl'];
-
-exports.cobisMatchVars = ['wikidata', 'viafurl', 'sbn'];
-
 // Queries
 let cobisQuery = `
     PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
@@ -37,69 +33,82 @@ let cobisQuery = `
 `;
 
 let wikidataQuery = (name, surname) => {
-
     return `
-PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wd: <http://www.wikidata.org/entity/>
-
-SELECT (?item as ?wikidata) ?nome ?tipologia ?num ?descrizione ?altLabel  ?birthDate ?deathDate ?immagine ?itwikipedia ?enwikipedia  ?viafurl
-
-WHERE {
-
-SERVICE wikibase:label {
-  bd:serviceParam wikibase:language "it,en,fr,de,nl".
-  ?item rdfs:label ?nome .
-  ?type rdfs:label ?tipologia.
-  ?item skos:altLabel ?altLabel .
-  ?item schema:description ?descrizione
-}
-SERVICE wikibase:mwapi {
-  bd:serviceParam wikibase:api "EntitySearch" .
-  bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-  bd:serviceParam mwapi:search "${name} ${surname}" .
-  bd:serviceParam mwapi:language "en" .
-  ?item wikibase:apiOutputItem mwapi:item .
-  ?num wikibase:apiOrdinal true .
-}
-OPTIONAL {
-  ?item wdt:P569 ?birthDate .
-}
-OPTIONAL {
-  ?item wdt:P570 ?deathDate .
-}
-OPTIONAL {
-  ?item wdt:P18 ?immagine .
-}
-OPTIONAL {
-  ?itwikipedia schema:about ?item   .
-
-  FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
-}
-OPTIONAL {
-  ?enwikipedia schema:about ?item   .
-  FILTER(CONTAINS(STR(?enwikipedia), 'en.wikipedia.org'))
-}
-OPTIONAL {
-  ?item wdt:P214 ?viaf
-  BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
-}
-MINUS{
-  ?item wdt:P31 wd:Q15632617
-}
-MINUS{
-  ?item wdt:P31 wd:Q4167410
-}
-MINUS{
-  ?item wdt:P31 ?class.
-  ?class wdt:P279* wd:Q838948
-}
-MINUS{
-  ?item wdt:P31 ?class.
-  ?class wdt:P279* wd:Q234460
-}
-
-?item wdt:P31 ?type .
-} ORDER BY ASC(?num) LIMIT 20`
+        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+        PREFIX wd: <http://www.wikidata.org/entity/>
+        SELECT (?item as ?wikidata) ?nome ?tipologia ?num ?descrizione ?altLabel  ?birthDate ?deathDate ?immagine ?itwikipedia ?enwikipedia ?viafurl ?sbn
+        WHERE {
+        
+            SERVICE wikibase:label {
+                bd:serviceParam wikibase:language "it,en,fr,de,nl".
+                ?item rdfs:label ?nome .
+                ?type rdfs:label ?tipologia.
+                ?item skos:altLabel ?altLabel .
+                ?item schema:description ?descrizione
+            }
+            
+            SERVICE wikibase:mwapi {
+                bd:serviceParam wikibase:api "EntitySearch" .
+                bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+                bd:serviceParam mwapi:search "${name + " " + surname}" .
+                bd:serviceParam mwapi:language "en" .
+                ?item wikibase:apiOutputItem mwapi:item .
+                ?num wikibase:apiOrdinal true .
+            }
+            
+            OPTIONAL {
+                ?item wdt:P569 ?birthDate .
+            }
+            
+            OPTIONAL {
+                ?item wdt:P570 ?deathDate .
+            }
+            
+            OPTIONAL {
+                ?item wdt:P18 ?immagine .
+            }
+            
+            OPTIONAL {
+                ?itwikipedia schema:about ?item   .
+                FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
+            }
+            
+            OPTIONAL {
+                ?enwikipedia schema:about ?item   .
+                FILTER(CONTAINS(STR(?enwikipedia), 'en.wikipedia.org'))
+            }
+            
+            OPTIONAL {
+                ?item wdt:P214 ?viaf
+                BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
+            }
+            
+            OPTIONAL {
+                ?item wdt:P396 ?sbn_raw
+                BIND(REPLACE(STR(?sbn_raw), "\\\\\\\\", "_") as ?sbn)
+            }
+            
+            MINUS{
+                ?item wdt:P31 wd:Q15632617
+            }
+            
+            MINUS{
+                ?item wdt:P31 wd:Q4167410
+            }
+            
+            MINUS{
+                ?item wdt:P31 ?class.
+                ?class wdt:P279* wd:Q838948
+            }
+            
+            MINUS{
+                ?item wdt:P31 ?class.
+                ?class wdt:P279* wd:Q234460
+            }
+            
+            ?item wdt:P31 ?type .
+          
+        } ORDER BY ASC(?num) LIMIT 20`
 };
 
 // Cobis queries utils
@@ -156,16 +165,16 @@ let handleWikidataBody = (body) => {
 
 
 let handleVIAFBody = (body, viafurls) => {
+
     // Initialize response
-    let results = [];
+    let VIAFresult = [];
 
     if (body.result === null)
-        return results
+        return VIAFresult;
 
     let parsedcode = [];
 
     body.result.forEach((d) => {
-
         // Populate result
         if (['uniformtitleexpression', 'uniformtitlework'].indexOf(d.nametype) < 0 && viafurls.indexOf('https://viaf.org/viaf/' + d.viafid) === -1 && parsedcode.indexOf(d.viafid) === -1 ) {
             parsedcode.push(d.viafid);
@@ -180,11 +189,11 @@ let handleVIAFBody = (body, viafurls) => {
 
             item.item = JSON.stringify(item);
 
-            results.push(item)
+            VIAFresult.push(item)
         }
     });
 
-    return results;
+    return VIAFresult;
 
 };
 
@@ -213,14 +222,6 @@ exports.composeQueryWikidata = (name, surname) => {
     }
 };
 
-exports.handleCobisBody = (body) => {
-    return handleCobisBody(body);
-};
-
-exports.handleWikidataBody = (body) => {
-    return handleWikidataBody(body);
-};
-
 exports.composeQueryVIAF = (name, surname) => {
     return {
         method: 'GET',
@@ -234,6 +235,14 @@ exports.composeQueryVIAF = (name, surname) => {
             'user-agent': 'pippo',
         }
     }
+};
+
+exports.handleCobisBody = (body) => {
+    return handleCobisBody(body);
+};
+
+exports.handleWikidataBody = (body) => {
+    return handleWikidataBody(body);
 };
 
 exports.handleVIAFBody = (body, viaflist) => {

@@ -1,7 +1,10 @@
 // Global variables
 let options = {};
 let selected_items = {};
-//let valid_labels = ["name", "surname", "description", "birthDate", "deathDate", "immagine"];
+let person_uri = "";
+
+// Labels filter
+let valid_labels = ["wikidata", "viafurl", "sbn"];
 
 // Selection handling
 function update_selection(item) {
@@ -22,7 +25,6 @@ function get_from_options(item, callback) {
 
     // Get item from option
     options.forEach((option) => {
-        console.log(item)
         if(option.item.toString() === item.toString())
             callback(option);
     })
@@ -136,7 +138,8 @@ $.get('/views/template/author-card.html', (template) => {
         dataType: 'json',
         success: response => {
 
-            console.log(response);
+            // Store person identifier
+            person_uri = response.personURI;
 
             // Parse titles and roles
             if(response.title)
@@ -161,6 +164,8 @@ $.get('/views/template/author-options.html', (template) => {
     let token = params[0];
     let offset = params[1];
 
+    console.lo
+
     // Get Wikidata candidates
     $.ajax({
 
@@ -171,8 +176,12 @@ $.get('/views/template/author-options.html', (template) => {
 
             // Handle response
             let tokens = response.personName.split(', ');
-            let name = tokens[1];
             let surname = tokens[0];
+            let name = tokens[1];
+
+            console.log(response);
+            console.log(name);
+            console.log(surname);
 
             // Query for wikidata options
             $.ajax({
@@ -184,6 +193,7 @@ $.get('/views/template/author-options.html', (template) => {
                     // Render output
                     let output = Mustache.render(template, response);
                     options = response.options;
+                    console.log(options);
                     $('#author-options').html(output).fadeIn(2000);
 
                     // Push state
@@ -211,7 +221,7 @@ function show_matches(matches) {
     $.get('/views/template/matches.html', (template) => {
 
         // Generate container
-        let container = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/' + offset});
+        let container = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/' + offset, 'identifier': person_uri});
         $('#author-container').html(container);
 
         // Populate matches container

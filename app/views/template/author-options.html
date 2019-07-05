@@ -1,42 +1,43 @@
 <div class="ui grid cards">
-  {{#options}}
+    {{#options}}
     <div class="eight wide column">
-      <div data-item="{{item}}" class="ui card fluid">
-        <div class="content grid ui">
-          <div class="two column row">
-            <div class="column">
+        <div data-item="{{item}}" class="ui card fluid">
+            <div class="content grid ui">
+                <div class="two column row">
+                    <div class="column">
 
-              <div class="header">{{nome}}</div>
-              <div class="meta">
-                <span class="category">{{tipologia}}</span>
-              </div>
-              <div class="description">
-                <p>{{descrizione}}</p>
-              </div>
+                        <div class="header">{{nome}}</div>
+                        <div class="meta">
+                            <span class="category">{{tipologia}}</span>
+                        </div>
+                        <div class="description">
+                            <p>{{descrizione}}</p>
+                        </div>
+                    </div>
+                    <div class="column left aligns">
+                        {{#birthDate}}{{.}} {{/birthDate}}{{deathDate}}
+                    </div>
+                </div>
             </div>
-            <div class="column left aligns">
-              {{#birthDate}}{{.}} {{/birthDate}}{{deathDate}}
-            </div>
-          </div>
-        </div>
 
-        <div class="extra content">
+            <div class="extra content">
           <span class="left floated">
             {{#wikidata}}<a href={{.}} target="_blank">Wikidata</a><br>{{/wikidata}}
+            {{#itwikipedia}}<a href={{.}} target="_blank">Wikipedia</a><br>{{/itwikipedia}}
             {{#viafurl}}<a href={{.}} target="_blank">VIAF</a>{{/viafurl}}
           </span>
-          <div class="right floated author">
-            {{#immagine}}<img class="ui avatar image" src="{{.}}">{{/immagine}}
-          </div>
+                <div class="right floated author">
+                    {{#immagine}}<img class="ui avatar image" src="{{.}}">{{/immagine}}
+                </div>
+            </div>
+            <div class="extra content">
+                <div class="ui two buttons">
+                    <button onclick="match_author(this)" class="ui button">Match me</button>
+                    <div class="or"></div>
+                    <button onclick="select_author(this)" class="ui positive button">Select me</button>
+                </div>
+            </div>
         </div>
-        <div class="extra content">
-          <div class="ui two buttons">
-            <button onclick="match_author(this)" class="ui button">Match me</button>
-            <div class="or"></div>
-            <button onclick="select_author(this)" class="ui positive button">Select me</button>
-          </div>
-        </div>
-      </div>
     </div>
-  {{/options}}
+    {{/options}}
 </div>

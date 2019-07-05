@@ -74,12 +74,12 @@ module.exports = function (app) {
 
         // Make request
         nodeRequest(query, (err, res, body) => {
-            let wikidataResult = queries.handleWikidataBody(JSON.parse(body));
 
+            let wikidataResult = queries.handleWikidataBody(JSON.parse(body));
             let viaflist = [];
 
-            wikidataResult.forEach((d)=>{
-                viaflist.push(d.viafurl);
+            wikidataResult.forEach((element) => {
+                viaflist.push(element.viafurl);
             });
 
             // Compose VIAF query
@@ -87,7 +87,6 @@ module.exports = function (app) {
 
             // Make request
             nodeRequest(query, (err, res, body) => {
-
 
                 let viafResult = queries.handleVIAFBody(JSON.parse(body), viaflist);
 
