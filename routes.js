@@ -94,6 +94,7 @@ module.exports = function (app) {
                     vars: queries.cobisMatchVars,
                     options: wikidataResult.concat(viafResult)
                 });
+
             });
         });
     });

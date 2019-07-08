@@ -15,13 +15,20 @@
                         </div>
                     </div>
                     <div class="middle aligned content">
-                        {{#descrizione}}<p><b>Descrizione:</b> {{.}}</p>{{/descrizione}}
+                        {{#descrizione}}<p>{{.}}</p>{{/descrizione}}
                         {{#birthDate}}<p><b>Data di nascita:</b> {{.}}</p>{{/birthDate}}
                         {{#deathDate}}<p><b>Data di morte: </b>{{.}}</p>{{/deathDate}}
+                        {{^descrizione}}
+                            {{^birthDate}}
+                                {{^deathDate}}
+                                    <i>Non sono presenti informazioni aggiuntive riguardo questo elemento</i>
+                                {{/deathDate}}
+                            {{/birthDate}}
+                        {{/descrizione}}
                     </div>
                 </div>
             </div>
-            <a class="ui red ribbon label">Esplora su...</a>
+            <a class="ui red ribbon label">Esplora in...</a>
             <div style="margin: 20px 0" class="center aligned">
                 {{#wikidata}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikidata</a>{{/wikidata}}
                 {{#itwikipedia}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia</a>{{/itwikipedia}}

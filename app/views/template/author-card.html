@@ -7,20 +7,30 @@
 
 <div class="column">
     <div class="ui raised segment">
+        {{#identifiers}}
         <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Autore</a>
-        <p style="text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0;">{{personName}}</p>
+        <p style="text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0;">
+            <a style="color: inherit" target="_blank" href="{{uri}}">
+                <i style="font-size: 12px; position: relative; top: -3px; margin-right: 5px;" class="fas fa-external-link-alt"></i> {{personName}}
+            </a>
+        </p>
+        {{/identifiers}}
+        {{#titles}}
         <a class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesLength}})</a>
         <div style="margin-top: 20px; margin-bottom: 20px;" class="ui bulleted list">
-            {{#titles}}
+            {{#titlesItem}}
             <div class="item">{{.}}</div>
-            {{/titles}}
+            {{/titlesItem}}
         </div>
+        {{/titles}}
+        {{#roles}}
         <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
         <div style="margin-top: 20px; margin-bottom: 20px;" class="ui bulleted list">
-            {{#roles}}
+            {{#rolesItem}}
             <div class="item">{{.}}</div>
-            {{/roles}}
+            {{/rolesItem}}
         </div>
+        {{/roles}}
         <div class="ui divider"></div>
         <div style="margin: 20px 0">
             <div style="margin-bottom: 10px;" class="fluid ui labeled button" tabindex="0">
@@ -31,8 +41,11 @@
                     0
                 </a>
             </div>
-            <!--<button style="margin-bottom: 20px;" class="fluid ui primary button">Associa autori selezionati</button>-->
-            <button class="fluid ui button">Vai al prossimo autore</button>
+            {{#identifiers}}
+            <a href="/get/cobis/authors/{{next}}">
+                <div class="fluid ui button">Vai al prossimo autore</div>
+            </a>
+            {{/identifiers}}
         </div>
     </div>
 </div>
