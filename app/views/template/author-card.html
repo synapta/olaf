@@ -33,17 +33,19 @@
         {{/roles}}
         <div class="ui divider"></div>
         <div style="margin: 20px 0">
-            <div style="margin-bottom: 10px;" class="fluid ui labeled button" tabindex="0">
-                <button onclick="match_multiple_authors()" class="fluid ui primary button">
-                    Associa autori selezionati
-                </button>
-                <a id="selected-options-counter" class="ui basic label">
-                    0
-                </a>
+            <div style="margin-bottom: 10px;" id="send_button">
+                <div class="fluid ui labeled button" tabindex="0">
+                    <button onclick="match_multiple_authors()" class="fluid ui primary button">
+                        Associa autori selezionati
+                    </button>
+                    <a id="selected-options-counter" class="ui basic label">
+                        0
+                    </a>
+                </div>
             </div>
             {{#identifiers}}
             <a href="/get/cobis/authors/{{next}}">
-                <div class="fluid ui button">Vai al prossimo autore</div>
+                <div class="fluid ui button">Salta autore</div>
             </a>
             {{/identifiers}}
         </div>

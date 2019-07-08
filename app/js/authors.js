@@ -90,12 +90,12 @@ function select_author(element) {
         // Change color and text
         element.classList.remove('negative');
         element.classList.add('positive');
-        element.innerHTML = 'Select me';
+        element.innerHTML = 'Seleziona candidato';
     } else {
         // Change color
         element.classList.remove('positive');
         element.classList.add('negative');
-        element.innerHTML = 'Deselect me';
+        element.innerHTML = 'Deseleziona candidato';
     }
 
     // Update selection counter
@@ -178,8 +178,8 @@ $.get('/views/template/author-options.html', (template) => {
 
             // Handle response
             let tokens = response.personName.split(', ');
-            let surname = "Galilei";
-            let name = "Galileo";
+            let surname = tokens[0].split('<')[0] || "";
+            let name = tokens[1] || "";
 
             // Query for wikidata options
             $.ajax({
@@ -230,6 +230,10 @@ function show_matches(matches) {
                 // Push output
                 if(Object.keys(matches).length === ++count) {
                     $('#matches-selection').html(output).promise().done(() => {
+
+                        // Set new button
+                        $('#send_button').html('<button onclick="alert(\'Invio informazioni\')" class="ui fluid primary button">Conferma assegnazione</button>');
+
                         // Set dropdown behavior
                         $('.ui.dropdown').dropdown({
                             onChange: function (value, text, selected) {
