@@ -36,7 +36,7 @@ let wikidataQuery = (name, surname) => {
     return `
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
         PREFIX wd: <http://www.wikidata.org/entity/>
-        SELECT (?item as ?wikidata) ?nome ?tipologia ?num ?descrizione ?altLabel  ?birthDate ?deathDate ?immagine ?itwikipedia ?enwikipedia ?viafurl ?sbn
+        SELECT (?item as ?wikidata) ?nome ?tipologia ?num ?descrizione ?altLabel  ?birthDate ?deathDate ?immagine ?itwikipedia ?enwikipedia ?treccani ?viafurl ?sbn
         WHERE {
         
             SERVICE wikibase:label {
@@ -51,7 +51,7 @@ let wikidataQuery = (name, surname) => {
                 bd:serviceParam wikibase:api "EntitySearch" .
                 bd:serviceParam wikibase:endpoint "www.wikidata.org" .
                 bd:serviceParam mwapi:search "${name + " " + surname}" .
-                bd:serviceParam mwapi:language "en" .
+                bd:serviceParam mwapi:language "it" .
                 ?item wikibase:apiOutputItem mwapi:item .
                 ?num wikibase:apiOrdinal true .
             }
@@ -69,12 +69,16 @@ let wikidataQuery = (name, surname) => {
             }
             
             OPTIONAL {
-                ?itwikipedia schema:about ?item   .
+                ?item wdt:P3365 ?treccani .
+            }
+            
+            OPTIONAL {
+                ?itwikipedia schema:about ?item .
                 FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
             }
             
             OPTIONAL {
-                ?enwikipedia schema:about ?item   .
+                ?enwikipedia schema:about ?item .
                 FILTER(CONTAINS(STR(?enwikipedia), 'en.wikipedia.org'))
             }
             
@@ -98,12 +102,8 @@ let wikidataQuery = (name, surname) => {
             
             MINUS{
                 ?item wdt:P31 ?class.
-                ?class wdt:P279* wd:Q838948
-            }
-            
-            MINUS{
-                ?item wdt:P31 ?class.
                 ?class wdt:P279* wd:Q234460
+                VALUES ?class {wd:Q838948 wd:Q14204246}
             }
             
             ?item wdt:P31 ?type .

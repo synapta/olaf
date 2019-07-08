@@ -1,42 +1,36 @@
-<div class="ui grid cards">
+<div class="ui two column grid">
     {{#options}}
-    <div class="eight wide column">
-        <div data-item="{{item}}" class="ui card fluid">
-            <div class="content grid ui">
-                <div class="two column row">
-                    <div class="column">
-
-                        <div class="header">{{nome}}</div>
-                        <div class="meta">
-                            <span class="category">{{tipologia}}</span>
-                        </div>
-                        <div class="description">
-                            <p>{{descrizione}}</p>
+    <div class="column">
+        <div data-item="{{item}}" class="ui raised segment">
+            <div style="text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0;">
+                <div style="margin-bottom: 5px;">{{nome}}</div>
+                <div style="font-size: 16px; color: #aaa;">{{tipologia}}</div>
+            </div>
+            <a class="ui red ribbon label">Candidato</a>
+            <div class="ui items">
+                <div class="item">
+                    <div class="ui small image">
+                        <div style="width: 100px; height: 100px; border-radius: 100%; background-image: url({{#immagine}}{{.}}{{/immagine}}); background-size: cover; margin: 0 auto; background-color: #ccc; text-align: center; line-height: 100px; font-size: 40px;">
+                            {{^immagine}}<i class="fas fa-user"></i>{{/immagine}}
                         </div>
                     </div>
-                    <div class="column left aligns">
-                        {{#birthDate}}{{.}} {{/birthDate}}{{deathDate}}
+                    <div class="middle aligned content">
+                        {{#descrizione}}<p><b>Descrizione:</b> {{.}}</p>{{/descrizione}}
+                        {{#birthDate}}<p><b>Data di nascita:</b> {{.}}</p>{{/birthDate}}
+                        {{#deathDate}}<p><b>Data di morte: </b>{{.}}</p>{{/deathDate}}
                     </div>
                 </div>
             </div>
-
-            <div class="extra content">
-          <span class="left floated">
-            {{#wikidata}}<a href={{.}} target="_blank">Wikidata</a><br>{{/wikidata}}
-            {{#itwikipedia}}<a href={{.}} target="_blank">Wikipedia</a><br>{{/itwikipedia}}
-            {{#viafurl}}<a href={{.}} target="_blank">VIAF</a>{{/viafurl}}
-          </span>
-                <div class="right floated author">
-                    {{#immagine}}<img class="ui avatar image" src="{{.}}">{{/immagine}}
-                </div>
+            <a class="ui red ribbon label">Esplora su...</a>
+            <div style="margin: 20px 0" class="center aligned">
+                {{#wikidata}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikidata</a>{{/wikidata}}
+                {{#itwikipedia}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia</a>{{/itwikipedia}}
+                {{#viafurl}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">VIAF</a>{{/viafurl}}
+                {{#treccani}}<a class="ui center aligned blue label" href="http://www.treccani.it/enciclopedia/{{.}}" target="_blank">Treccani</a>{{/treccani}}
+                {{#sbn}}<a class="ui center aligned blue label" href="http://id.sbn.it/af/{{.}}" target="_blank">SBN</a>{{/sbn}}
             </div>
-            <div class="extra content">
-                <div class="ui two buttons">
-                    <button onclick="match_author(this)" class="ui button">Match me</button>
-                    <div class="or"></div>
-                    <button onclick="select_author(this)" class="ui positive button">Select me</button>
-                </div>
-            </div>
+            <div class="ui divider"></div>
+            <button onclick="select_author(this)" class="ui fluid green button">Select me</button>
         </div>
     </div>
     {{/options}}

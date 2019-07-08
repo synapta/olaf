@@ -1,26 +1,38 @@
-<div style="margin-bottom: 40px;" class="ui fluid container">
-    <div class="ui top attached segment">
-        <!-- <img class="ui avatar image" src="/css/unknown.jpg"> -->
-        <span>{{personName}}</span>
-    </div>
-    <div class="ui attached header">
-        <p>Titles</p>
-    </div>
-    <div class="ui attached segment">
-        <div class="ui bulleted list">
-            {{#title}}
-                <div class="item">{{.}}</div>
-            {{/title}}
+<style>
+    .ribbon .fas
+    {
+        margin-right: 5px;
+    }
+</style>
+
+<div class="column">
+    <div class="ui raised segment">
+        <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Autore</a>
+        <p style="text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0;">{{personName}}</p>
+        <a class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesLength}})</a>
+        <div style="margin-top: 20px; margin-bottom: 20px;" class="ui bulleted list">
+            {{#titles}}
+            <div class="item">{{.}}</div>
+            {{/titles}}
         </div>
-    </div>
-    <div class="ui attached header">
-        <p>Role</p>
-    </div>
-    <div class="ui bottom attached segment">
-        <div class="ui bulleted list">
-            {{#personRole}}
-                <div class="item">{{.}}</div>
-            {{/personRole}}
+        <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
+        <div style="margin-top: 20px; margin-bottom: 20px;" class="ui bulleted list">
+            {{#roles}}
+            <div class="item">{{.}}</div>
+            {{/roles}}
+        </div>
+        <div class="ui divider"></div>
+        <div style="margin: 20px 0">
+            <div style="margin-bottom: 10px;" class="fluid ui labeled button" tabindex="0">
+                <button onclick="match_multiple_authors()" class="fluid ui primary button">
+                    Associa autori selezionati
+                </button>
+                <a id="selected-options-counter" class="ui basic label">
+                    0
+                </a>
+            </div>
+            <!--<button style="margin-bottom: 20px;" class="fluid ui primary button">Associa autori selezionati</button>-->
+            <button class="fluid ui button">Vai al prossimo autore</button>
         </div>
     </div>
 </div>

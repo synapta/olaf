@@ -1,7 +1,7 @@
 // Global variables
 let options = {};
 let selected_items = {};
-let person_uri = "";
+let person_uri = null;
 
 // Labels filter
 let valid_labels = ["wikidata", "viafurl", "sbn"];
@@ -59,7 +59,7 @@ function group_labels(options, callback) {
 function select_author(element) {
 
     // Get option item
-    let item = element.closest('.card').getAttribute('data-item');
+    let item = element.closest('.segment').getAttribute('data-item');
     // Get selection result
     let selected = update_selection(item);
 
@@ -113,6 +113,7 @@ function match_multiple_authors() {
                 // End iteration
                 if(selected_options.length === selected_items_keys.length) {
                     group_labels(selected_options, (grouped_labels) => {
+                        console.log(grouped_labels);
                         show_matches(grouped_labels);
                     });
                 }
@@ -138,19 +139,27 @@ $.get('/views/template/author-card.html', (template) => {
         dataType: 'json',
         success: response => {
 
+            console.log(response)
+
             // Store person identifier
             person_uri = response.personURI;
 
             // Parse titles and roles
-            if(response.title)
-                response.title = response.title.split('###');
+            if(response.title) {
+                response.titles = response.title.split('###');
+                response.titlesLength = response.titles.length;
+                delete response.title;
+            }
 
-            if(response.personRole)
-                response.personRole = response.personRole.split('###');
+            if(response.personRole) {
+                response.roles = response.personRole.split('###');
+                delete response.personRole;
+            }
 
             //Generate and set output
             let output = Mustache.render(template, response);
             $('#author-card').html(output).fadeIn(2000);
+            $('.sticky').sticky({context: '#author-options'});
 
         }
     });
@@ -176,12 +185,8 @@ $.get('/views/template/author-options.html', (template) => {
 
             // Handle response
             let tokens = response.personName.split(', ');
-            let surname = tokens[0];
-            let name = tokens[1];
-
-            console.log(response);
-            console.log(name);
-            console.log(surname);
+            let surname = "Galilei";
+            let name = "Galileo";
 
             // Query for wikidata options
             $.ajax({
@@ -193,7 +198,6 @@ $.get('/views/template/author-options.html', (template) => {
                     // Render output
                     let output = Mustache.render(template, response);
                     options = response.options;
-                    console.log(options);
                     $('#author-options').html(output).fadeIn(2000);
 
                     // Push state
@@ -221,7 +225,7 @@ function show_matches(matches) {
     $.get('/views/template/matches.html', (template) => {
 
         // Generate container
-        let container = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/' + offset, 'identifier': person_uri});
+        let container = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/' + offset, 'identifier': person_uri, 'next': 'http://localhost:3645/get/cobis/authors/' + (+offset + 1)});
         $('#author-container').html(container);
 
         // Populate matches container
