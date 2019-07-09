@@ -1,0 +1,52 @@
+{{#items}}
+    <div class="ui raised segment">
+        <!--<a class="ui red ribbon label">Candidato</a>-->
+        <div class="ui items">
+            <div class="item">
+                <div class="ui small image">
+                    <div style="width: 100px; height: 100px; border-radius: 100%; background-image: url({{#immagine}}{{.}}{{/immagine}}); background-size: cover; margin: 0 auto; background-color: #ccc; text-align: center; line-height: 100px; font-size: 40px;">
+                        {{^immagine}}<i class="fas fa-user"></i>{{/immagine}}
+                    </div>
+                </div>
+                <div class="middle aligned content">
+                    <div style="text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0;">
+                        <div style="margin-bottom: 5px;">{{nome}}</div>
+                        <div style="font-size: 16px; color: #aaa;">{{tipologia}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui divider"></div>
+        {{#wikidata}}
+            <div class="add_match">
+                <div data-label="wikidata" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span><b>Wikidata:</b> {{.}}</span>
+            </div>
+        {{/wikidata}}
+        {{#viafurl}}
+            <div class="add_match">
+                <div data-label="viafurl" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span><b>VIAF:</b> {{.}}</span>
+            </div>
+        {{/viafurl}}
+        {{#sbn}}
+            <div class="add_match">
+                <div data-label="sbn" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span><b>SBN:</b> {{.}}</span>
+            </div>
+        {{/sbn}}
+    </div>
+{{/items}}
+
+<style>
+    .add_match
+    {
+        margin-bottom: 10px;
+    }
+</style>

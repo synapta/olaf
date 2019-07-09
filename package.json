@@ -24,6 +24,7 @@
     "request": "^2.88.0",
     "require": "^2.4.20",
     "semantic-ui-grid": "^2.4.1",
+    "sugar": "latest",
     "underscore": "^1.9.1"
   }
 }

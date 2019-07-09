@@ -16,7 +16,7 @@
         </p>
         {{/identifiers}}
         {{#titles}}
-        <a class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesLength}})</a>
+        <a href="{{identifiers.uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesLength}}) - Visualizza tutte</a>
         <div style="margin-top: 20px; margin-bottom: 20px;" class="ui bulleted list">
             {{#titlesItem}}
             <div class="item">{{.}}</div>
@@ -27,7 +27,7 @@
         <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
         <div style="margin-top: 20px; margin-bottom: 20px;" class="ui bulleted list">
             {{#rolesItem}}
-            <div class="item">{{.}}</div>
+            <div class="item title">{{.}}</div>
             {{/rolesItem}}
         </div>
         {{/roles}}

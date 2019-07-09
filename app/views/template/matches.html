@@ -1,9 +1,7 @@
-<form action="{{action}}" type="" method="post">
+<form id="matches-form" action="{{action}}" type="" method="post">
     <input type="hidden" name="identifier" value="{{identifier}}" />
-    <div class="ui grid">
-        <div class="eight wide column">
-            <h1 style="margin-bottom: 25px">Matches selection</h1>
-        </div>
+    <div class="ui two column grid">
+        <div class="column" id="matches-selection"></div>
+        <div class="column" id="matches-options"></div>
     </div>
-    <div id="matches-selection"></div>
 </form>

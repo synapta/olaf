@@ -1,6 +1,7 @@
 // Global variables
 let options = {};
 let selected_items = {};
+let selected_fields = {};
 let author_uri = null;
 
 // Labels filter
@@ -9,7 +10,7 @@ let valid_labels = ["wikidata", "viafurl", "sbn"];
 // Response parsing
 function parse_cobis_response(response, uri, offset) {
 
-    response.identifiers = {uri: uri, offset: offset, next: +offset + 1, prev: +offset + 1};
+    response.identifiers = {uri: uri, offset: offset, next: +offset + 1, prev: +offset - 1};
 
     // Parse titles and roles
     if(response.title) {
@@ -64,9 +65,9 @@ function group_labels(options, callback) {
             // Group by valid keys
             if(valid_labels.includes(key)) {
                 if (key in grouped_options)
-                    grouped_options[key].push(option[key]);
+                    grouped_options[key].push({'identifier': option[key], 'item': option});
                 else
-                    grouped_options[key] = [option[key]];
+                    grouped_options[key] = [{'identifier': option[key], 'item': option}];
             }
         });
 
@@ -119,7 +120,6 @@ function match_multiple_authors() {
                 // End iteration
                 if(selected_options.length === selected_items_keys.length) {
                     group_labels(selected_options, (grouped_labels) => {
-                        console.log(grouped_labels);
                         show_matches(grouped_labels);
                     });
                 }
@@ -127,6 +127,24 @@ function match_multiple_authors() {
         });
     } else
         alert('Devi selezionare almeno un autore col quale fare match');
+
+}
+
+function match_field(element) {
+
+    let label = element.getAttribute('data-label');
+    let value = element.getAttribute('data-value');
+
+    // Select field
+    if(selected_fields[label] === value)
+        delete selected_fields[label];
+    else
+        selected_fields[label] = value;
+
+    console.log(selected_fields);
+
+    // Update fields rendering
+    update_fields()
 
 }
 
@@ -153,8 +171,6 @@ $.get('/views/template/author-card.html', (template) => {
             let output = Mustache.render(template, author);
             $('#author-card').html(output);
             $('#author-card').css({width: $('#author-card').parent().width(), position: 'fixed'});
-
-            console.log(author)
 
         }
     });
@@ -219,39 +235,69 @@ function show_matches(matches) {
 
         // Generate container
         let container = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/' + offset, 'identifier': author_uri, 'next': 'http://localhost:3645/get/cobis/authors/' + (+offset + 1)});
+        let selected_options = [];
+
         $('#author-container').html(container);
 
-        // Populate matches container
-        $.get('/views/template/matches-selection.html', (template) => {
-            // Handle keys
-            Object.keys(matches).forEach((key) => {
-                // Compose output
-                output += Mustache.render(template, {'label': key, 'items': matches[key]});
-                // Push output
-                if(Object.keys(matches).length === ++count) {
-                    $('#matches-selection').html(output).promise().done(() => {
-
-                        // Set new button
-                        $('#send_button').html('<button onclick="alert(\'Invio informazioni\')" class="ui fluid primary button">Conferma assegnazione</button>');
-
-                        // Set dropdown behavior
-                        $('.ui.dropdown').dropdown({
-                            onChange: function (value, text, selected) {
-
-                                // Set dropdown default text
-                                $(this).dropdown('set text', 'Elemento selezionato');
-
-                                // Set editable input value
-                                let label = selected[0].getAttribute('data-label');
-                                let input = $('#' + label);
-                                input.parent().removeClass('disabled');
-                                input.val(text);
-
-                            }
-                        });
-                    });
-                }
+        // Populate matches options
+        $.get('/views/template/matches-options.html', (template) => {
+            Object.keys(selected_items).forEach((item) => {
+                get_from_options(item, (option) => {
+                    // Collect selected options
+                    selected_options.push(option);
+                    // End iteration
+                    if(selected_options.length === Object.keys(selected_items).length) {
+                        output = Mustache.render(template, {'items': selected_options});
+                        $('#matches-options').html(output);
+                    }
+                });
             });
         });
+
+        // Populate matches container
+        $.get('/views/template/matches-selection-empty.html', (template) => {
+            // Set button behavior
+            $('#send_button').html('<button onclick="send_matches()" class="ui fluid primary button">Conferma assegnazione</button>');
+            // Set empty template
+            output = Mustache.render(template);
+            $('#matches-selection').html(output);
+        });
     });
+}
+
+function update_fields(){
+
+    let output = "";
+    let count = 0;
+
+    // Remove ticks
+    $('.field_selection').removeClass('green').html('<i class="fas fa-plus"></i>');
+
+    // Set selected values
+    if(Object.keys(selected_fields).length > 0) {
+        Object.keys(selected_fields).forEach((label) => {
+            $('.field_selection[data-label="' + label + '"][data-value="' + selected_fields[label] + '"]').addClass('green').html('<i class="fas fa-check"></i>');
+            $.get('/views/template/matches-selection.html', (template) => {
+                // Compose output
+                output += Mustache.render(template, {'label': label, 'value': selected_fields[label]});
+                // Push output
+                if(Object.keys(selected_fields).length === ++count)
+                    $('#matches-selection').html(output);
+            })
+        });
+    } else {
+        $.get('/views/template/matches-selection-empty.html', (template) => {
+            // Set empty template
+            output = Mustache.render(template);
+            $('#matches-selection').html(output);
+        });
+    }
+
+}
+
+function send_matches(){
+
+    // Send form
+    document.getElementById('matches-form').submit();
+
 }
