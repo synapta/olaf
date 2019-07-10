@@ -259,7 +259,7 @@ function show_matches(matches) {
         // Populate matches container
         $.get('/views/template/matches-selection-empty.html', (template) => {
             // Set button behavior
-            $('#send_button').html('<button onclick="send_matches()" class="ui fluid primary button">Conferma assegnazione</button>');
+            $('#send-button').html('<button onclick="send_matches()" class="ui fluid primary button">Conferma assegnazione</button>');
             // Set empty template
             output = Mustache.render(template);
             $('#matches-selection').html(output);

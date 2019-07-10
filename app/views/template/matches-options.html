@@ -4,14 +4,14 @@
         <div class="ui items">
             <div class="item">
                 <div class="ui small image">
-                    <div style="width: 100px; height: 100px; border-radius: 100%; background-image: url({{#immagine}}{{.}}{{/immagine}}); background-size: cover; margin: 0 auto; background-color: #ccc; text-align: center; line-height: 100px; font-size: 40px;">
+                    <div class="author-image" style="background-image: url({{#immagine}}{{.}}{{/immagine}});">
                         {{^immagine}}<i class="fas fa-user"></i>{{/immagine}}
                     </div>
                 </div>
                 <div class="middle aligned content">
-                    <div style="text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0;">
-                        <div style="margin-bottom: 5px;">{{nome}}</div>
-                        <div style="font-size: 16px; color: #aaa;">{{tipologia}}</div>
+                    <div class="author-name">
+                        <div class="author-title">{{nome}}</div>
+                        <div class="author-subtitle">{{tipologia}}</div>
                     </div>
                 </div>
             </div>
@@ -43,10 +43,3 @@
         {{/sbn}}
     </div>
 {{/items}}
-
-<style>
-    .add_match
-    {
-        margin-bottom: 10px;
-    }
-</style>

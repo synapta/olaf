@@ -2,15 +2,15 @@
     {{#options}}
     <div class="column">
         <div data-item="{{item}}" class="ui raised segment">
-            <div style="text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0;">
-                <div style="margin-bottom: 5px;">{{nome}}</div>
-                <div style="font-size: 16px; color: #aaa;">{{tipologia}}</div>
+            <div class="author-name">
+                <div class="author-title">{{nome}}</div>
+                <div class="author-subtitle">{{tipologia}}</div>
             </div>
             <a class="ui red ribbon label">Candidato</a>
             <div class="ui items">
                 <div class="item">
                     <div class="ui small image">
-                        <div style="width: 100px; height: 100px; border-radius: 100%; background-image: url({{#immagine}}{{.}}{{/immagine}}); background-size: cover; margin: 0 auto; background-color: #ccc; text-align: center; line-height: 100px; font-size: 40px;">
+                        <div style="background-image: url({{#immagine}}{{.}}{{/immagine}});" class="author-image">
                             {{^immagine}}<i class="fas fa-user"></i>{{/immagine}}
                         </div>
                     </div>
@@ -29,7 +29,7 @@
                 </div>
             </div>
             <a class="ui red ribbon label">Esplora in...</a>
-            <div style="margin: 20px 0" class="center aligned">
+            <div class="center aligned card-box">
                 {{#wikidata}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikidata</a>{{/wikidata}}
                 {{#itwikipedia}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia</a>{{/itwikipedia}}
                 {{#viafurl}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">VIAF</a>{{/viafurl}}
