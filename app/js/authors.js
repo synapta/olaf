@@ -8,9 +8,9 @@ let author_uri = null;
 let valid_labels = ["wikidata", "viafurl", "sbn"];
 
 // Response parsing
-function parse_cobis_response(response, uri, offset) {
+function parse_cobis_response(response, uri) {
 
-    response.identifiers = {uri: uri, offset: offset, next: +offset + 1, prev: +offset - 1};
+    response.identifiers = {uri: uri};
 
     // Parse titles and roles
     if(response.title) {
@@ -156,11 +156,11 @@ $.get('/views/template/author-card.html', (template) => {
     // Extract params from url
     let params = parse_url(window.location.href, [4, 6]);
     let token = params[0];
-    let offset = params[1];
 
     // Make request and send response
     $.ajax({
-        url: '/api/v1/' + token + '/author-info/' + offset,
+
+        url: '/api/v1/' + token + '/author/',
         method: 'GET',
         dataType: 'json',
         success: response => {
@@ -168,53 +168,39 @@ $.get('/views/template/author-card.html', (template) => {
             // Store person identifier
             author_uri = response.personURI;
             // Parse response
-            let author = parse_cobis_response(response, response.personURI, offset);
+            let author = parse_cobis_response(response, response.personURI);
             //Generate and set output
             let output = Mustache.render(template, author);
             $('#author-card').html(output);
             $('#author-card').css({width: $('#author-card').parent().width(), position: 'fixed'});
 
-        }
-    });
+            $.get('/views/template/author-options.html', (template) => {
 
-});
+                // Handle response
+                let tokens = response.personName.split(', ');
+                let surname = tokens[0].split('<')[0] || "";
+                let name = tokens[1] || "";
 
-$.get('/views/template/author-options.html', (template) => {
+                // Query for wikidata options
+                $.ajax({
 
-    // Extract params from url
-    let params = parse_url(window.location.href, [4, 6]);
-    let token = params[0];
-    let offset = params[1];
+                    url: '/api/v1/' + token + '/author-options/?name=' + encodeURI(name) + '&surname=' + encodeURI(surname),
+                    method: 'GET',
+                    dataType: 'json',
+                    success: response => {
 
-    // Get Wikidata candidates
-    $.ajax({
+                        // Render output
+                        let output = Mustache.render(template, response);
+                        options = response.options;
+                        $('#author-options').html(output).fadeIn(2000);
 
-        url: '/api/v1/' + token + '/author-info/' + offset,
-        method: 'GET',
-        dataType: 'json',
-        success: response => {
+                        // Push state
+                        //history.pushState({}, "", window.location.href);
 
-            // Handle response
-            let tokens = response.personName.split(', ');
-            let surname = tokens[0].split('<')[0] || "";
-            let name = tokens[1] || "";
+                    }
 
-            // Query for wikidata options
-            $.ajax({
-                url: '/api/v1/' + token + '/author-options/' + offset  + '?name=' + encodeURI(name) + '&surname=' + encodeURI(surname),
-                method: 'GET',
-                dataType: 'json',
-                success: response => {
+                });
 
-                    // Render output
-                    let output = Mustache.render(template, response);
-                    options = response.options;
-                    $('#author-options').html(output).fadeIn(2000);
-
-                    // Push state
-                    history.pushState({}, "", window.location.href);
-
-                }
             });
 
         }

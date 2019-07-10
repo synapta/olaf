@@ -3,34 +3,68 @@ let queryUrl = 'https://dati.cobis.to.it/sparql?default-graph-uri=&query=';
 let queryFormat = '&format=json';
 
 // Queries
-let cobisQuery = `
-    PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
-    PREFIX schema: <http://schema.org/>
-    PREFIX dcterm: <http://purl.org/dc/terms/>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    PREFIX owl: <http://www.w3.org/2002/07/owl#>
-    PREFIX bookType: <http://dati.cobis.to.it/vocabulary/bookType/>
+let cobisQuery = (offset) => {
+    return `PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
+            PREFIX schema: <http://schema.org/>
+            PREFIX dcterm: <http://purl.org/dc/terms/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            PREFIX bookType: <http://dati.cobis.to.it/vocabulary/bookType/>
+            PREFIX olaf: <http://olaf.synapta.io/onto/>
+               
+            SELECT ?personURI ?personName (SAMPLE(?description) as ?description) (SAMPLE(?link) as ?link) (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) (GROUP_CONCAT(distinct(?title); separator="###") as ?title) WHERE {
+        
+                {
+                    SELECT ?personURI (COUNT(DISTINCT ?contribution) as ?titlesCount) WHERE {
+               
+                        ?contribution bf2:agent ?personURI .
+                        MINUS {?personURI owl:sameAs ?wd}
+                        FILTER(ISURI(?personURI))
+            
+                    } GROUP BY ?personURI
+                      ORDER BY DESC(?titlesCount)
+                      LIMIT 1
+                      OFFSET ${offset}
+                }
+        
+                ?instance bf2:instanceOf ?work .
+                ?work bf2:contribution ?contribution .
+                ?contribution bf2:agent ?personURI .
+        
+                ?instance bf2:title ?titleURI .
+                ?titleURI rdfs:label ?title .
+        
+                OPTIONAL {?personURI schema:description ?description . }
+                OPTIONAL { ?personURI foaf:isPrimaryTopicOf ?link . }
+        
+                OPTIONAL { ?personURI schema:name ?personName . }
+                OPTIONAL { ?contribution bf2:role/rdfs:label ?personRole . }
+                MINUS {?personURI owl:sameAs ?wd}
+                MINUS {?personURI olaf:skipped ?skipped}
+                
+            } GROUP BY ?personURI ?personName`;
+};
 
-    SELECT ?personURI ?personName ( SAMPLE(?description ) as ?description ) ( SAMPLE(?link ) as ?link ) (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) (GROUP_CONCAT(distinct(?title); separator="###") as ?title) where {
-        GRAPH <http://dati.cobis.to.it/OATO/> {
-            ?instance bf2:instanceOf ?work .
-            ?work bf2:contribution ?contribution .
-            ?contribution bf2:agent ?personURI .
-
-            ?instance bf2:title ?titleURI .
-            ?titleURI rdfs:label ?title .
-
-            OPTIONAL {?personURI schema:description ?description . }
-            OPTIONAL { ?personURI foaf:isPrimaryTopicOf ?link . }
-
-            OPTIONAL { ?personURI schema:name ?personName . }
-            OPTIONAL { ?contribution bf2:role/rdfs:label ?personRole . }
-            MINUS {?personURI owl:sameAs ?wd}
-        }
-    } GROUP BY ?personURI ?personName
-    LIMIT 1
-    OFFSET
+/*let cobisInsertWikidata = `
+    INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+        ${personUri} owl:sameAs ${wikidataUri}
+    }
 `;
+
+let cobisInsertViaf = `
+    INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+        ${personUri} cobis:hasViafURL ${viafUri}
+    }
+`;
+
+let cobisInsertSkip = `
+    PREFIX olaf: <http://olaf.synapta.io/onto/>
+    INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+        ${personUri} olaf:skipped "${new Date()}"
+    }
+`;*/
+
+//dati.cobis.to.it
 
 let wikidataQuery = (name, surname) => {
     return `
@@ -201,7 +235,7 @@ let handleVIAFBody = (body, viafurls) => {
 // Exports
 exports.composeCobisQuery = (offset) => {
     // Compose query
-    return queryUrl + encodeURIComponent(cobisQuery) + offset + queryFormat;
+    return queryUrl + encodeURIComponent(cobisQuery(offset)) + queryFormat;
 };
 
 exports.composeQueryWikidata = (name, surname) => {

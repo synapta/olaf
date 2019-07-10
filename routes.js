@@ -42,15 +42,15 @@ module.exports = function (app) {
     });
 
     // Frontend
-    app.get('/get/:token/authors/:offset', function (request, response) {
+    app.get('/get/:token/author', function (request, response) {
         response.sendFile('authors.html', {root: __dirname + '/app/views'})
     });
 
     // API
-    app.get('/api/v1/:token/author-info/:offset', (request, response) => {
+    app.get('/api/v1/:token/author/', (request, response) => {
 
         // Compose query
-        let offset = request.params.offset;
+        let offset = Math.floor(Math.random() * 49);
         let query = queries.composeCobisQuery(offset);
 
         // Make request
@@ -63,7 +63,7 @@ module.exports = function (app) {
         });
     });
 
-    app.get('/api/v1/:token/author-options/:offset', (request, response) => {
+    app.get('/api/v1/:token/author-options/', (request, response) => {
 
         // Get parameters
         let name = request.query.name;
