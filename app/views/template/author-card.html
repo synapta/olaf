@@ -39,9 +39,7 @@
                 </div>
             </div>
             {{#identifiers}}
-            <a href="/get/cobis/authors/{{next}}">
-                <div class="fluid ui button">Salta autore</div>
-            </a>
+                <div onclick="skip_author(this)" data-identifier="{{uri}}" class="fluid ui button">Salta autore</div>
             {{/identifiers}}
         </div>
     </div>

@@ -3,7 +3,7 @@ let queryUrl = 'https://dati.cobis.to.it/sparql?default-graph-uri=&query=';
 let queryFormat = '&format=json';
 
 // Queries
-let cobisQuery = (offset) => {
+let cobisSelect = (offset) => {
     return `PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
             PREFIX schema: <http://schema.org/>
             PREFIX dcterm: <http://purl.org/dc/terms/>
@@ -19,6 +19,7 @@ let cobisQuery = (offset) => {
                
                         ?contribution bf2:agent ?personURI .
                         MINUS {?personURI owl:sameAs ?wd}
+                        MINUS {?personURI olaf:skipped ?skipped}
                         FILTER(ISURI(?personURI))
             
                     } GROUP BY ?personURI
@@ -45,24 +46,33 @@ let cobisQuery = (offset) => {
             } GROUP BY ?personURI ?personName`;
 };
 
-/*let cobisInsertWikidata = `
-    INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
-        ${personUri} owl:sameAs ${wikidataUri}
-    }
-`;
+let cobisInsertWikidata = (personUri, wikidataUri) => {
+    return `INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+                <${personUri}> owl:sameAs ${wikidataUri}
+            }`;
+};
 
-let cobisInsertViaf = `
-    INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
-        ${personUri} cobis:hasViafURL ${viafUri}
-    }
-`;
+let cobisInsertViaf = (personUri, viafurl) => {
+    return `INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+                <${personUri}> cobis:hasViafURL ${viafurl}
+            }`;
+};
 
-let cobisInsertSkip = `
-    PREFIX olaf: <http://olaf.synapta.io/onto/>
-    INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
-        ${personUri} olaf:skipped "${new Date()}"
-    }
-`;*/
+let cobisInsertSbn = (personUri, sbn) => {
+    return `INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+                ${personUri} cobis:hasSbn ${sbn}
+            }`;
+};
+
+let cobisInsertSkip = (personUri) => {
+    return `PREFIX olaf: <http://olaf.synapta.io/onto/>
+            INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+                <${personUri}> olaf:skipped ?now
+            }
+            WHERE {
+                BIND(NOW() as ?now)
+            }`;
+};
 
 //dati.cobis.to.it
 
@@ -233,9 +243,25 @@ let handleVIAFBody = (body, viafurls) => {
 
 
 // Exports
-exports.composeCobisQuery = (offset) => {
+exports.cobisSelect = (offset) => {
+    return cobisSelect(offset);
+};
+
+exports.cobisInsertSkip = (personUri) => {
+    return cobisInsertSkip(personUri);
+};
+
+exports.cobisInsertWikidata = (personUri, wikidataUri) => {
+    return cobisInsertWikidata(personUri, wikidataUri);
+};
+
+exports.cobisInsertViaf = (personUri, viafurl) => {
+    return cobisInsertViaf(personUri, viafurl);
+};
+
+exports.composeCobisQuery = (query) => {
     // Compose query
-    return queryUrl + encodeURIComponent(cobisQuery(offset)) + queryFormat;
+    return queryUrl + encodeURIComponent(query) + queryFormat;
 };
 
 exports.composeQueryWikidata = (name, surname) => {

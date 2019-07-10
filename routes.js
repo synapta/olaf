@@ -51,7 +51,7 @@ module.exports = function (app) {
 
         // Compose query
         let offset = Math.floor(Math.random() * 49);
-        let query = queries.composeCobisQuery(offset);
+        let query = queries.composeCobisQuery(queries.cobisSelect(offset));
 
         // Make request
         nodeRequest(query, (err, res, body) => {
@@ -99,7 +99,59 @@ module.exports = function (app) {
         });
     });
 
-    app.post('/api/v1/:token/author-matches/:offset', (request, response) => {
-        response.json(request.body);
+    app.post('/api/v1/:token/author-matches/', (request, response) => {
+
+        // Get uri
+        let personUri = request.body.identifier;
+        let wikidataUri = request.body.wikidataUri;
+        let viafurl = request.body.viafurl;
+        let sbn = request.body.sbn;
+
+        // Set endpoints
+        let endpoints = {'wikidata': wikidataUri, 'viaf': viafurl, 'sbn': sbn};
+        let completedQueries = 0;
+
+        // Compose query
+        let wikidataQuery = queries.composeCobisQuery(queries.cobisInsertWikidata(personUri, wikidataUri));
+        let viafQuery = queries.composeCobisQuery(queries.cobisInsertViaf(personUri, viafurl));
+        let sbnQuery = null;
+
+        Object.keys(endpoints).forEach((key) => {
+
+            // Empty query
+            let query = null;
+
+            // Parse query
+            if(endpoints[key] !== undefined) {
+                if (key === 'wikidata')
+                    query = wikidataQuery;
+                else if (key === 'viaf')
+                    query = viafQuery;
+                else if (key === 'sbn')
+                    query = sbnQuery;
+            }
+
+            http.get(query, function(res) {
+                if(++completedQueries === Object.keys(endpoints).length)
+                    response.json({'status': 'success'});
+            })
+
+        })
     });
+
+    app.post('/api/v1/:token/author-skip/', (request, response) => {
+
+        // Get uri
+        let personUri = request.body.uri;
+        // Compose query
+        let query = queries.composeCobisQuery(queries.cobisInsertSkip(personUri));
+
+        // Compose Cobis query
+        nodeRequest(query, (err, res, body) => {
+            // Send response
+            response.json({'status': 'success'});
+        });
+
+    });
+
 };

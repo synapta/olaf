@@ -75,7 +75,7 @@ function group_labels(options, callback) {
             }
         });
 
-        // Termination
+        // End iteration
         if(++count === options.length)
             callback(grouped_options);
 
@@ -178,8 +178,8 @@ $.get('/views/template/author-card.html', (template) => {
 
                 // Handle response
                 let tokens = response.personName.split(', ');
-                let surname = tokens[0].split('<')[0] || "";
-                let name = tokens[1] || "";
+                let surname = tokens[0].split('<')[0].trim() || "";
+                let name = tokens[1].split('<')[0].trim() || "";
 
                 // Query for wikidata options
                 $.ajax({
@@ -208,21 +208,19 @@ $.get('/views/template/author-card.html', (template) => {
 
 });
 
-function show_matches(matches) {
+function show_matches() {
 
     // Extract params from url
     let params = parse_url(window.location.href, [4, 6]);
     let token = params[0];
-    let offset = params[1];
 
     // Variables
     let output = '';
-    let count = 0;
 
     $.get('/views/template/matches.html', (template) => {
 
         // Generate container
-        let container = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/' + offset, 'identifier': author_uri, 'next': 'http://localhost:3645/get/cobis/authors/' + (+offset + 1)});
+        let container = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/', 'identifier': author_uri});
         let selected_options = [];
 
         $('#author-container').html(container);
@@ -250,13 +248,13 @@ function show_matches(matches) {
             output = Mustache.render(template);
             $('#matches-selection').html(output);
         });
+
     });
 }
 
 function update_fields(){
 
     let output = "";
-    let count = 0;
     let render_fiels = [];
 
     // Remove ticks
@@ -284,9 +282,33 @@ function update_fields(){
 
 }
 
-function send_matches(){
+function skip_author(element){
 
+    // Get author uri
+    let uri = $(element).attr('data-identifier');
+    // Extract params from url
+    let params = parse_url(window.location.href, [4, 6]);
+    let token = params[0];
+
+    // API call
+    $.ajax({
+
+        url: '/api/v1/' + token + '/author-skip/',
+        method: 'POST',
+        data: {'uri': uri},
+        dataType: 'json',
+        success: response => {
+            if(response.status === 'success')
+                location.reload();
+            else
+                alert("Errore");
+        }
+
+    });
+
+}
+
+function send_matches(){
     // Send form
     document.getElementById('matches-form').submit();
-
 }
