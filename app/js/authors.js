@@ -14,8 +14,12 @@ function parse_cobis_response(response, uri, offset) {
 
     // Parse titles and roles
     if(response.title) {
-        let titles = response.title.split('###');
-        response.titles = {titlesLength: titles.length, titlesItem: titles};
+        let titlesRaw = response.title.split('###');
+        // Get three titles
+        let titles = [];
+        for(let i = 0; i < titlesRaw.length && i < 3; i++)
+            titles.push(titlesRaw[i]);
+        response.titles = {titlesLength: titlesRaw.length, titlesItem: titles};
         delete response.title;
     }
 
@@ -140,8 +144,6 @@ function match_field(element) {
         delete selected_fields[label];
     else
         selected_fields[label] = value;
-
-    console.log(selected_fields);
 
     // Update fields rendering
     update_fields()
@@ -269,6 +271,7 @@ function update_fields(){
 
     let output = "";
     let count = 0;
+    let render_fiels = [];
 
     // Remove ticks
     $('.field_selection').removeClass('green').html('<i class="fas fa-plus"></i>');
@@ -277,14 +280,14 @@ function update_fields(){
     if(Object.keys(selected_fields).length > 0) {
         Object.keys(selected_fields).forEach((label) => {
             $('.field_selection[data-label="' + label + '"][data-value="' + selected_fields[label] + '"]').addClass('green').html('<i class="fas fa-check"></i>');
-            $.get('/views/template/matches-selection.html', (template) => {
-                // Compose output
-                output += Mustache.render(template, {'label': label, 'value': selected_fields[label]});
-                // Push output
-                if(Object.keys(selected_fields).length === ++count)
-                    $('#matches-selection').html(output);
-            })
+            render_fiels.push({'label': label, 'value': selected_fields[label]});
         });
+        $.get('/views/template/matches-selection.html', (template) => {
+            // Compose output
+            output = Mustache.render(template, {'fields': render_fiels});
+            // Push output
+            $('#matches-selection').html(output);
+        })
     } else {
         $.get('/views/template/matches-selection-empty.html', (template) => {
             // Set empty template

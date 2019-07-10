@@ -3,6 +3,13 @@
     {
         margin-right: 5px;
     }
+    .title
+    {
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 </style>
 
 <div class="column">
@@ -17,17 +24,19 @@
         {{/identifiers}}
         {{#titles}}
         <a href="{{identifiers.uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesLength}}) - Visualizza tutte</a>
-        <div style="margin-top: 20px; margin-bottom: 20px;" class="ui bulleted list">
+        <ul style="margin-top: 20px; margin-bottom: 20px;" class="ui bulleted list">
             {{#titlesItem}}
-            <div class="item">{{.}}</div>
+            <li>
+                <div class="item title">{{.}}</div>
+            </li>
             {{/titlesItem}}
-        </div>
+        </ul>
         {{/titles}}
         {{#roles}}
         <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
         <div style="margin-top: 20px; margin-bottom: 20px;" class="ui bulleted list">
             {{#rolesItem}}
-            <div class="item title">{{.}}</div>
+            <div class="item">{{.}}</div>
             {{/rolesItem}}
         </div>
         {{/roles}}
