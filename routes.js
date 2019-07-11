@@ -1,7 +1,6 @@
 // Requirements
 const express        = require('express');
 const bodyParser     = require('body-parser');
-const config         = require('./app/js/config.js');
 const nodeRequest    = require('request');
 const promiseRequest = require('request-promise');
 const queries        = require('./query');
