@@ -50,7 +50,7 @@ let cobisSelect = (offset) => {
 
 let cobisInsertWikidata = (personUri, wikidataUri) => {
     return `INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
-                <${personUri}> owl:sameAs "${wikidataUri}"
+                <${personUri}> owl:sameAs <${wikidataUri}>
             }`;
 };
 
