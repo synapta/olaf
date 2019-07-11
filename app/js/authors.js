@@ -1,7 +1,37 @@
 // Global variables
 let options = {};
 let selected_items = {};
-//let valid_labels = ["name", "surname", "description", "birthDate", "deathDate", "immagine"];
+let selected_fields = {};
+let author_uri = null;
+
+// Labels filter
+let valid_labels = ["wikidata", "viafurl", "sbn"];
+
+// Response parsing
+function parse_cobis_response(response, uri) {
+
+    response.identifiers = {uri: uri};
+
+    // Parse titles and roles
+    if(response.title) {
+        let titlesRaw = response.title.split('###');
+        // Get three titles
+        let titles = [];
+        for(let i = 0; i < titlesRaw.length && i < 3; i++)
+            titles.push(titlesRaw[i]);
+        response.titles = {titlesLength: titlesRaw.length, titlesItem: titles};
+        delete response.title;
+    }
+
+    if(response.personRole) {
+        let roles = response.personRole.split('###');
+        response.roles = {rolesLength: roles.length, rolesItem: roles};
+        delete response.personRole;
+    }
+
+    return response;
+
+}
 
 // Selection handling
 function update_selection(item) {
@@ -22,7 +52,6 @@ function get_from_options(item, callback) {
 
     // Get item from option
     options.forEach((option) => {
-        console.log(item)
         if(option.item.toString() === item.toString())
             callback(option);
     })
@@ -40,13 +69,13 @@ function group_labels(options, callback) {
             // Group by valid keys
             if(valid_labels.includes(key)) {
                 if (key in grouped_options)
-                    grouped_options[key].push(option[key]);
+                    grouped_options[key].push({'identifier': option[key], 'item': option});
                 else
-                    grouped_options[key] = [option[key]];
+                    grouped_options[key] = [{'identifier': option[key], 'item': option}];
             }
         });
 
-        // Termination
+        // End iteration
         if(++count === options.length)
             callback(grouped_options);
 
@@ -57,7 +86,7 @@ function group_labels(options, callback) {
 function select_author(element) {
 
     // Get option item
-    let item = element.closest('.card').getAttribute('data-item');
+    let item = element.closest('.segment').getAttribute('data-item');
     // Get selection result
     let selected = update_selection(item);
 
@@ -66,32 +95,16 @@ function select_author(element) {
         // Change color and text
         element.classList.remove('negative');
         element.classList.add('positive');
-        element.innerHTML = 'Select me';
+        element.innerHTML = 'Seleziona candidato';
     } else {
         // Change color
         element.classList.remove('positive');
         element.classList.add('negative');
-        element.innerHTML = 'Deselect me';
+        element.innerHTML = 'Deseleziona candidato';
     }
 
     // Update selection counter
     document.getElementById('selected-options-counter').innerHTML = Object.keys(selected_items).length;
-
-}
-
-function match_author(element) {
-
-    // Get option item
-    let item = element.closest('.card').getAttribute('data-item');
-    // Select item
-    update_selection(item);
-
-    // Get from options
-    get_from_options(item, (option) => {
-        group_labels([option], (grouped_labels) => {
-            show_matches(grouped_labels);
-        });
-    });
 
 }
 
@@ -121,75 +134,94 @@ function match_multiple_authors() {
 
 }
 
+function match_field(element) {
+
+    let label = element.getAttribute('data-label');
+    let value = element.getAttribute('data-value');
+
+    // Select field
+    if(selected_fields[label] === value)
+        delete selected_fields[label];
+    else
+        selected_fields[label] = value;
+
+    // Update fields rendering
+    update_fields()
+
+}
+
 // Rendering
 $.get('/views/template/author-card.html', (template) => {
 
     // Extract params from url
     let params = parse_url(window.location.href, [4, 6]);
     let token = params[0];
-    let offset = params[1];
+
+    // Print message
+    let action = sessionStorage.getItem("action");
+    $.get('/views/template/author-message.html', (template) => {
+
+        // Parse message
+        let message = {};
+        if(action === 'match')
+            message = {'style': 'success', 'title': 'Autore associato correttamente', 'text': 'Attendi mentre verranno caricate le successive opzioni.'};
+        else if(action === 'skip')
+            message = {'style': '', 'title': 'Autore saltato', 'text': 'Attendi mentre verranno caricate le successive opzioni.'};
+        else
+            message = {'style': '', 'title': 'Benvenuto su OLAF', 'text': 'Attendi mentre verranno caricate le successive opzioni.'};
+
+        // Show message
+        let output = Mustache.render(template, message);
+        $('#author-options').html(output);
+
+    });
 
     // Make request and send response
     $.ajax({
-        url: '/api/v1/' + token + '/author-info/' + offset,
+
+        url: '/api/v1/' + token + '/author/',
         method: 'GET',
         dataType: 'json',
         success: response => {
 
-            console.log(response);
-
-            // Parse titles and roles
-            if(response.title)
-                response.title = response.title.split('###');
-
-            if(response.personRole)
-                response.personRole = response.personRole.split('###');
-
+            // Store person identifier
+            author_uri = response.personURI;
+            // Parse response
+            let author = parse_cobis_response(response, response.personURI);
             //Generate and set output
-            let output = Mustache.render(template, response);
-            $('#author-card').html(output).fadeIn(2000);
+            let output = Mustache.render(template, author);
+            $('#author-card').html(output);
+            $('#author-card').css({width: $('#author-card').parent().width(), position: 'fixed'});
 
-        }
-    });
+            // Print options
+            $.get('/views/template/author-options.html', (template) => {
 
-});
+                // Handle response
+                let tokens = response.personName.split(', ');
 
-$.get('/views/template/author-options.html', (template) => {
+                // Get name and surname
+                let surname = tokens[0].split('<')[0].trim() || "";
+                let name = "";
+                if(tokens[1])
+                    name = tokens[1].split('<')[0].trim() || "";
 
-    // Extract params from url
-    let params = parse_url(window.location.href, [4, 6]);
-    let token = params[0];
-    let offset = params[1];
+                // Query for wikidata options
+                $.ajax({
 
-    // Get Wikidata candidates
-    $.ajax({
+                    url: '/api/v1/' + token + '/author-options/?name=' + encodeURI(name) + '&surname=' + encodeURI(surname),
+                    method: 'GET',
+                    dataType: 'json',
+                    success: response => {
 
-        url: '/api/v1/' + token + '/author-info/' + offset,
-        method: 'GET',
-        dataType: 'json',
-        success: response => {
+                        // Render output
+                        let output = Mustache.render(template, response);
+                        options = response.options;
+                        $('#author-options').html(output).fadeIn(2000);
 
-            // Handle response
-            let tokens = response.personName.split(', ');
-            let name = tokens[1];
-            let surname = tokens[0];
+                    }
 
-            // Query for wikidata options
-            $.ajax({
-                url: '/api/v1/' + token + '/author-options/' + offset  + '?name=' + encodeURI(name) + '&surname=' + encodeURI(surname),
-                method: 'GET',
-                dataType: 'json',
-                success: response => {
+                });
 
-                    // Render output
-                    let output = Mustache.render(template, response);
-                    options = response.options;
-                    $('#author-options').html(output).fadeIn(2000);
-
-                    // Push state
-                    history.pushState({}, "", window.location.href);
-
-                }
             });
 
         }
@@ -197,50 +229,112 @@ $.get('/views/template/author-options.html', (template) => {
 
 });
 
-function show_matches(matches) {
+function show_matches() {
 
     // Extract params from url
     let params = parse_url(window.location.href, [4, 6]);
     let token = params[0];
-    let offset = params[1];
 
     // Variables
     let output = '';
-    let count = 0;
 
     $.get('/views/template/matches.html', (template) => {
 
         // Generate container
-        let container = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/' + offset});
+        let container = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/', 'identifier': author_uri});
+        let selected_options = [];
+
         $('#author-container').html(container);
 
-        // Populate matches container
-        $.get('/views/template/matches-selection.html', (template) => {
-            // Handle keys
-            Object.keys(matches).forEach((key) => {
-                // Compose output
-                output += Mustache.render(template, {'label': key, 'items': matches[key]});
-                // Push output
-                if(Object.keys(matches).length === ++count) {
-                    $('#matches-selection').html(output).promise().done(() => {
-                        // Set dropdown behavior
-                        $('.ui.dropdown').dropdown({
-                            onChange: function (value, text, selected) {
-
-                                // Set dropdown default text
-                                $(this).dropdown('set text', 'Elemento selezionato');
-
-                                // Set editable input value
-                                let label = selected[0].getAttribute('data-label');
-                                let input = $('#' + label);
-                                input.parent().removeClass('disabled');
-                                input.val(text);
-
-                            }
-                        });
-                    });
-                }
+        // Populate matches options
+        $.get('/views/template/matches-options.html', (template) => {
+            Object.keys(selected_items).forEach((item) => {
+                get_from_options(item, (option) => {
+                    // Collect selected options
+                    selected_options.push(option);
+                    // End iteration
+                    if(selected_options.length === Object.keys(selected_items).length) {
+                        output = Mustache.render(template, {'items': selected_options});
+                        $('#matches-options').html(output);
+                    }
+                });
             });
         });
+
+        // Populate matches container
+        $.get('/views/template/matches-selection-empty.html', (template) => {
+            // Set button behavior
+            $('#send-button').html('<button onclick="send_matches()" class="ui fluid primary button">Conferma assegnazione</button>');
+            // Set empty template
+            output = Mustache.render(template);
+            $('#matches-selection').html(output);
+        });
+
     });
+}
+
+function update_fields(){
+
+    let output = "";
+    let render_fiels = [];
+
+    // Remove ticks
+    $('.field_selection').removeClass('green').html('<i class="fas fa-plus"></i>');
+
+    // Set selected values
+    if(Object.keys(selected_fields).length > 0) {
+        Object.keys(selected_fields).forEach((label) => {
+            $('.field_selection[data-label="' + label + '"][data-value="' + selected_fields[label] + '"]').addClass('green').html('<i class="fas fa-check"></i>');
+            render_fiels.push({'label': label, 'value': selected_fields[label]});
+        });
+        $.get('/views/template/matches-selection.html', (template) => {
+            // Compose output
+            output = Mustache.render(template, {'fields': render_fiels});
+            // Push output
+            $('#matches-selection').html(output);
+        })
+    } else {
+        $.get('/views/template/matches-selection-empty.html', (template) => {
+            // Set empty template
+            output = Mustache.render(template);
+            $('#matches-selection').html(output);
+        });
+    }
+
+}
+
+function skip_author(element){
+
+    // Get author uri
+    let uri = $(element).attr('data-identifier');
+    // Extract params from url
+    let params = parse_url(window.location.href, [4, 6]);
+    let token = params[0];
+
+    // API call
+    $.ajax({
+
+        url: '/api/v1/' + token + '/author-skip/',
+        method: 'POST',
+        data: {'uri': uri},
+        dataType: 'json',
+        success: response => {
+            if(response.status === 'success') {
+                // Store last action in session
+                sessionStorage.setItem("action", "skip");
+                // Reload page
+                location.reload();
+            } else
+                alert("Errore");
+        }
+
+    });
+
+}
+
+function send_matches(){
+    // Store last action in session
+    sessionStorage.setItem("action", "match");
+    // Send form
+    document.getElementById('matches-form').submit();
 }

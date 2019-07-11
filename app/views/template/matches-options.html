@@ -1,0 +1,45 @@
+{{#items}}
+    <div class="ui raised segment">
+        <!--<a class="ui red ribbon label">Candidato</a>-->
+        <div class="ui items">
+            <div class="item">
+                <div class="ui small image">
+                    <div class="author-image" style="background-image: url({{#immagine}}{{.}}{{/immagine}});">
+                        {{^immagine}}<i class="fas fa-user"></i>{{/immagine}}
+                    </div>
+                </div>
+                <div class="middle aligned content">
+                    <div class="author-name">
+                        <div class="author-title">{{nome}}</div>
+                        <div class="author-subtitle">{{tipologia}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui divider"></div>
+        {{#wikidata}}
+            <div class="add_match">
+                <div data-label="wikidata" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span><b>Wikidata:</b> {{.}}</span>
+            </div>
+        {{/wikidata}}
+        {{#viafurl}}
+            <div class="add_match">
+                <div data-label="viafurl" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span><b>VIAF:</b> {{.}}</span>
+            </div>
+        {{/viafurl}}
+        {{#sbn}}
+            <div class="add_match">
+                <div data-label="sbn" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span><b>SBN:</b> {{.}}</span>
+            </div>
+        {{/sbn}}
+    </div>
+{{/items}}

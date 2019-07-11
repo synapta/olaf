@@ -22,8 +22,11 @@
     "jquery": "^3.4.1",
     "morgan": "^1.9.1",
     "request": "^2.88.0",
+    "request-promise": "latest",
     "require": "^2.4.20",
     "semantic-ui-grid": "^2.4.1",
-    "underscore": "^1.9.1"
+    "sugar": "latest",
+    "underscore": "^1.9.1",
+    "http": "latest"
   }
 }

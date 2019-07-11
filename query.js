@@ -2,106 +2,161 @@
 let queryUrl = 'https://dati.cobis.to.it/sparql?default-graph-uri=&query=';
 let queryFormat = '&format=json';
 
-let cobisVariables = ['nome', 'descrizione', 'tipologia', 'birthDate', 'deathDate', 'immagine', 'wikidata', 'itwikipedia', 'enwikipedia', 'viafurl'];
-
-exports.cobisMatchVars = ['wikidata', 'viafurl', 'sbn'];
-
 // Queries
-let cobisQuery = `
-    PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
-    PREFIX schema: <http://schema.org/>
-    PREFIX dcterm: <http://purl.org/dc/terms/>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    PREFIX owl: <http://www.w3.org/2002/07/owl#>
-    PREFIX bookType: <http://dati.cobis.to.it/vocabulary/bookType/>
+let cobisSelect = (offset) => {
+    return `PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
+            PREFIX schema: <http://schema.org/>
+            PREFIX dcterm: <http://purl.org/dc/terms/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            PREFIX bookType: <http://dati.cobis.to.it/vocabulary/bookType/>
+            PREFIX olaf: <http://olaf.synapta.io/onto/>
 
-    SELECT ?personURI ?personName ( SAMPLE(?description ) as ?description ) ( SAMPLE(?link ) as ?link ) (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) (GROUP_CONCAT(distinct(?title); separator="###") as ?title) where {
-        GRAPH <http://dati.cobis.to.it/OATO/> {
-            ?instance bf2:instanceOf ?work .
-            ?work bf2:contribution ?contribution .
-            ?contribution bf2:agent ?personURI .
+            SELECT ?personURI ?personName (SAMPLE(?description) as ?description) (SAMPLE(?link) as ?link) (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) (GROUP_CONCAT(distinct(?title); separator="###") as ?title) WHERE {
 
-            ?instance bf2:title ?titleURI .
-            ?titleURI rdfs:label ?title .
+                {
+                    SELECT ?personURI (COUNT(DISTINCT ?contribution) as ?titlesCount) WHERE {
 
-            OPTIONAL {?personURI schema:description ?description . }
-            OPTIONAL { ?personURI foaf:isPrimaryTopicOf ?link . }
+                        ?contribution bf2:agent ?personURI .
+                        MINUS {?personURI owl:sameAs ?wd}
+                        MINUS {?personURI cobis:hasViafURL ?vf}
+                        MINUS {?personURI olaf:skipped ?skipped}
+                        FILTER(ISURI(?personURI))
 
-            OPTIONAL { ?personURI schema:name ?personName . }
-            OPTIONAL { ?contribution bf2:role/rdfs:label ?personRole . }
-            MINUS {?personURI owl:sameAs ?wd}
-        }
-    } GROUP BY ?personURI ?personName
-    LIMIT 1
-    OFFSET
-`;
+                    } GROUP BY ?personURI
+                      ORDER BY DESC(?titlesCount)
+                      LIMIT 1
+                      OFFSET ${offset}
+                }
+
+                ?instance bf2:instanceOf ?work .
+                ?work bf2:contribution ?contribution .
+                ?contribution bf2:agent ?personURI .
+
+                ?instance bf2:title ?titleURI .
+                ?titleURI rdfs:label ?title .
+
+                OPTIONAL {?personURI schema:description ?description . }
+                OPTIONAL { ?personURI foaf:isPrimaryTopicOf ?link . }
+
+                OPTIONAL { ?personURI schema:name ?personName . }
+                OPTIONAL { ?contribution bf2:role/rdfs:label ?personRole . }
+                MINUS {?personURI owl:sameAs ?wd}
+                MINUS {?personURI cobis:hasViafURL ?vf}
+                MINUS {?personURI olaf:skipped ?skipped}
+
+            } GROUP BY ?personURI ?personName`;
+};
+
+let cobisInsertWikidata = (personUri, wikidataUri) => {
+    return `INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+                <${personUri}> owl:sameAs "${wikidataUri}"
+            }`;
+};
+
+let cobisInsertViaf = (personUri, viafurl) => {
+    return `PREFIX cobis: <http://dati.cobis.to.it/vocab/>
+            INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+                <${personUri}> cobis:hasViafURL "${viafurl}"
+            }`;
+};
+
+let cobisInsertSbn = (personUri, sbn) => {
+    return `PREFIX cobis: <http://dati.cobis.to.it/vocab/>
+            INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+                <${personUri}> cobis:hasSbn "${sbn}"
+            }`;
+};
+
+let cobisInsertSkip = (personUri) => {
+    return `PREFIX olaf: <http://olaf.synapta.io/onto/>
+            INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+                <${personUri}> olaf:skipped ?now
+            }
+            WHERE {
+                BIND(NOW() as ?now)
+            }`;
+};
+
+//dati.cobis.to.it
 
 let wikidataQuery = (name, surname) => {
-
     return `
-PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wd: <http://www.wikidata.org/entity/>
+        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+        PREFIX wd: <http://www.wikidata.org/entity/>
+        SELECT (?item as ?wikidata) ?nome ?tipologia ?num ?descrizione ?altLabel  ?birthDate ?deathDate ?immagine ?itwikipedia ?enwikipedia ?treccani ?viafurl ?sbn
+        WHERE {
 
-SELECT (?item as ?wikidata) (SAMPLE (?nome) as ?nome) (GROUP_CONCAT(?tipologia) as ?tipologia) (SAMPLE (?num) as ?num) (SAMPLE (?descrizione) as ?descrizione) (SAMPLE (?altLabel) as ?altLabel)  (SAMPLE (?birthDate) as ?birthDate) (SAMPLE (?deathDate) as ?deathDate) (SAMPLE (?immagine) as ?immagine) (SAMPLE (?itwikipedia) as ?itwikipedia) (SAMPLE (?enwikipedia) as ?enwikipedia)  (SAMPLE (?viafurl) as ?viafurl)
+            SERVICE wikibase:label {
+                bd:serviceParam wikibase:language "it,en,fr,de,nl".
+                ?item rdfs:label ?nome .
+                ?type rdfs:label ?tipologia.
+                ?item skos:altLabel ?altLabel .
+                ?item schema:description ?descrizione
+            }
 
-WHERE {
+            SERVICE wikibase:mwapi {
+                bd:serviceParam wikibase:api "EntitySearch" .
+                bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+                bd:serviceParam mwapi:search "${name + " " + surname}" .
+                bd:serviceParam mwapi:language "it" .
+                ?item wikibase:apiOutputItem mwapi:item .
+                ?num wikibase:apiOrdinal true .
+            }
 
-SERVICE wikibase:label {
-  bd:serviceParam wikibase:language "[AUTO],it".
-  ?item rdfs:label ?nome .
-  ?type rdfs:label ?tipologia.
-  ?item skos:altLabel ?altLabel .
-  ?item schema:description ?descrizione
-}
-SERVICE wikibase:mwapi {
-  bd:serviceParam wikibase:api "EntitySearch" .
-  bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-  bd:serviceParam mwapi:search "${name} ${surname}" .
-  bd:serviceParam mwapi:language "en" .
-  ?item wikibase:apiOutputItem mwapi:item .
-  ?num wikibase:apiOrdinal true .
-}
-OPTIONAL {
-  ?item wdt:P569 ?birthDate .
-}
-OPTIONAL {
-  ?item wdt:P570 ?deathDate .
-}
-OPTIONAL {
-  ?item wdt:P18 ?immagine .
-}
-OPTIONAL {
-  ?itwikipedia schema:about ?item   .
+            OPTIONAL {
+                ?item wdt:P569 ?birthDate .
+            }
 
-  FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
-}
-OPTIONAL {
-  ?enwikipedia schema:about ?item   .
-  FILTER(CONTAINS(STR(?enwikipedia), 'en.wikipedia.org'))
-}
-OPTIONAL {
-  ?item wdt:P214 ?viaf
-  BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
-}
-MINUS{
-  ?item wdt:P31 wd:Q15632617
-}
-MINUS{
-  ?item wdt:P31 wd:Q4167410
-}
-MINUS{
-  ?item wdt:P31 ?class.
-  ?class wdt:P279* wd:Q838948
-}
-MINUS{
-  ?item wdt:P31 ?class.
-  ?class wdt:P279* wd:Q234460
-}
+            OPTIONAL {
+                ?item wdt:P570 ?deathDate .
+            }
 
-?item wdt:P31 ?type .
-}
-GROUP BY ?item
-ORDER BY ASC(?num) LIMIT 20`;
+            OPTIONAL {
+                ?item wdt:P18 ?immagine .
+            }
+
+            OPTIONAL {
+                ?item wdt:P3365 ?treccani .
+            }
+
+            OPTIONAL {
+                ?itwikipedia schema:about ?item .
+                FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
+            }
+
+            OPTIONAL {
+                ?enwikipedia schema:about ?item .
+                FILTER(CONTAINS(STR(?enwikipedia), 'en.wikipedia.org'))
+            }
+
+            OPTIONAL {
+                ?item wdt:P214 ?viaf
+                BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
+            }
+
+            OPTIONAL {
+                ?item wdt:P396 ?sbn_raw
+                BIND(REPLACE(STR(?sbn_raw), "\\\\\\\\", "_") as ?sbn)
+            }
+
+            MINUS{
+                ?item wdt:P31 wd:Q15632617
+            }
+
+            MINUS{
+                ?item wdt:P31 wd:Q4167410
+            }
+
+            MINUS{
+                ?item wdt:P31 ?class.
+                ?class wdt:P279* wd:Q234460
+                VALUES ?class {wd:Q838948 wd:Q14204246}
+            }
+
+            ?item wdt:P31 ?type .
+
+        } ORDER BY ASC(?num) LIMIT 20`
 };
 
 // Cobis queries utils
@@ -158,16 +213,16 @@ let handleWikidataBody = (body) => {
 
 
 let handleVIAFBody = (body, viafurls) => {
+
     // Initialize response
-    let results = [];
+    let VIAFresult = [];
 
     if (body.result === null)
-        return results
+        return VIAFresult;
 
     let parsedcode = [];
 
     body.result.forEach((d) => {
-
         // Populate result
         if (['uniformtitleexpression', 'uniformtitlework'].indexOf(d.nametype) < 0 && viafurls.indexOf('https://viaf.org/viaf/' + d.viafid) === -1 && parsedcode.indexOf(d.viafid) === -1 ) {
             parsedcode.push(d.viafid);
@@ -182,19 +237,39 @@ let handleVIAFBody = (body, viafurls) => {
 
             item.item = JSON.stringify(item);
 
-            results.push(item)
+            VIAFresult.push(item)
         }
     });
 
-    return results;
+    return VIAFresult;
 
 };
 
 
 // Exports
-exports.composeCobisQuery = (offset) => {
+exports.cobisSelect = (offset) => {
+    return cobisSelect(offset);
+};
+
+exports.cobisInsertSkip = (personUri) => {
+    return cobisInsertSkip(personUri);
+};
+
+exports.cobisInsertWikidata = (personUri, wikidataUri) => {
+    return cobisInsertWikidata(personUri, wikidataUri);
+};
+
+exports.cobisInsertViaf = (personUri, viafurl) => {
+    return cobisInsertViaf(personUri, viafurl);
+};
+
+exports.cobisInsertSbn = (personUri, sbn) => {
+    return cobisInsertSbn(personUri, sbn);
+};
+
+exports.composeCobisQuery = (query) => {
     // Compose query
-    return queryUrl + encodeURIComponent(cobisQuery) + offset + queryFormat;
+    return queryUrl + encodeURIComponent(query) + queryFormat;
 };
 
 exports.composeQueryWikidata = (name, surname) => {
@@ -215,14 +290,6 @@ exports.composeQueryWikidata = (name, surname) => {
     }
 };
 
-exports.handleCobisBody = (body) => {
-    return handleCobisBody(body);
-};
-
-exports.handleWikidataBody = (body) => {
-    return handleWikidataBody(body);
-};
-
 exports.composeQueryVIAF = (name, surname) => {
     return {
         method: 'GET',
@@ -236,6 +303,14 @@ exports.composeQueryVIAF = (name, surname) => {
             'user-agent': 'pippo',
         }
     }
+};
+
+exports.handleCobisBody = (body) => {
+    return handleCobisBody(body);
+};
+
+exports.handleWikidataBody = (body) => {
+    return handleWikidataBody(body);
 };
 
 exports.handleVIAFBody = (body, viaflist) => {

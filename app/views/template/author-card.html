@@ -1,26 +1,46 @@
-<div style="margin-bottom: 40px;" class="ui fluid container">
-    <div class="ui top attached segment">
-        <!-- <img class="ui avatar image" src="/css/unknown.jpg"> -->
-        <span>{{personName}}</span>
-    </div>
-    <div class="ui attached header">
-        <p>Titles</p>
-    </div>
-    <div class="ui attached segment">
-        <div class="ui bulleted list">
-            {{#title}}
-                <div class="item">{{.}}</div>
-            {{/title}}
+<div class="column">
+    <div class="ui raised segment">
+        {{#identifiers}}
+        <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Autore</a>
+        <p class="author-name">
+            <a target="_blank" href="{{uri}}">
+                <i id="author-link" class="fas fa-external-link-alt"></i> {{personName}}
+            </a>
+        </p>
+        {{/identifiers}}
+        {{#titles}}
+        <a href="{{identifiers.uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesLength}}) - Visualizza tutte</a>
+        <ul class="ui bulleted list card-box">
+            {{#titlesItem}}
+            <li>
+                <div class="item title">{{.}}</div>
+            </li>
+            {{/titlesItem}}
+        </ul>
+        {{/titles}}
+        {{#roles}}
+        <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
+        <div class="ui bulleted list card-box">
+            {{#rolesItem}}
+            <div class="item">{{.}}</div>
+            {{/rolesItem}}
         </div>
-    </div>
-    <div class="ui attached header">
-        <p>Role</p>
-    </div>
-    <div class="ui bottom attached segment">
-        <div class="ui bulleted list">
-            {{#personRole}}
-                <div class="item">{{.}}</div>
-            {{/personRole}}
+        {{/roles}}
+        <div class="ui divider"></div>
+        <div class="card-box">
+            <div id="send-button">
+                <div class="fluid ui labeled button" tabindex="0">
+                    <button onclick="match_multiple_authors()" class="fluid ui primary button">
+                        Associa autori selezionati
+                    </button>
+                    <a id="selected-options-counter" class="ui basic label">
+                        0
+                    </a>
+                </div>
+            </div>
+            {{#identifiers}}
+                <div onclick="skip_author(this)" data-identifier="{{uri}}" class="fluid ui button">Salta autore</div>
+            {{/identifiers}}
         </div>
     </div>
 </div>

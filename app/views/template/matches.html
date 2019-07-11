@@ -1,13 +1,7 @@
-<form action="{{action}}" type="" method="post">
-    <div class="ui grid">
-        <div class="eight wide column">
-            <h1 style="margin-bottom: 25px">Matches selection</h1>
-        </div>
-        <div class="eight wide column">
-            <button class="ui right floated primary button">
-                Send matches
-            </button>
-        </div>
+<form id="matches-form" action="{{action}}" type="" method="post">
+    <input type="hidden" name="identifier" value="{{identifier}}" />
+    <div class="ui two column grid">
+        <div class="column" id="matches-selection"></div>
+        <div class="column" id="matches-options"></div>
     </div>
-    <div id="matches-selection"></div>
 </form>

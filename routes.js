@@ -1,9 +1,9 @@
 // Requirements
-const express     = require('express');
-const bodyParser  = require('body-parser');
-const config      = require('./app/js/config.js');
-const nodeRequest = require('request');
-const queries     = require('./query');
+const express        = require('express');
+const bodyParser     = require('body-parser');
+const nodeRequest    = require('request');
+const promiseRequest = require('request-promise');
+const queries        = require('./query');
 
 // Token validation
 function validateToken(token) {
@@ -42,16 +42,16 @@ module.exports = function (app) {
     });
 
     // Frontend
-    app.get('/get/:token/authors/:offset', function (request, response) {
+    app.get('/get/:token/author', function (request, response) {
         response.sendFile('authors.html', {root: __dirname + '/app/views'})
     });
 
     // API
-    app.get('/api/v1/:token/author-info/:offset', (request, response) => {
+    app.get('/api/v1/:token/author/', (request, response) => {
 
         // Compose query
-        let offset = request.params.offset;
-        let query = queries.composeCobisQuery(offset);
+        let offset = Math.floor(Math.random() * 49);
+        let query = queries.composeCobisQuery(queries.cobisSelect(offset));
 
         // Make request
         nodeRequest(query, (err, res, body) => {
@@ -63,7 +63,7 @@ module.exports = function (app) {
         });
     });
 
-    app.get('/api/v1/:token/author-options/:offset', (request, response) => {
+    app.get('/api/v1/:token/author-options/', (request, response) => {
 
         // Get parameters
         let name = request.query.name;
@@ -74,12 +74,12 @@ module.exports = function (app) {
 
         // Make request
         nodeRequest(query, (err, res, body) => {
-            let wikidataResult = queries.handleWikidataBody(JSON.parse(body));
 
+            let wikidataResult = queries.handleWikidataBody(JSON.parse(body));
             let viaflist = [];
 
-            wikidataResult.forEach((d)=>{
-                viaflist.push(d.viafurl);
+            wikidataResult.forEach((element) => {
+                viaflist.push(element.viafurl);
             });
 
             // Compose VIAF query
@@ -88,18 +88,66 @@ module.exports = function (app) {
             // Make request
             nodeRequest(query, (err, res, body) => {
 
-
                 let viafResult = queries.handleVIAFBody(JSON.parse(body), viaflist);
 
                 response.json({
                     vars: queries.cobisMatchVars,
                     options: wikidataResult.concat(viafResult)
                 });
+
             });
         });
     });
 
-    app.post('/api/v1/:token/author-matches/:offset', (request, response) => {
-        response.json(request.body);
+    app.post('/api/v1/:token/author-matches/', (request, response) => {
+
+        // Get uri
+        let personUri = request.body.identifier;
+        let wikidataUri = request.body.wikidata;
+        let viafurl = request.body.viafurl;
+        let sbn = request.body.sbn;
+
+        // Set queries
+        let links = {'wikidata': wikidataUri, 'viaf': viafurl, 'sbn': sbn};
+        let linkQueries = [];
+
+        // Queries array
+        Object.keys(links).forEach((key) => {
+
+            // Parse query
+            if(links[key] !== undefined) {
+                if (key === 'wikidata')
+                    linkQueries.push(queries.composeCobisQuery(queries.cobisInsertWikidata(personUri, wikidataUri)));
+                else if (key === 'viaf')
+                    linkQueries.push(queries.composeCobisQuery(queries.cobisInsertViaf(personUri, viafurl)));
+                else if (key === 'sbn' && !personUri.includes('IT_ICCU'))
+                    linkQueries.push(queries.composeCobisQuery(queries.cobisInsertSbn(personUri, sbn)));
+            }
+
+        });
+
+        // Map queries to make Promise
+        let promises = linkQueries.map(link => promiseRequest(link));
+        Promise.all(promises).then((data) => {
+            // Send response
+            response.redirect('/get/' + request.params.token + '/author');
+        });
+
     });
+
+    app.post('/api/v1/:token/author-skip/', (request, response) => {
+
+        // Get uri
+        let personUri = request.body.uri;
+        // Compose query
+        let query = queries.composeCobisQuery(queries.cobisInsertSkip(personUri));
+
+        // Compose Cobis query
+        nodeRequest(query, (err, res, body) => {
+            // Send response
+            response.json({'status': 'success'});
+        });
+
+    });
+
 };

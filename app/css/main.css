@@ -1,141 +1,253 @@
-.alldatadiv {
-    width: 80%;
-    margin: 2px auto;
-    height: 80%;
-}
-.allcheckdiv {
-    width: 50%;
-    margin: 2px auto;
-    height: 80%;
-}
-.keepfooterdown{
-    min-height: 50%
-}
-.alloptionsdiv {
-    width: 95%;
-    height: 80%;
-}
-#oldnewstyle{
-    width:500px
-}
-#attribute{
-    background-color: rgba(0, 0, 0, 0.329)
+/* Generali */
+
+.container
+{
+    width: 100% !important;
+    min-height: 100vh !important;
+    padding: 40px !important;
+    padding-top: 90px !important;
 }
 
-#author-buttons {
-    float: left;
-    margin-left: 25%;
-    box-sizing: border-box;
-}
-.sselected{
-    margin: 1px auto;
-    box-shadow: 1px 1px 25px rgba(0, 255, 21, 0.35);
-    border-radius: 2px;
-}
-.sselected:hover{
-    box-shadow: 2px 2px 25px rgba(0, 202, 17, 0.61);
-    border-radius: 2px;
-}
-.unselected:hover{
-    box-shadow: 1px 1px 25px rgba(83, 83, 83, 0.35);
-    border-radius: 2px;
-}
-.grid {
-    box-sizing: border-box;
-}
-
-.main_author {
-    width: 60%;
-    /*background: #fafafa;*/
-    margin: 2px auto;
-    /*box-shadow: 1px 1px 25px rgba(0, 0, 0, 0.35);*/
-    border-radius: 1px;
-    /*border: 6px solid #305a72;*/
-    box-sizing: border-box;
-    height: 30%;
-}
-
-.scrollable1 {
-    max-height: 100px;
-    overflow-y: scroll;
-}
-
-li {
-    display: block;
-}
-
-li:hover {
-    /*background-color: rgba(0, 255, 21, 0.35);*/
-}
-a:hover{
-    /* background-color: rgba(0, 110, 255, 0.35); */
-    cursor: pointer;
-}
-
-#footer{
-    bottom: 0;
-    right: 0;
-    left:0;
-}
-/*  HEADER  */
-
-/* Style the header with a grey background and some padding */
-
-.header {
-    overflow: hidden;
-    background-color: #f1f1f1;
-    padding: 20px 10px;
-}
-
-/* Style the header links */
-
-.header a {
-    float: left;
-    color: black;
+.navbar
+{
+    height: 65px;
     text-align: center;
-    padding: 12px;
-    text-decoration: none;
-    font-size: 18px;
-    line-height: 25px;
-    border-radius: 4px;
 }
 
-/* Style the logo link (notice that we set the same value of line-height and font-size to prevent the header to increase when the font gets bigger */
+.navbar .header
+{
+    width: 100%;
+    line-height: 65px;
+}
 
-.header a.logo {
-    font-size: 25px;
+.card-box
+{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Author card */
+
+.author-name
+{
+    text-align: center;
+    font-size: 20px;
     font-weight: bold;
+    margin: 20px 0;
 }
 
-/* Change the background color on mouse-over */
-
-.header a:hover {
-    background-color: #ddd;
-    color: black;
+.author-name a
+{
+    color: inherit;
 }
 
-/* Style the active/current link*/
-
-.header a.active {
-    background-color: dodgerblue;
-    color: white;
+#author-link
+{
+    font-size: 12px;
+    position: relative;
+    top: -3px;
+    margin-right: 5px;
 }
 
-/* Float the link section to the right */
-
-.header-right {
-    float: right;
+#send-button
+{
+    margin-bottom: 10px;
 }
 
-/* Add media queries for responsiveness - when the screen is 500px wide or less, stack the links on top of each other */
+.ribbon .fas
+{
+    margin-right: 5px;
+}
 
-@media screen and (max-width: 500px) {
-    .header a {
-        float: none;
-        display: block;
-        text-align: left;
+.title
+{
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Author options */
+
+.author-image
+{
+    width: 100px;
+    height: 100px;
+    border-radius: 100%;
+    background-size: cover;
+    margin: 0 auto;
+    background-color: #ccc;
+    text-align: center;
+    line-height: 100px;
+    font-size: 40px;
+}
+
+.author-title
+{
+    margin-bottom: 5px;
+}
+
+.author-subtitle
+{
+    font-size: 16px;
+    color: #aaa;
+}
+
+/* Matches options */
+
+.add_match
+{
+    margin-bottom: 10px;
+}
+
+/* Matches selection */
+
+.fa-arrow-left, .fa-arrow-right, .fa-spinner
+{
+    font-size: 45px;
+    margin-right: 15px;
+}
+
+.fa-spinner
+{
+    -webkit-animation: rotation 2s infinite linear !important;
+    animation: rotation 2s infinite linear !important;
+}
+
+/* Footer */
+
+/* FOOTER */
+.footer-container {
+    padding: 1.5rem 5rem;
+    box-shadow: 0px 2px 4px 0px rgba(34, 36, 38, 0.12), 0px 2px 10px 0px rgba(34, 36, 38, 0.15);
+    border-top: 1px solid rgba(34, 36, 38, 0.15)
+}
+
+.footer-section-1 {
+    padding: 4rem 5rem 3rem;
+    background-color: #eee;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+#footer-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#footer-menu a {
+    color: var(--light-g);
+    font-size: 13px !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0 15px;
+    cursor: pointer;
+    transition: all .5s;
+}
+
+.cc-container {
+    text-align: center;
+    max-width: 600px;
+    margin: 2rem auto 0;
+    color: var(--light-g);
+}
+
+.footer-section-2 {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    font-size: .8rem;
+    background-color: #121212;
+    color: #ffffff;
+}
+
+#footer-logo {
+    position: absolute;
+    left: 5rem;
+}
+
+#footer-logo img {
+    height: 100px;
+    vertical-align: baseline;
+}
+
+.footer-section-2 .block-2 > a {
+    font-size: 1rem;
+    color: var(--dark-g);
+    border-bottom: 1px solid;
+    margin-left: 6px;
+    transition: all .5s;
+}
+
+.footer-section-2 .block-2 > a:hover {
+    text-decoration: none;
+    opacity: .5;
+}
+
+#footer-synapta-logo {
+    height: 20px;
+    margin-left: 10px;
+    vertical-align: bottom;
+}
+
+#piemonte-logo {
+    height: 28px;
+    margin: 0 10px;
+}
+
+/* VERY SMALL SCREENS AND LARGE TABLETS */
+@media screen and (max-width: 991px) {
+    .footer-section-1 {
+        flex-direction: column;
+        padding: 2rem 3rem;
     }
-    .header-right {
-        float: none;
+
+    #footer-logo {
+        position: relative;
+        left: 0;
+    }
+
+    #footer-menu {
+        margin-top: 2rem;
+    }
+}
+
+/* SMARTPHONES (portait) */
+@media screen and (max-width: 576px) {
+    /* FOOTER */
+    .footer-container {
+        padding: 1.5rem;
+    }
+
+    #footer-menu {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #footer-menu li {
+        margin: .9rem 0;
+    }
+
+    #footer-menu a {
+        font-size: 1.2rem !important;
+    }
+
+    .footer-section-1 {
+        padding: 3rem 1.5rem;
+    }
+
+    .footer-section-2 {
+        flex-direction: column;
+    }
+
+    .footer-section-2 > div {
+        margin: 1rem 0;
     }
 }
