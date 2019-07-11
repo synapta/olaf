@@ -5,7 +5,19 @@
     width: 100% !important;
     min-height: 100vh !important;
     padding: 40px !important;
-    padding-top: 70px !important;
+    padding-top: 90px !important;
+}
+
+.navbar
+{
+    height: 65px;
+    text-align: center;
+}
+
+.navbar .header
+{
+    width: 100%;
+    line-height: 65px;
 }
 
 .card-box
@@ -100,4 +112,142 @@
 {
     -webkit-animation: rotation 2s infinite linear !important;
     animation: rotation 2s infinite linear !important;
+}
+
+/* Footer */
+
+/* FOOTER */
+.footer-container {
+    padding: 1.5rem 5rem;
+    box-shadow: 0px 2px 4px 0px rgba(34, 36, 38, 0.12), 0px 2px 10px 0px rgba(34, 36, 38, 0.15);
+    border-top: 1px solid rgba(34, 36, 38, 0.15)
+}
+
+.footer-section-1 {
+    padding: 4rem 5rem 3rem;
+    background-color: #eee;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+#footer-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#footer-menu a {
+    color: var(--light-g);
+    font-size: 13px !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0 15px;
+    cursor: pointer;
+    transition: all .5s;
+}
+
+.cc-container {
+    text-align: center;
+    max-width: 600px;
+    margin: 2rem auto 0;
+    color: var(--light-g);
+}
+
+.footer-section-2 {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    font-size: .8rem;
+    background-color: #121212;
+    color: #ffffff;
+}
+
+#footer-logo {
+    position: absolute;
+    left: 5rem;
+}
+
+#footer-logo img {
+    height: 100px;
+    vertical-align: baseline;
+}
+
+.footer-section-2 .block-2 > a {
+    font-size: 1rem;
+    color: var(--dark-g);
+    border-bottom: 1px solid;
+    margin-left: 6px;
+    transition: all .5s;
+}
+
+.footer-section-2 .block-2 > a:hover {
+    text-decoration: none;
+    opacity: .5;
+}
+
+#footer-synapta-logo {
+    height: 20px;
+    margin-left: 10px;
+    vertical-align: bottom;
+}
+
+#piemonte-logo {
+    height: 28px;
+    margin: 0 10px;
+}
+
+/* VERY SMALL SCREENS AND LARGE TABLETS */
+@media screen and (max-width: 991px) {
+    .footer-section-1 {
+        flex-direction: column;
+        padding: 2rem 3rem;
+    }
+
+    #footer-logo {
+        position: relative;
+        left: 0;
+    }
+
+    #footer-menu {
+        margin-top: 2rem;
+    }
+}
+
+/* SMARTPHONES (portait) */
+@media screen and (max-width: 576px) {
+    /* FOOTER */
+    .footer-container {
+        padding: 1.5rem;
+    }
+
+    #footer-menu {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #footer-menu li {
+        margin: .9rem 0;
+    }
+
+    #footer-menu a {
+        font-size: 1.2rem !important;
+    }
+
+    .footer-section-1 {
+        padding: 3rem 1.5rem;
+    }
+
+    .footer-section-2 {
+        flex-direction: column;
+    }
+
+    .footer-section-2 > div {
+        margin: 1rem 0;
+    }
 }
