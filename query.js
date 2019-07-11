@@ -82,13 +82,15 @@ let cobisInsertSkip = (personUri) => {
 
 let wikidataQuery = (name, surname) => {
     return `
+
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
         PREFIX wd: <http://www.wikidata.org/entity/>
-        SELECT (?item as ?wikidata) ?nome ?tipologia ?num ?descrizione ?altLabel  ?birthDate ?deathDate ?immagine ?itwikipedia ?enwikipedia ?treccani ?viafurl ?sbn
+        SELECT (?item as ?wikidata) (SAMPLE (?nome) as ?nome) (GROUP_CONCAT(?tipologia) as ?tipologia) (SAMPLE (?num) as ?num) (SAMPLE (?descrizione) as ?descrizione) (SAMPLE (?altLabel) as ?altLabel)  (SAMPLE (?birthDate) as ?birthDate) (SAMPLE (?deathDate) as ?deathDate) (SAMPLE (?immagine) as ?immagine) (SAMPLE (?itwikipedia) as ?itwikipedia) (SAMPLE (?enwikipedia) as ?enwikipedia)  (SAMPLE (?viafurl) as ?viafurl)
+        (SAMPLE (?treccani) as ?treccani)  (SAMPLE (?sbn) as ?sbn)
         WHERE {
 
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "it,en,fr,de,nl".
+                bd:serviceParam wikibase:language "it".
                 ?item rdfs:label ?nome .
                 ?type rdfs:label ?tipologia.
                 ?item skos:altLabel ?altLabel .
@@ -156,7 +158,9 @@ let wikidataQuery = (name, surname) => {
 
             ?item wdt:P31 ?type .
 
-        } ORDER BY ASC(?num) LIMIT 20`
+        }
+        GROUP BY ?item
+        ORDER BY ASC(?num) LIMIT 20`
 };
 
 // Cobis queries utils
