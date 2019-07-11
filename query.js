@@ -19,6 +19,7 @@ let cobisSelect = (offset) => {
                
                         ?contribution bf2:agent ?personURI .
                         MINUS {?personURI owl:sameAs ?wd}
+                        MINUS {?personURI cobis:hasViafURL ?vf}
                         MINUS {?personURI olaf:skipped ?skipped}
                         FILTER(ISURI(?personURI))
             
@@ -41,6 +42,7 @@ let cobisSelect = (offset) => {
                 OPTIONAL { ?personURI schema:name ?personName . }
                 OPTIONAL { ?contribution bf2:role/rdfs:label ?personRole . }
                 MINUS {?personURI owl:sameAs ?wd}
+                MINUS {?personURI cobis:hasViafURL ?vf}
                 MINUS {?personURI olaf:skipped ?skipped}
                 
             } GROUP BY ?personURI ?personName`;
@@ -48,19 +50,21 @@ let cobisSelect = (offset) => {
 
 let cobisInsertWikidata = (personUri, wikidataUri) => {
     return `INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
-                <${personUri}> owl:sameAs ${wikidataUri}
+                <${personUri}> owl:sameAs "${wikidataUri}"
             }`;
 };
 
 let cobisInsertViaf = (personUri, viafurl) => {
-    return `INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
-                <${personUri}> cobis:hasViafURL ${viafurl}
+    return `PREFIX cobis: <http://dati.cobis.to.it/vocab/>
+            INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+                <${personUri}> cobis:hasViafURL "${viafurl}"
             }`;
 };
 
 let cobisInsertSbn = (personUri, sbn) => {
-    return `INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
-                ${personUri} cobis:hasSbn ${sbn}
+    return `PREFIX cobis: <http://dati.cobis.to.it/vocab/>
+            INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+                <${personUri}> cobis:hasSbn "${sbn}"
             }`;
 };
 
@@ -257,6 +261,10 @@ exports.cobisInsertWikidata = (personUri, wikidataUri) => {
 
 exports.cobisInsertViaf = (personUri, viafurl) => {
     return cobisInsertViaf(personUri, viafurl);
+};
+
+exports.cobisInsertSbn = (personUri, sbn) => {
+    return cobisInsertSbn(personUri, sbn);
 };
 
 exports.composeCobisQuery = (query) => {

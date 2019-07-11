@@ -157,6 +157,25 @@ $.get('/views/template/author-card.html', (template) => {
     let params = parse_url(window.location.href, [4, 6]);
     let token = params[0];
 
+    // Print message
+    let action = sessionStorage.getItem("action");
+    $.get('/views/template/author-message.html', (template) => {
+
+        // Parse message
+        let message = {};
+        if(action === 'match')
+            message = {'style': 'success', 'title': 'Autore associato correttamente', 'text': 'Attendi mentre verranno caricate le successive opzioni.'};
+        else if(action === 'skip')
+            message = {'style': '', 'title': 'Autore saltato', 'text': 'Attendi mentre verranno caricate le successive opzioni.'};
+        else
+            message = {'style': '', 'title': 'Benvenuto su OLAF', 'text': 'Attendi mentre verranno caricate le successive opzioni.'};
+
+        // Show message
+        let output = Mustache.render(template, message);
+        $('#author-options').html(output);
+
+    });
+
     // Make request and send response
     $.ajax({
 
@@ -174,12 +193,17 @@ $.get('/views/template/author-card.html', (template) => {
             $('#author-card').html(output);
             $('#author-card').css({width: $('#author-card').parent().width(), position: 'fixed'});
 
+            // Print options
             $.get('/views/template/author-options.html', (template) => {
 
                 // Handle response
                 let tokens = response.personName.split(', ');
+
+                // Get name and surname
                 let surname = tokens[0].split('<')[0].trim() || "";
-                let name = tokens[1].split('<')[0].trim() || "";
+                let name = "";
+                if(tokens[1])
+                    name = tokens[1].split('<')[0].trim() || "";
 
                 // Query for wikidata options
                 $.ajax({
@@ -193,9 +217,6 @@ $.get('/views/template/author-card.html', (template) => {
                         let output = Mustache.render(template, response);
                         options = response.options;
                         $('#author-options').html(output).fadeIn(2000);
-
-                        // Push state
-                        //history.pushState({}, "", window.location.href);
 
                     }
 
@@ -298,9 +319,12 @@ function skip_author(element){
         data: {'uri': uri},
         dataType: 'json',
         success: response => {
-            if(response.status === 'success')
+            if(response.status === 'success') {
+                // Store last action in session
+                sessionStorage.setItem("action", "skip");
+                // Reload page
                 location.reload();
-            else
+            } else
                 alert("Errore");
         }
 
@@ -309,6 +333,8 @@ function skip_author(element){
 }
 
 function send_matches(){
+    // Store last action in session
+    sessionStorage.setItem("action", "match");
     // Send form
     document.getElementById('matches-form').submit();
 }

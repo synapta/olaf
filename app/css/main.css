@@ -90,8 +90,14 @@
 
 /* Matches selection */
 
-.fa-arrow-left, .fa-arrow-right
+.fa-arrow-left, .fa-arrow-right, .fa-spinner
 {
     font-size: 45px;
     margin-right: 15px;
+}
+
+.fa-spinner
+{
+    -webkit-animation: rotation 2s infinite linear !important;
+    animation: rotation 2s infinite linear !important;
 }

@@ -1,9 +1,10 @@
 // Requirements
-const express     = require('express');
-const bodyParser  = require('body-parser');
-const config      = require('./app/js/config.js');
-const nodeRequest = require('request');
-const queries     = require('./query');
+const express        = require('express');
+const bodyParser     = require('body-parser');
+const config         = require('./app/js/config.js');
+const nodeRequest    = require('request');
+const promiseRequest = require('request-promise');
+const queries        = require('./query');
 
 // Token validation
 function validateToken(token) {
@@ -103,40 +104,36 @@ module.exports = function (app) {
 
         // Get uri
         let personUri = request.body.identifier;
-        let wikidataUri = request.body.wikidataUri;
+        let wikidataUri = request.body.wikidata;
         let viafurl = request.body.viafurl;
         let sbn = request.body.sbn;
 
-        // Set endpoints
-        let endpoints = {'wikidata': wikidataUri, 'viaf': viafurl, 'sbn': sbn};
-        let completedQueries = 0;
+        // Set queries
+        let links = {'wikidata': wikidataUri, 'viaf': viafurl, 'sbn': sbn};
+        let linkQueries = [];
 
-        // Compose query
-        let wikidataQuery = queries.composeCobisQuery(queries.cobisInsertWikidata(personUri, wikidataUri));
-        let viafQuery = queries.composeCobisQuery(queries.cobisInsertViaf(personUri, viafurl));
-        let sbnQuery = null;
-
-        Object.keys(endpoints).forEach((key) => {
-
-            // Empty query
-            let query = null;
+        // Queries array
+        Object.keys(links).forEach((key) => {
 
             // Parse query
-            if(endpoints[key] !== undefined) {
+            if(links[key] !== undefined) {
                 if (key === 'wikidata')
-                    query = wikidataQuery;
+                    linkQueries.push(queries.composeCobisQuery(queries.cobisInsertWikidata(personUri, wikidataUri)));
                 else if (key === 'viaf')
-                    query = viafQuery;
-                else if (key === 'sbn')
-                    query = sbnQuery;
+                    linkQueries.push(queries.composeCobisQuery(queries.cobisInsertViaf(personUri, viafurl)));
+                else if (key === 'sbn' && !personUri.includes('IT_ICCU'))
+                    linkQueries.push(queries.composeCobisQuery(queries.cobisInsertSbn(personUri, sbn)));
             }
 
-            http.get(query, function(res) {
-                if(++completedQueries === Object.keys(endpoints).length)
-                    response.json({'status': 'success'});
-            })
+        });
 
-        })
+        // Map queries to make Promise
+        let promises = linkQueries.map(link => promiseRequest(link));
+        Promise.all(promises).then((data) => {
+            // Send response
+            response.redirect('/get/' + request.params.token + '/author');
+        });
+
     });
 
     app.post('/api/v1/:token/author-skip/', (request, response) => {
