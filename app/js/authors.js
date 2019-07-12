@@ -246,14 +246,6 @@ function show_matches() {
                     if(selected_options.length === Object.keys(selectedItems).length) {
                         output = Mustache.render(template, {'items': selected_options});
                         $('#matches-options').html(output);
-                        // Make all fields selected
-                        $('.field_selection').each((index, value) => {
-                            if(!$(this).hasClass('green')){
-                                $('.field_selection')[index].click();
-                            }
-                            // Update fields
-                            update_fields();
-                        })
                     }
                 });
             });
