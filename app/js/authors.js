@@ -116,10 +116,15 @@ function match_field(element) {
     let value = element.getAttribute('data-value');
 
     // Select field
-    if(selectedFields[label] === value)
-        delete selectedFields[label];
-    else
-        selectedFields[label] = value;
+    if(selectedFields[label]) {
+        if (selectedFields[label].includes(value)) {
+            selectedFields[label] = selectedFields[label].filter((item) => {
+                return item !== value;
+            });
+        } else
+            selectedFields[label].push(value);
+    } else
+        selectedFields[label] = [value];
 
     // Update fields rendering
     update_fields()
@@ -222,6 +227,15 @@ function show_matches() {
 
         $('#author-container').html(container);
 
+        // Populate matches container
+        $.get('/views/template/matches-selection-empty.html', (template) => {
+            // Set button behavior
+            $('#send-button').html('<button onclick="send_matches()" class="ui fluid primary button">Conferma assegnazione</button>');
+            // Set empty template
+            output = Mustache.render(template);
+            $('#matches-selection').html(output);
+        });
+
         // Populate matches options
         $.get('/views/template/matches-options.html', (template) => {
             Object.keys(selectedItems).forEach((item) => {
@@ -232,18 +246,15 @@ function show_matches() {
                     if(selected_options.length === Object.keys(selectedItems).length) {
                         output = Mustache.render(template, {'items': selected_options});
                         $('#matches-options').html(output);
+                        // Make all fields selected
+                        $('.field_selection').each((index, value) => {
+                            if(!$(this).hasClass('green')){
+                                $('.field_selection')[index].click();
+                            }
+                        })
                     }
                 });
             });
-        });
-
-        // Populate matches container
-        $.get('/views/template/matches-selection-empty.html', (template) => {
-            // Set button behavior
-            $('#send-button').html('<button onclick="send_matches()" class="ui fluid primary button">Conferma assegnazione</button>');
-            // Set empty template
-            output = Mustache.render(template);
-            $('#matches-selection').html(output);
         });
 
     });
@@ -260,8 +271,12 @@ function update_fields(){
     // Set selected values
     if(Object.keys(selectedFields).length > 0) {
         Object.keys(selectedFields).forEach((label) => {
-            $('.field_selection[data-label="' + label + '"][data-value="' + selectedFields[label] + '"]').addClass('green').html('<i class="fas fa-check"></i>');
-            render_fiels.push({'label': label, 'value': selectedFields[label]});
+            let values = [];
+            selectedFields[label].forEach((value) => {
+                values.push(value);
+                $('.field_selection[data-label="' + label + '"][data-value="' + value + '"]').addClass('green').html('<i class="fas fa-check"></i>');
+            });
+            render_fiels.push({'label': label, 'values': values});
         });
         $.get('/views/template/matches-selection.html', (template) => {
             // Compose output

@@ -14,10 +14,11 @@ let authorSelect = () => {
                     SELECT ?personURI (COUNT(DISTINCT ?contribution) as ?titlesCount) WHERE {
 
                         ?contribution bf2:agent ?personURI .
+                        
+                        FILTER(ISURI(?personURI))
                         MINUS {?personURI owl:sameAs ?wd}
                         MINUS {?personURI cobis:hasViafURL ?vf}
                         MINUS {?personURI olaf:skipped ?skipped}
-                        FILTER(ISURI(?personURI))
 
                     } GROUP BY ?personURI
                       ORDER BY DESC(?titlesCount)
@@ -28,18 +29,13 @@ let authorSelect = () => {
                 ?instance bf2:instanceOf ?work .
                 ?work bf2:contribution ?contribution .
                 ?contribution bf2:agent ?personURI .
-
                 ?instance bf2:title ?titleURI .
                 ?titleURI rdfs:label ?title .
 
                 OPTIONAL {?personURI schema:description ?description . }
-                OPTIONAL { ?personURI foaf:isPrimaryTopicOf ?link . }
-
-                OPTIONAL { ?personURI schema:name ?personName . }
-                OPTIONAL { ?contribution bf2:role/rdfs:label ?personRole . }
-                MINUS {?personURI owl:sameAs ?wd}
-                MINUS {?personURI cobis:hasViafURL ?vf}
-                MINUS {?personURI olaf:skipped ?skipped}
+                OPTIONAL {?personURI foaf:isPrimaryTopicOf ?link . }
+                OPTIONAL {?personURI schema:name ?personName . }
+                OPTIONAL {?contribution bf2:role/rdfs:label ?personRole . }
 
             } GROUP BY ?personURI ?personName`;
 };
@@ -244,9 +240,16 @@ function authorLink(body) {
     let optionViaf = body.optionViaf;
     let optionSbn = body.optionSbn;
 
+    // Single variables as arrays
+    if(!Array.isArray(optionWikidata))
+        optionWikidata = [optionWikidata];
+    if(!Array.isArray(optionViaf))
+        optionViaf = [optionViaf];
+    if(!Array.isArray(optionSbn))
+        optionSbn = [optionSbn];
+
     // Queries params and requests
     let links = {'wikidata': optionWikidata, 'viaf': optionViaf, 'sbn': optionSbn};
-    console.log(links);
     let requests = [];
 
     // Generate requests
@@ -254,12 +257,19 @@ function authorLink(body) {
 
         // Parse query
         if(links[key] !== undefined) {
-            if (key === 'wikidata')
-                requests.push(composeQuery(cobisInsertWikidata(authorUri, optionWikidata)));
-            else if (key === 'viaf')
-                requests.push(composeQuery(cobisInsertViaf(authorUri, optionViaf)));
-            else if (key === 'sbn' && !optionWikidata.includes('IT_ICCU'))
-                requests.push(composeQuery(cobisInsertSbn(authorUri, optionViaf)));
+            if (key === 'wikidata') {
+                optionWikidata.forEach((option) => {
+                    requests.push(composeQuery(cobisInsertWikidata(authorUri, option)));
+                });
+            } else if (key === 'viaf') {
+                optionViaf.forEach((option) => {
+                    requests.push(composeQuery(cobisInsertViaf(authorUri, option)));
+                });
+            } else if (key === 'sbn' && !authorUri.includes('IT_ICCU')){
+                optionSbn.forEach((option) => {
+                    requests.push(composeQuery(cobisInsertSbn(authorUri, option)));
+                })
+            }
         }
 
     });
@@ -302,7 +312,7 @@ function composeQueryWikidata(name, surname){
             Host: 'query.wikidata.org',
             'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
             Accept: 'application/sparql-results+json',
-            'user-agent': 'olaf',
+            'user-agent': 'pippo',
         }
     }
 
@@ -320,7 +330,7 @@ function composeQueryVIAF(name, surname){
         headers: {
             'cache-control': 'no-cache',
             'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
-            'user-agent': 'olaf',
+            'user-agent': 'pippo',
         }
     }
 

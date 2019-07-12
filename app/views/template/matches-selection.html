@@ -2,9 +2,11 @@
 <div class="ui raised segment">
     <div class="ui bottom left attached label">{{label}}</div>
     <div>
-        <div class="ui fluid input">
-            <input type="text" name="{{label}}" placeholder="{{label}}" value="{{value}}" />
+        {{#values}}
+        <div style="margin-bottom: 10px;" class="ui fluid input">
+            <input type="text" name="{{label}}" placeholder="{{label}}" value="{{.}}" />
         </div>
+        {{/values}}
     </div>
 </div>
 {{/fields}}
