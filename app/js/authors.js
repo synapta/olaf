@@ -251,6 +251,8 @@ function show_matches() {
                             if(!$(this).hasClass('green')){
                                 $('.field_selection')[index].click();
                             }
+                            // Update fields
+                            update_fields();
                         })
                     }
                 });
