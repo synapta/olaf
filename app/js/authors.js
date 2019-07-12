@@ -284,7 +284,7 @@ function skip_author(element){
     // Get author uri
     let uri = $(element).attr('data-identifier');
     // Extract params from url
-    let params = parse_url(window.location.href, [4, 6]);
+    let params = parseUrl(window.location.href, [4, 6]);
     let token = params[0];
 
     // API call

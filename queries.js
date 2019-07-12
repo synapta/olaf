@@ -44,30 +44,30 @@ let authorSelect = () => {
             } GROUP BY ?personURI ?personName`;
 };
 
-let cobisInsertWikidata = (personUri, wikidataUri) => {
+let cobisInsertWikidata = (authorUri, optionWikidata) => {
     return `INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
-                <${personUri}> owl:sameAs <${wikidataUri}>
+                <${authorUri}> owl:sameAs <${optionWikidata}>
             }`;
 };
 
-let cobisInsertViaf = (personUri, viafurl) => {
+let cobisInsertViaf = (authorUri, optionViaf) => {
     return `PREFIX cobis: <http://dati.cobis.to.it/vocab/>
             INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
-                <${personUri}> cobis:hasViafURL "${viafurl}"
+                <${authorUri}> cobis:hasViafURL "${optionViaf}"
             }`;
 };
 
-let cobisInsertSbn = (personUri, sbn) => {
+let cobisInsertSbn = (authorUri, optionSbn) => {
     return `PREFIX cobis: <http://dati.cobis.to.it/vocab/>
             INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
-                <${personUri}> cobis:hasSbn "${sbn}"
+                <${authorUri}> cobis:hasSbn "${optionSbn}"
             }`;
 };
 
-let cobisInsertSkip = (personUri) => {
+let cobisInsertSkip = (authorUri) => {
     return `PREFIX olaf: <http://olaf.synapta.io/onto/>
             INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
-                <${personUri}> olaf:skipped ?now
+                <${authorUri}> olaf:skipped ?now
             }
             WHERE {
                 BIND(NOW() as ?now)
@@ -230,60 +230,13 @@ let handleVIAFBody = (body, viafurls) => {
 
 // Functions
 function authorOptions(name, surname){
+
     // Compose queries
     return [composeQueryWikidata(name, surname), composeQueryVIAF(name, surname)];
-}
-
-// Query composer
-function composeQuery(query) {
-
-    // Query parameters
-    let queryUrl = 'https://dati.cobis.to.it/sparql?default-graph-uri=&query=';
-    let queryFormat = '&format=json';
-
-    return queryUrl + encodeURIComponent(query) + queryFormat;
 
 }
 
-function composeQueryWikidata(name, surname){
-
-    // Compose query
-    return {
-        method: 'GET',
-        url: 'https://query.wikidata.org/sparql',
-        qs: {
-            query: wikidataQuery(name, surname)
-        },
-        headers: {
-            'cache-control': 'no-cache',
-            Host: 'query.wikidata.org',
-            'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
-            Accept: 'application/sparql-results+json',
-            'user-agent': 'pippo',
-        }
-    }
-
-}
-
-function composeQueryVIAF(name, surname){
-
-    // Compose query
-    return {
-        method: 'GET',
-        url: 'https://www.viaf.org/viaf/AutoSuggest',
-        qs: {
-            query: name + " " + surname
-        },
-        headers: {
-            'cache-control': 'no-cache',
-            'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
-            'user-agent': 'pippo',
-        }
-    }
-
-}
-
-function authorLink(body){
+function authorLink(body) {
 
     // Get body params
     let authorUri = body.authorUri;
@@ -315,6 +268,64 @@ function authorLink(body){
 
 }
 
+function authorSkip(body) {
+
+    // Get body params
+    let authorUri = body.authorUri;
+    // Return query
+    return cobisInsertSkip(authorUri);
+
+}
+
+// Query composer
+function composeQuery(query) {
+
+    // Query parameters
+    let queryUrl = 'https://dati.cobis.to.it/sparql?default-graph-uri=&query=';
+    let queryFormat = '&format=json';
+
+    return queryUrl + encodeURIComponent(query) + queryFormat;
+
+}
+
+function composeQueryWikidata(name, surname){
+
+    // Compose query
+    return {
+        method: 'GET',
+        url: 'https://query.wikidata.org/sparql',
+        qs: {
+            query: wikidataQuery(name, surname)
+        },
+        headers: {
+            'cache-control': 'no-cache',
+            Host: 'query.wikidata.org',
+            'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
+            Accept: 'application/sparql-results+json',
+            'user-agent': 'olaf',
+        }
+    }
+
+}
+
+function composeQueryVIAF(name, surname){
+
+    // Compose query
+    return {
+        method: 'GET',
+        url: 'https://www.viaf.org/viaf/AutoSuggest',
+        qs: {
+            query: name + " " + surname
+        },
+        headers: {
+            'cache-control': 'no-cache',
+            'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
+            'user-agent': 'olaf',
+        }
+    }
+
+}
+
 // Exports
 exports.authorSelect = () => {
     return composeQuery(authorSelect());
@@ -323,6 +334,10 @@ exports.authorSelect = () => {
 exports.authorOptions = (name, surname) => {
     return authorOptions(name, surname);
 };
+
+exports.authorSkip = (body) => {
+    return authorSkip(body);
+}
 
 exports.authorLink = (body) => {
     return authorLink(body)

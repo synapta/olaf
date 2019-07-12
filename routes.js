@@ -44,7 +44,9 @@ module.exports = function (app) {
 
     // Frontend
     app.get('/get/:token/author', function (request, response) {
-        response.sendFile('authors.html', {root: __dirname + '/app/views'})
+
+        response.sendFile('authors.html', {root: __dirname + '/app/views'});
+
     });
 
     // API
@@ -57,6 +59,7 @@ module.exports = function (app) {
         nodeRequest(query, (err, res, body) => {
             // Handle and send author
             let author = parser.parseAuthor(JSON.parse(body));
+            // Send response
             response.json(author);
         });
 
@@ -68,12 +71,13 @@ module.exports = function (app) {
         let name = request.query.name;
         let surname = request.query.surname;
 
-        // Get queries
-        let optionQueries = queries.authorOptions(name, surname);
-        let optionRequests = optionQueries.map(query => promiseRequest(query));
+        // Get requests
+        let requests = queries.authorOptions(name, surname);
+        // Map requests to make Promise
+        requests = requests.map(query => promiseRequest(query));
 
         // Make options queries
-        Promise.all(optionRequests).then((bodies) => {
+        Promise.all(requests).then((bodies) => {
             // Parse result
             parser.parseAuthorOptions(bodies.map(body => JSON.parse(body)), (options) => {
                 // Send back options response
@@ -89,6 +93,7 @@ module.exports = function (app) {
         let requests = queries.authorLink(request.body);
         // Map requests to make Promise
         requests = requests.map(req => promiseRequest(req));
+
         // Send requests
         Promise.all(requests).then((data) => {
             // Send response
@@ -99,13 +104,11 @@ module.exports = function (app) {
 
     app.post('/api/v1/:token/author-skip/', (request, response) => {
 
-        // Get uri
-        let personUri = request.body.uri;
         // Compose query
-        let query = queries.composeCobisQuery(queries.cobisInsertSkip(personUri));
+        let requests = queries.authorSkip(request.body);
 
-        // Compose Cobis query
-        nodeRequest(query, (err, res, body) => {
+        // Send requests
+        nodeRequest(requests, (err, res, body) => {
             // Send response
             response.json({'status': 'success'});
         });
