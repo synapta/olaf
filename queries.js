@@ -1,9 +1,5 @@
-// Parameters
-let queryUrl = 'https://dati.cobis.to.it/sparql?default-graph-uri=&query=';
-let queryFormat = '&format=json';
-
 // Queries
-let cobisSelect = (offset) => {
+let authorSelect = () => {
     return `PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
             PREFIX schema: <http://schema.org/>
             PREFIX dcterm: <http://purl.org/dc/terms/>
@@ -26,7 +22,7 @@ let cobisSelect = (offset) => {
                     } GROUP BY ?personURI
                       ORDER BY DESC(?titlesCount)
                       LIMIT 1
-                      OFFSET ${offset}
+                      OFFSET ${Math.floor(Math.random() * 49)}
                 }
 
                 ?instance bf2:instanceOf ?work .
@@ -78,11 +74,8 @@ let cobisInsertSkip = (personUri) => {
             }`;
 };
 
-//dati.cobis.to.it
-
 let wikidataQuery = (name, surname) => {
     return `
-
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
         PREFIX wd: <http://www.wikidata.org/entity/>
         SELECT (?item as ?wikidata) (SAMPLE (?nome) as ?nome) (GROUP_CONCAT(?tipologia) as ?tipologia) (SAMPLE (?num) as ?num) (SAMPLE (?descrizione) as ?descrizione) (SAMPLE (?altLabel) as ?altLabel)  (SAMPLE (?birthDate) as ?birthDate) (SAMPLE (?deathDate) as ?deathDate) (SAMPLE (?immagine) as ?immagine) (SAMPLE (?itwikipedia) as ?itwikipedia) (SAMPLE (?enwikipedia) as ?enwikipedia)  (SAMPLE (?viafurl) as ?viafurl)
@@ -163,22 +156,8 @@ let wikidataQuery = (name, surname) => {
         ORDER BY ASC(?num) LIMIT 20`
 };
 
-// Cobis queries utils
-let handleCobisBody = (body) => {
-
-    let binding = body.results.bindings[0];
-    let cobisResponse = {};
-
-    Object.keys(binding).forEach((key) => {
-        cobisResponse[key] = binding[key].value;
-    });
-
-    return cobisResponse
-
-};
-
 // Wikidata queries utils
-let handleWikidataBody = (body) => {
+/*let handleWikidataBody = (body) => {
 
     // Initialize response
     let wikidataResult = [];
@@ -247,36 +226,27 @@ let handleVIAFBody = (body, viafurls) => {
 
     return VIAFresult;
 
-};
+};*/
 
+// Functions
+function authorOptions(name, surname){
+    // Compose queries
+    return [composeQueryWikidata(name, surname), composeQueryVIAF(name, surname)];
+}
 
-// Exports
-exports.cobisSelect = (offset) => {
-    return cobisSelect(offset);
-};
+// Query composer
+function composeQuery(query) {
 
-exports.cobisInsertSkip = (personUri) => {
-    return cobisInsertSkip(personUri);
-};
+    // Query parameters
+    let queryUrl = 'https://dati.cobis.to.it/sparql?default-graph-uri=&query=';
+    let queryFormat = '&format=json';
 
-exports.cobisInsertWikidata = (personUri, wikidataUri) => {
-    return cobisInsertWikidata(personUri, wikidataUri);
-};
-
-exports.cobisInsertViaf = (personUri, viafurl) => {
-    return cobisInsertViaf(personUri, viafurl);
-};
-
-exports.cobisInsertSbn = (personUri, sbn) => {
-    return cobisInsertSbn(personUri, sbn);
-};
-
-exports.composeCobisQuery = (query) => {
-    // Compose query
     return queryUrl + encodeURIComponent(query) + queryFormat;
-};
 
-exports.composeQueryWikidata = (name, surname) => {
+}
+
+function composeQueryWikidata(name, surname){
+
     // Compose query
     return {
         method: 'GET',
@@ -292,9 +262,12 @@ exports.composeQueryWikidata = (name, surname) => {
             'user-agent': 'pippo',
         }
     }
-};
 
-exports.composeQueryVIAF = (name, surname) => {
+}
+
+function composeQueryVIAF(name, surname){
+
+    // Compose query
     return {
         method: 'GET',
         url: 'https://www.viaf.org/viaf/AutoSuggest',
@@ -307,16 +280,50 @@ exports.composeQueryVIAF = (name, surname) => {
             'user-agent': 'pippo',
         }
     }
+
+}
+
+function authorLink(body){
+
+    // Get body params
+    let authorUri = body.authorUri;
+    let optionWikidata = body.optionWikidata;
+    let optionViaf = body.optionViaf;
+    let optionSbn = body.optionSbn;
+
+    // Queries params and requests
+    let links = {'wikidata': optionWikidata, 'viaf': optionViaf, 'sbn': optionSbn};
+    console.log(links);
+    let requests = [];
+
+    // Generate requests
+    Object.keys(links).forEach((key) => {
+
+        // Parse query
+        if(links[key] !== undefined) {
+            if (key === 'wikidata')
+                requests.push(composeQuery(cobisInsertWikidata(authorUri, optionWikidata)));
+            else if (key === 'viaf')
+                requests.push(composeQuery(cobisInsertViaf(authorUri, optionViaf)));
+            else if (key === 'sbn' && !optionWikidata.includes('IT_ICCU'))
+                requests.push(composeQuery(cobisInsertSbn(authorUri, optionViaf)));
+        }
+
+    });
+
+    return requests;
+
+}
+
+// Exports
+exports.authorSelect = () => {
+    return composeQuery(authorSelect());
 };
 
-exports.handleCobisBody = (body) => {
-    return handleCobisBody(body);
+exports.authorOptions = (name, surname) => {
+    return authorOptions(name, surname);
 };
 
-exports.handleWikidataBody = (body) => {
-    return handleWikidataBody(body);
-};
-
-exports.handleVIAFBody = (body, viaflist) => {
-    return handleVIAFBody(body, viaflist);
+exports.authorLink = (body) => {
+    return authorLink(body)
 };

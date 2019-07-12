@@ -4,42 +4,42 @@
         <div class="ui items">
             <div class="item">
                 <div class="ui small image">
-                    <div class="author-image" style="background-image: url({{#immagine}}{{.}}{{/immagine}});">
-                        {{^immagine}}<i class="fas fa-user"></i>{{/immagine}}
+                    <div class="author-image" style="background-image: url({{#optionImage}}{{.}}{{/optionImage}});">
+                        {{^optionImage}}<i class="fas fa-user"></i>{{/optionImage}}
                     </div>
                 </div>
                 <div class="middle aligned content">
                     <div class="author-name">
-                        <div class="author-title">{{nome}}</div>
-                        <div class="author-subtitle">{{tipologia}}</div>
+                        <div class="author-title">{{optionName}}</div>
+                        <div class="author-subtitle">{{optionType}}</div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="ui divider"></div>
-        {{#wikidata}}
+        {{#optionWikidata}}
             <div class="add_match">
-                <div data-label="wikidata" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
+                <div data-label="optionWikidata" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
                     <i class="fas fa-plus"></i>
                 </div>
                 <span><b>Wikidata:</b> {{.}}</span>
             </div>
-        {{/wikidata}}
-        {{#viafurl}}
+        {{/optionWikidata}}
+        {{#optionViaf}}
             <div class="add_match">
-                <div data-label="viafurl" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
+                <div data-label="optionViaf" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
                     <i class="fas fa-plus"></i>
                 </div>
                 <span><b>VIAF:</b> {{.}}</span>
             </div>
-        {{/viafurl}}
-        {{#sbn}}
+        {{/optionViaf}}
+        {{#optionSbn}}
             <div class="add_match">
-                <div data-label="sbn" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
+                <div data-label="optionSbn" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
                     <i class="fas fa-plus"></i>
                 </div>
                 <span><b>SBN:</b> {{.}}</span>
             </div>
-        {{/sbn}}
+        {{/optionSbn}}
     </div>
 {{/items}}

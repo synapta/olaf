@@ -1,40 +1,40 @@
 <div class="ui two column grid">
     {{#options}}
     <div class="column">
-        <div data-item="{{item}}" class="ui raised segment">
+        <div data-item="{{optionItem}}" class="ui raised segment">
             <div class="author-name">
-                <div class="author-title">{{nome}}</div>
-                <div class="author-subtitle">{{tipologia}}</div>
+                <div class="author-title">{{optionName}}</div>
+                <div class="author-subtitle">{{optionType}}</div>
             </div>
             <a class="ui red ribbon label">Candidato</a>
             <div class="ui items">
                 <div class="item">
                     <div class="ui small image">
-                        <div style="background-image: url({{#immagine}}{{.}}{{/immagine}});" class="author-image">
-                            {{^immagine}}<i class="fas fa-user"></i>{{/immagine}}
+                        <div style="background-image: url({{#optionImage}}{{.}}{{/optionImage}});" class="author-image">
+                            {{^optionImage}}<i class="fas fa-user"></i>{{/optionImage}}
                         </div>
                     </div>
                     <div class="middle aligned content">
-                        {{#descrizione}}<p>{{.}}</p>{{/descrizione}}
-                        {{#birthDate}}<p><b>Data di nascita:</b> {{.}}</p>{{/birthDate}}
-                        {{#deathDate}}<p><b>Data di morte: </b>{{.}}</p>{{/deathDate}}
-                        {{^descrizione}}
-                            {{^birthDate}}
-                                {{^deathDate}}
+                        {{#optionDescription}}<p>{{.}}</p>{{/optionDescription}}
+                        {{#optionBirthDate}}<p><b>Data di nascita:</b> {{.}}</p>{{/optionBirthDate}}
+                        {{#optionDeathDate}}<p><b>Data di morte: </b>{{.}}</p>{{/optionDeathDate}}
+                        {{^optionDescription}}
+                            {{^optionBirthDate}}
+                                {{^optionDeathDate}}
                                     <i>Non sono presenti informazioni aggiuntive riguardo questo elemento</i>
-                                {{/deathDate}}
-                            {{/birthDate}}
-                        {{/descrizione}}
+                                {{/optionDeathDate}}
+                            {{/optionBirthDate}}
+                        {{/optionDescription}}
                     </div>
                 </div>
             </div>
             <a class="ui red ribbon label">Esplora in...</a>
             <div class="center aligned card-box">
-                {{#wikidata}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikidata</a>{{/wikidata}}
-                {{#itwikipedia}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia</a>{{/itwikipedia}}
-                {{#viafurl}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">VIAF</a>{{/viafurl}}
-                {{#treccani}}<a class="ui center aligned blue label" href="http://www.treccani.it/enciclopedia/{{.}}" target="_blank">Treccani</a>{{/treccani}}
-                {{#sbn}}<a class="ui center aligned blue label" href="http://id.sbn.it/af/{{.}}" target="_blank">SBN</a>{{/sbn}}
+                {{#optionWikidata}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikidata</a>{{/optionWikidata}}
+                {{#optionWikiperdiaIt}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia</a>{{/optionWikiperdiaIt}}
+                {{#optionViaf}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">VIAF</a>{{/optionViaf}}
+                {{#optionTreccani}}<a class="ui center aligned blue label" href="http://www.treccani.it/enciclopedia/{{.}}" target="_blank">Treccani</a>{{/optionTreccani}}
+                {{#optionSbn}}<a class="ui center aligned blue label" href="http://id.sbn.it/af/{{.}}" target="_blank">SBN</a>{{/optionSbn}}
             </div>
             <div class="ui divider"></div>
             <button onclick="select_author(this)" class="ui fluid green button">Seleziona candidato</button>

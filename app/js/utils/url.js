@@ -1,5 +1,5 @@
 // Exports
-function parse_url(url, indexes){
+function parseUrl(url, indexes){
 
     // Get url tokens
     let tokens = url.split('/');

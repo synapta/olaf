@@ -3,7 +3,8 @@ const express        = require('express');
 const bodyParser     = require('body-parser');
 const nodeRequest    = require('request');
 const promiseRequest = require('request-promise');
-const queries        = require('./query');
+const queries        = require('./queries');
+const parser         = require('./parser');
 
 // Token validation
 function validateToken(token) {
@@ -50,17 +51,15 @@ module.exports = function (app) {
     app.get('/api/v1/:token/author/', (request, response) => {
 
         // Compose query
-        let offset = Math.floor(Math.random() * 49);
-        let query = queries.composeCobisQuery(queries.cobisSelect(offset));
+        let query = queries.authorSelect();
 
         // Make request
         nodeRequest(query, (err, res, body) => {
-
-            // Handle and send Cobis body
-            let cobisResult = queries.handleCobisBody(JSON.parse(body));
-            response.json(cobisResult);
-
+            // Handle and send author
+            let author = parser.parseAuthor(JSON.parse(body));
+            response.json(author);
         });
+
     });
 
     app.get('/api/v1/:token/author-options/', (request, response) => {
@@ -69,69 +68,32 @@ module.exports = function (app) {
         let name = request.query.name;
         let surname = request.query.surname;
 
-        // Compose Wikidata query
-        let query = queries.composeQueryWikidata(name, surname);
+        // Get queries
+        let optionQueries = queries.authorOptions(name, surname);
+        let optionRequests = optionQueries.map(query => promiseRequest(query));
 
-        // Make request
-        nodeRequest(query, (err, res, body) => {
-
-            let wikidataResult = queries.handleWikidataBody(JSON.parse(body));
-            let viaflist = [];
-
-            wikidataResult.forEach((element) => {
-                viaflist.push(element.viafurl);
-            });
-
-            // Compose VIAF query
-            let query = queries.composeQueryVIAF(name, surname);
-
-            // Make request
-            nodeRequest(query, (err, res, body) => {
-
-                let viafResult = queries.handleVIAFBody(JSON.parse(body), viaflist);
-
-                response.json({
-                    vars: queries.cobisMatchVars,
-                    options: wikidataResult.concat(viafResult)
-                });
-
+        // Make options queries
+        Promise.all(optionRequests).then((bodies) => {
+            // Parse result
+            parser.parseAuthorOptions(bodies.map(body => JSON.parse(body)), (options) => {
+                // Send back options response
+                response.json(options);
             });
         });
+
     });
 
     app.post('/api/v1/:token/author-matches/', (request, response) => {
 
-        // Get uri
-        let personUri = request.body.identifier;
-        let wikidataUri = request.body.wikidata;
-        let viafurl = request.body.viafurl;
-        let sbn = request.body.sbn;
-
-        // Set queries
-        let links = {'wikidata': wikidataUri, 'viaf': viafurl, 'sbn': sbn};
-        let linkQueries = [];
-
-        // Queries array
-        Object.keys(links).forEach((key) => {
-
-            // Parse query
-            if(links[key] !== undefined) {
-                if (key === 'wikidata')
-                    linkQueries.push(queries.composeCobisQuery(queries.cobisInsertWikidata(personUri, wikidataUri)));
-                else if (key === 'viaf')
-                    linkQueries.push(queries.composeCobisQuery(queries.cobisInsertViaf(personUri, viafurl)));
-                else if (key === 'sbn' && !personUri.includes('IT_ICCU'))
-                    linkQueries.push(queries.composeCobisQuery(queries.cobisInsertSbn(personUri, sbn)));
-            }
-
-        });
-
-        // Map queries to make Promise
-        let promises = linkQueries.map(link => promiseRequest(link));
-        Promise.all(promises).then((data) => {
+        // Get requests
+        let requests = queries.authorLink(request.body);
+        // Map requests to make Promise
+        requests = requests.map(req => promiseRequest(req));
+        // Send requests
+        Promise.all(requests).then((data) => {
             // Send response
             response.redirect('/get/' + request.params.token + '/author');
-        });
+        })
 
     });
 

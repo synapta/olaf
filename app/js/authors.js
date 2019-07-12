@@ -1,50 +1,26 @@
-// Global variables
+// Global collection
 let options = {};
-let selected_items = {};
-let selected_fields = {};
-let author_uri = null;
+let selectedItems = {};
+let selectedFields = {};
+
+// Global variables
+let author = null;
 
 // Labels filter
-let valid_labels = ["wikidata", "viafurl", "sbn"];
-
-// Response parsing
-function parse_cobis_response(response, uri) {
-
-    response.identifiers = {uri: uri};
-
-    // Parse titles and roles
-    if(response.title) {
-        let titlesRaw = response.title.split('###');
-        // Get three titles
-        let titles = [];
-        for(let i = 0; i < titlesRaw.length && i < 3; i++)
-            titles.push(titlesRaw[i]);
-        response.titles = {titlesLength: titlesRaw.length, titlesItem: titles};
-        delete response.title;
-    }
-
-    if(response.personRole) {
-        let roles = response.personRole.split('###');
-        response.roles = {rolesLength: roles.length, rolesItem: roles};
-        delete response.personRole;
-    }
-
-    return response;
-
-}
+let validLabels = ["optionWikidata", "optionViaf", "optionSbn"];
 
 // Selection handling
 function update_selection(item) {
 
     // Evaluate option selection
-    if(selected_items[item])
+    if(selectedItems[item])
         // Remove selection
-        delete selected_items[item];
+        delete selectedItems[item];
     else
         // Add selection
-        selected_items[item] = true;
+        selectedItems[item] = true;
 
-    return selected_items[item];
+    return selectedItems[item];
 
 }
 
@@ -52,7 +28,7 @@ function get_from_options(item, callback) {
 
     // Get item from option
     options.forEach((option) => {
-        if(option.item.toString() === item.toString())
+        if(option.optionItem.toString() === item.toString())
             callback(option);
     })
 
@@ -67,7 +43,7 @@ function group_labels(options, callback) {
 
         Object.keys(option).forEach((key) => {
             // Group by valid keys
-            if(valid_labels.includes(key)) {
+            if(validLabels.includes(key)) {
                 if (key in grouped_options)
                     grouped_options[key].push({'identifier': option[key], 'item': option});
                 else
@@ -104,14 +80,14 @@ function select_author(element) {
     }
 
     // Update selection counter
-    document.getElementById('selected-options-counter').innerHTML = Object.keys(selected_items).length;
+    document.getElementById('selected-options-counter').innerHTML = Object.keys(selectedItems).length;
 
 }
 
 function match_multiple_authors() {
 
     // Get selected authors length
-    let selected_items_keys = Object.keys(selected_items);
+    let selected_items_keys = Object.keys(selectedItems);
     // Get selected authors
     let selected_options = [];
 
@@ -140,10 +116,10 @@ function match_field(element) {
     let value = element.getAttribute('data-value');
 
     // Select field
-    if(selected_fields[label] === value)
-        delete selected_fields[label];
+    if(selectedFields[label] === value)
+        delete selectedFields[label];
     else
-        selected_fields[label] = value;
+        selectedFields[label] = value;
 
     // Update fields rendering
     update_fields()
@@ -154,7 +130,7 @@ function match_field(element) {
 $.get('/views/template/author-card.html', (template) => {
 
     // Extract params from url
-    let params = parse_url(window.location.href, [4, 6]);
+    let params = parseUrl(window.location.href, [4, 6]);
     let token = params[0];
 
     // Print message
@@ -185,9 +161,7 @@ $.get('/views/template/author-card.html', (template) => {
         success: response => {
 
             // Store person identifier
-            author_uri = response.personURI;
-            // Parse response
-            let author = parse_cobis_response(response, response.personURI);
+            author = response;
             //Generate and set output
             let output = Mustache.render(template, author);
             $('#author-card').html(output);
@@ -197,7 +171,7 @@ $.get('/views/template/author-card.html', (template) => {
             $.get('/views/template/author-options.html', (template) => {
 
                 // Handle response
-                let tokens = response.personName.split(', ');
+                let tokens = author.authorName.split(', ');
 
                 // Get name and surname
                 let surname = tokens[0].split('<')[0].trim() || "";
@@ -215,8 +189,10 @@ $.get('/views/template/author-card.html', (template) => {
 
                         // Render output
                         let output = Mustache.render(template, response);
+                        // Store options
                         options = response.options;
-                        $('#author-options').html(output).fadeIn(2000);
+                        // Show output
+                        $('#author-options').html(output);
 
                     }
 
@@ -232,7 +208,7 @@ $.get('/views/template/author-card.html', (template) => {
 function show_matches() {
 
     // Extract params from url
-    let params = parse_url(window.location.href, [4, 6]);
+    let params = parseUrl(window.location.href, [4, 6]);
     let token = params[0];
 
     // Variables
@@ -241,19 +217,19 @@ function show_matches() {
     $.get('/views/template/matches.html', (template) => {
 
         // Generate container
-        let container = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/', 'identifier': author_uri});
+        let container = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/', 'authorUri': author.authorUri});
         let selected_options = [];
 
         $('#author-container').html(container);
 
         // Populate matches options
         $.get('/views/template/matches-options.html', (template) => {
-            Object.keys(selected_items).forEach((item) => {
+            Object.keys(selectedItems).forEach((item) => {
                 get_from_options(item, (option) => {
                     // Collect selected options
                     selected_options.push(option);
                     // End iteration
-                    if(selected_options.length === Object.keys(selected_items).length) {
+                    if(selected_options.length === Object.keys(selectedItems).length) {
                         output = Mustache.render(template, {'items': selected_options});
                         $('#matches-options').html(output);
                     }
@@ -282,10 +258,10 @@ function update_fields(){
     $('.field_selection').removeClass('green').html('<i class="fas fa-plus"></i>');
 
     // Set selected values
-    if(Object.keys(selected_fields).length > 0) {
-        Object.keys(selected_fields).forEach((label) => {
-            $('.field_selection[data-label="' + label + '"][data-value="' + selected_fields[label] + '"]').addClass('green').html('<i class="fas fa-check"></i>');
-            render_fiels.push({'label': label, 'value': selected_fields[label]});
+    if(Object.keys(selectedFields).length > 0) {
+        Object.keys(selectedFields).forEach((label) => {
+            $('.field_selection[data-label="' + label + '"][data-value="' + selectedFields[label] + '"]').addClass('green').html('<i class="fas fa-check"></i>');
+            render_fiels.push({'label': label, 'value': selectedFields[label]});
         });
         $.get('/views/template/matches-selection.html', (template) => {
             // Compose output

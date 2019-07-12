@@ -1,31 +1,29 @@
 <div class="column">
     <div class="ui raised segment">
-        {{#identifiers}}
         <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Autore</a>
         <p class="author-name">
-            <a target="_blank" href="{{uri}}">
-                <i id="author-link" class="fas fa-external-link-alt"></i> {{personName}}
+            <a target="_blank" href="{{authorUri}}">
+                <i id="author-link" class="fas fa-external-link-alt"></i> {{authorName}}
             </a>
         </p>
-        {{/identifiers}}
-        {{#titles}}
-        <a href="{{identifiers.uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesLength}}) - Visualizza tutte</a>
+        {{#authorTitles}}
+        <a href="{{authorUri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesNumber}}) - Visualizza tutte</a>
         <ul class="ui bulleted list card-box">
-            {{#titlesItem}}
+            {{#titlesItems}}
             <li>
                 <div class="item title">{{.}}</div>
             </li>
-            {{/titlesItem}}
+            {{/titlesItems}}
         </ul>
-        {{/titles}}
-        {{#roles}}
+        {{/authorTitles}}
+        {{#authorRoles}}
         <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
         <div class="ui bulleted list card-box">
-            {{#rolesItem}}
+            {{#rolesItems}}
             <div class="item">{{.}}</div>
-            {{/rolesItem}}
+            {{/rolesItems}}
         </div>
-        {{/roles}}
+        {{/authorRoles}}
         <div class="ui divider"></div>
         <div class="card-box">
             <div id="send-button">
@@ -38,9 +36,7 @@
                     </a>
                 </div>
             </div>
-            {{#identifiers}}
-                <div onclick="skip_author(this)" data-identifier="{{uri}}" class="fluid ui button">Salta autore</div>
-            {{/identifiers}}
+            <div onclick="skip_author(this)" data-identifier="{{authorUri}}" class="fluid ui button">Salta autore</div>
         </div>
     </div>
 </div>
