@@ -43,17 +43,15 @@ module.exports = function (app) {
     });
 
     // Frontend
-    app.get('/get/:token/author', function (request, response) {
-
+    app.get(['/get/:token/author/', '/get/:token/author/:authorId'], function (request, response) {
         response.sendFile('author.html', {root: __dirname + '/app/views'});
-
     });
 
     // API
-    app.get('/api/v1/:token/author/', (request, response) => {
+    app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
 
         // Compose query
-        let query = queries.authorSelect();
+        let query = queries.authorSelect(request.params.authorId);
 
         // Make request
         nodeRequest(query, (err, res, body) => {

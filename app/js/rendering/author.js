@@ -4,6 +4,8 @@ function renderAuthorCard(author){
 
         // Generate output
         let output = Mustache.render(template, author);
+        // Change page title
+        document.title = author.authorName.nameFull + ' - OLAF';
         // Send output
         $('#author-card')
             .html(output)

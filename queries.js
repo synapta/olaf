@@ -1,5 +1,5 @@
 // Queries
-let authorSelect = () => {
+let authorSelect = (authorId) => {
     return `PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
             PREFIX schema: <http://schema.org/>
             PREFIX dcterm: <http://purl.org/dc/terms/>
@@ -11,21 +11,27 @@ let authorSelect = () => {
             SELECT ?personURI ?personName (SAMPLE(?description) as ?description) (SAMPLE(?link) as ?link) (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) (GROUP_CONCAT(distinct(?title); separator="###") as ?title) WHERE {
 
                 {
-                    SELECT ?personURI (COUNT(DISTINCT ?contribution) as ?titlesCount) WHERE {
+                    SELECT ?personURI (COUNT(DISTINCT ?contribution) AS ?titlesCount) WHERE {
 
                         ?contribution bf2:agent ?personURI .
                         ?instance bf2:instanceOf ?work .
                         ?work bf2:contribution ?contribution .
                         ?contribution bf2:agent ?personURI .
                         
-                        MINUS {?personURI owl:sameAs ?wd}
-                        MINUS {?personURI cobis:hasViafURL ?vf}
-                        MINUS {?personURI olaf:skipped ?skipped}
+                        ${authorId ? `
+                            FILTER (?personURI = <http://dati.cobis.to.it/agent/${authorUri}>)
+                        ` : `
+                            MINUS {?personURI owl:sameAs ?wd}
+                            MINUS {?personURI cobis:hasViafURL ?vf}
+                            MINUS {?personURI olaf:skipped ?skipped}
+                        `}
 
                     } GROUP BY ?personURI
-                      ORDER BY DESC(?titlesCount)
-                      LIMIT 1
-                      OFFSET ${Math.floor(Math.random() * 49)}
+                      ${authorId ? `` : `
+                          ORDER BY DESC(?titlesCount)
+                          LIMIT 1                      
+                          OFFSET ${Math.floor(Math.random() * 49)}
+                      `}
                 }
 
                 ?instance bf2:instanceOf ?work .
@@ -39,7 +45,8 @@ let authorSelect = () => {
                 OPTIONAL {?personURI schema:name ?personName . }
                 OPTIONAL {?contribution bf2:role/rdfs:label ?personRole . }
 
-            } GROUP BY ?personURI ?personName`;
+            } GROUP BY ?personURI ?personName
+              ${authorId ? `LIMIT 1` : ``}`;
 };
 
 let cobisInsertWikidata = (authorUri, optionWikidata) => {
@@ -82,7 +89,7 @@ let wikidataQuery = (name, surname) => {
         WHERE {
 
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "it".
+                bd:serviceParam wikibase:language "it,en".
                 ?item rdfs:label ?nome .
                 ?type rdfs:label ?tipologia.
                 ?item skos:altLabel ?altLabel .
@@ -268,8 +275,8 @@ function composeQueryVIAF(name, surname){
 }
 
 // Exports
-exports.authorSelect = () => {
-    return composeQuery(authorSelect());
+exports.authorSelect = (params) => {
+    return composeQuery(authorSelect(params));
 };
 
 exports.authorOptions = (name, surname) => {
