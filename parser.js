@@ -92,9 +92,9 @@ function parseAuthorOptions(bodies, callback) {
     let viafBody = bodies[1];
 
     // Parse wikidata body
-    let wikidataWithViaf = [];
-    parseWikidataOptions(wikidataBody, wikidataWithViaf, (wikidataOptions) => {
-        parseViafOptions(viafBody, wikidataWithViaf, (viafOptions) => {
+    let knownViaf = [];
+    parseWikidataOptions(wikidataBody, knownViaf, (wikidataOptions) => {
+        parseViafOptions(viafBody, knownViaf, (viafOptions) => {
             // Compose options object
             let options = wikidataOptions.concat(viafOptions);
             // Callback
@@ -104,7 +104,7 @@ function parseAuthorOptions(bodies, callback) {
 
 }
 
-function parseWikidataOptions(wikidataBody, wikidataWithViaf, callback) {
+function parseWikidataOptions(wikidataBody, knownViaf, callback) {
 
     // Wikidata map
     let wikidataMap = {
@@ -136,7 +136,7 @@ function parseWikidataOptions(wikidataBody, wikidataWithViaf, callback) {
                 if(key === 'optionViaf') {
                     // Handle VIAF
                     let viafUriParameters = wikidataOption[key].split('/');
-                    wikidataWithViaf.push(viafUriParameters[viafUriParameters.length - 1]);
+                    knownViaf.push(viafUriParameters[viafUriParameters.length - 1]);
                 } else if(key === 'optionBirthDate' || key === 'optionDeathDate')
                     // Handle dates
                     wikidataOption[key] = wikidataOption[key].substr(0, 10);
@@ -154,7 +154,7 @@ function parseWikidataOptions(wikidataBody, wikidataWithViaf, callback) {
 
 }
 
-function parseViafOptions(viafBody, wikidataWithViaf, callback) {
+function parseViafOptions(viafBody, knownViaf, callback) {
 
     // VIAF map
     let viafMap = {
@@ -168,11 +168,13 @@ function parseViafOptions(viafBody, wikidataWithViaf, callback) {
         'optionWikiperdiaIt': null,
         'optionTreccani': null,
         'optionViaf': 'viafid',
-        'optionSbn': null
+        'optionSbn': 'iccu'
     };
 
     // Results array
     let viafOptions = [];
+    // Invalid fields
+    let invalidFields = ['uniformtitleexpression', 'uniformtitlework'];
 
     // Parse results
     let results = viafBody.result;
@@ -181,13 +183,17 @@ function parseViafOptions(viafBody, wikidataWithViaf, callback) {
             // Generate new option
             let viafOption = {};
             // Check VIAF id
-            if (!wikidataWithViaf.includes(result['viafid'])) {
+            if (!knownViaf.includes(result['viafid']) && !invalidFields.includes(result['nametype'])) {
                 // Map result
                 Object.keys(viafMap).forEach((key) => {
                     if (viafMap[key] && result[viafMap[key]] && result[viafMap[key]] !== '') {
                         viafOption[key] = result[viafMap[key]];
-                        if(key === 'optionViaf')
+                        if(key === 'optionViaf') {
+                            knownViaf.push(viafOption[key]);
                             viafOption[key] = 'https://viaf.org/viaf/' + viafOption[key];
+                        }
+                        if(key === 'optionSbn')
+                            viafOption[key] = "IT_ICCU_" + viafOption[key].substring(0, 4).toUpperCase() + "_" + viafOption[key].substring(4, 10);
                     } else
                         viafOption[key] = null;
                 });
