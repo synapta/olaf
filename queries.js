@@ -214,7 +214,7 @@ function authorSkip(body) {
     // Get body params
     let authorUri = body.authorUri;
     // Return query
-    return cobisInsertSkip(authorUri);
+    return composeQuery(cobisInsertSkip(authorUri));
 
 }
 

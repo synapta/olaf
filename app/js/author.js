@@ -119,6 +119,12 @@ $.ajax({
 
                 // Render author options
                 renderAuthorOptions({'options': response.options});
+                // Check empty response
+                if(response.options.length === 0) {
+                    alert('Non sono presenti match per questo autore. Verrà saltato automaticamente');
+                    authorSkip(author.authorUri);
+                }
+
                 // Get author selection fields
                 authorFields = response.fields;
 
