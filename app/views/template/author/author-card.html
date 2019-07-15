@@ -3,7 +3,7 @@
         <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Autore</a>
         <p class="author-name">
             <a target="_blank" href="{{authorUri}}">
-                <i id="author-link" class="fas fa-external-link-alt"></i> {{authorName}}
+                <i id="author-link" class="fas fa-external-link-alt"></i> {{authorName.nameFull}}
             </a>
         </p>
         {{#authorTitles}}
@@ -28,7 +28,7 @@
         <div class="card-box">
             <div id="send-button">
                 <div class="fluid ui labeled button" tabindex="0">
-                    <button onclick="match_multiple_authors()" class="fluid ui primary button">
+                    <button id="selected-options-send" onclick="authorMatch()" class="fluid ui button disabled">
                         Associa autori selezionati
                     </button>
                     <a id="selected-options-counter" class="ui basic label">
@@ -36,7 +36,7 @@
                     </a>
                 </div>
             </div>
-            <div onclick="skip_author(this)" data-identifier="{{authorUri}}" class="fluid ui button">Salta autore</div>
+            <div onclick="authorSkip('{{authorUri}}')" data-identifier="{{authorUri}}" class="fluid ui button">Salta autore</div>
         </div>
     </div>
 </div>

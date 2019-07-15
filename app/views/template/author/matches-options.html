@@ -1,6 +1,5 @@
-{{#items}}
+{{#options}}
     <div class="ui raised segment">
-        <!--<a class="ui red ribbon label">Candidato</a>-->
         <div class="ui items">
             <div class="item">
                 <div class="ui small image">
@@ -19,27 +18,27 @@
         <div class="ui divider"></div>
         {{#optionWikidata}}
             <div class="add_match">
-                <div data-label="optionWikidata" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
-                    <i class="fas fa-plus"></i>
+                <div data-label="optionWikidata" data-value="{{.}}" onclick="matchField('optionWikidata', '{{.}}')" class="ui compact green icon button field_selection">
+                    <i class="fas fa-check"></i>
                 </div>
                 <span><b>Wikidata:</b> {{.}}</span>
             </div>
         {{/optionWikidata}}
         {{#optionViaf}}
             <div class="add_match">
-                <div data-label="optionViaf" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
-                    <i class="fas fa-plus"></i>
+                <div data-label="optionViaf" data-value="{{.}}" onclick="matchField('optionViaf', '{{.}}')" class="ui compact green icon button field_selection">
+                    <i class="fas fa-check"></i>
                 </div>
                 <span><b>VIAF:</b> {{.}}</span>
             </div>
         {{/optionViaf}}
         {{#optionSbn}}
             <div class="add_match">
-                <div data-label="optionSbn" data-value="{{.}}" onclick="match_field(this)" class="ui compact icon button field_selection">
-                    <i class="fas fa-plus"></i>
+                <div data-label="optionSbn" data-value="{{.}}" onclick="matchField('optionSbn', '{{.}}')" class="ui compact green icon button field_selection">
+                    <i class="fas fa-check"></i>
                 </div>
                 <span><b>SBN:</b> {{.}}</span>
             </div>
         {{/optionSbn}}
     </div>
-{{/items}}
+{{/options}}

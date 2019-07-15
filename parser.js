@@ -25,7 +25,9 @@ function parseAuthor(body){
                 author[key] = null;
         });
 
-        // Parse titles and roles
+        // Parse name, titles and roles
+        if(author.authorName)
+            author.authorName = parseAuthorName(author.authorName);
         if(author.authorTitles)
             author.authorTitles = parseAuthorTitles(author.authorTitles);
         if(author.authorRoles)
@@ -34,6 +36,32 @@ function parseAuthor(body){
     }
 
     return author;
+
+}
+
+function parseAuthorName(authorName){
+
+    // Initialize name object
+    let nameObject = {};
+    // Store complete name
+    nameObject['nameFull'] = authorName;
+
+    // Split name
+    let tokens = authorName.split(', ');
+
+    // Parse name
+    let surname = tokens[0].split('<')[0].trim() || "";
+    let name = "";
+    if(tokens[1]) {
+        name = tokens[1].split('<')[0].trim() || tokens[1].split('(')[0].trim() || "";
+    }
+
+    // Store firstName and lastName
+    nameObject['nameFirst'] = name;
+    nameObject['nameLast'] = surname;
+
+    // Return name object
+    return nameObject;
 
 }
 
@@ -56,6 +84,9 @@ function parseAuthorRoles(authorRoles){
 // Parse author options
 function parseAuthorOptions(bodies, callback) {
 
+    // Set author labels
+    let authorFields = ["optionWikidata", "optionViaf", "optionSbn"];
+
     // Store bodies
     let wikidataBody = bodies[0];
     let viafBody = bodies[1];
@@ -67,7 +98,7 @@ function parseAuthorOptions(bodies, callback) {
             // Compose options object
             let options = wikidataOptions.concat(viafOptions);
             // Callback
-            callback({'options': options});
+            callback({'options': options, 'fields': authorFields});
         });
     });
 

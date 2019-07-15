@@ -14,8 +14,10 @@ let authorSelect = () => {
                     SELECT ?personURI (COUNT(DISTINCT ?contribution) as ?titlesCount) WHERE {
 
                         ?contribution bf2:agent ?personURI .
+                        ?instance bf2:instanceOf ?work .
+                        ?work bf2:contribution ?contribution .
+                        ?contribution bf2:agent ?personURI .
                         
-                        FILTER(ISURI(?personURI))
                         MINUS {?personURI owl:sameAs ?wd}
                         MINUS {?personURI cobis:hasViafURL ?vf}
                         MINUS {?personURI olaf:skipped ?skipped}
@@ -347,7 +349,7 @@ exports.authorOptions = (name, surname) => {
 
 exports.authorSkip = (body) => {
     return authorSkip(body);
-}
+};
 
 exports.authorLink = (body) => {
     return authorLink(body)

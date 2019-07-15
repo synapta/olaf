@@ -1,7 +1,7 @@
 <div class="ui two column grid">
     {{#options}}
     <div class="column">
-        <div data-item="{{optionItem}}" class="ui raised segment">
+        <div data-item="{{optionItem}}" class="ui raised segment author-option">
             <div class="author-name">
                 <div class="author-title">{{optionName}}</div>
                 <div class="author-subtitle">{{optionType}}</div>
@@ -37,7 +37,7 @@
                 {{#optionSbn}}<a class="ui center aligned blue label" href="http://id.sbn.it/af/{{.}}" target="_blank">SBN</a>{{/optionSbn}}
             </div>
             <div class="ui divider"></div>
-            <button onclick="select_author(this)" class="ui fluid green button">Seleziona candidato</button>
+            <button onclick="authorSelect(this, this.parentElement.getAttribute('data-item'))" class="ui fluid green button author-selection">Seleziona candidato</button>
         </div>
     </div>
     {{/options}}

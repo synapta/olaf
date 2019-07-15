@@ -45,7 +45,7 @@ module.exports = function (app) {
     // Frontend
     app.get('/get/:token/author', function (request, response) {
 
-        response.sendFile('authors.html', {root: __dirname + '/app/views'});
+        response.sendFile('author.html', {root: __dirname + '/app/views'});
 
     });
 
@@ -68,20 +68,20 @@ module.exports = function (app) {
     app.get('/api/v1/:token/author-options/', (request, response) => {
 
         // Get parameters
-        let name = request.query.name;
-        let surname = request.query.surname;
+        let firstName = request.query.firstName;
+        let lastName = request.query.lastName;
 
         // Get requests
-        let requests = queries.authorOptions(name, surname);
+        let requests = queries.authorOptions(firstName, lastName);
         // Map requests to make Promise
         requests = requests.map(query => promiseRequest(query));
 
         // Make options queries
         Promise.all(requests).then((bodies) => {
             // Parse result
-            parser.parseAuthorOptions(bodies.map(body => JSON.parse(body)), (options) => {
+            parser.parseAuthorOptions(bodies.map(body => JSON.parse(body)), (res) => {
                 // Send back options response
-                response.json(options);
+                response.json(res);
             });
         });
 

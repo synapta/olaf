@@ -1,4 +1,5 @@
-{{#fields}}
+{{#selectedFields}}
+{{#values.length}}
 <div class="ui raised segment">
     <div class="ui bottom left attached label">{{label}}</div>
     <div>
@@ -9,7 +10,8 @@
         {{/values}}
     </div>
 </div>
-{{/fields}}
+{{/values.length}}
+{{/selectedFields}}
 <div class="ui icon message">
     <i class="fas fa-arrow-left"></i>
     <div class="content">
