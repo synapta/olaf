@@ -15,7 +15,6 @@ function renderAuthorCard(author){
 // Render author options
 function renderAuthorOptions(options){
     $.get('/views/template/author/author-options.html', (template) => {
-        console.log(options);
         // Render output
         let output = Mustache.render(template, options);
         // Show output

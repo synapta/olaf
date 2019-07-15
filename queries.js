@@ -73,6 +73,7 @@ let cobisInsertSkip = (authorUri) => {
 };
 
 let wikidataQuery = (name, surname) => {
+
     return `
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
         PREFIX wd: <http://www.wikidata.org/entity/>
@@ -154,78 +155,6 @@ let wikidataQuery = (name, surname) => {
         ORDER BY ASC(?num) LIMIT 20`
 };
 
-// Wikidata queries utils
-/*let handleWikidataBody = (body) => {
-
-    // Initialize response
-    let wikidataResult = [];
-
-    // Count bindings
-    let count = 0;
-
-    body.results.bindings.forEach((binding) => {
-
-        // Generate object
-        wikidataResult[count] = {};
-
-        // Populate wikidataResult
-        Object.keys(binding).forEach((key) => {
-            // Get dates
-            if (key === "birthDate" || key === "deathDate")
-                wikidataResult[count][key] = binding[key].value.substr(0, 10);
-            // Get image
-            else if (key === "immagine")
-                wikidataResult[count][key] = binding[key].value.substr(5, binding[key].value.length);
-            // Other stuff
-            else
-                wikidataResult[count][key] = binding[key].value
-        });
-
-        wikidataResult[count].item = JSON.stringify(wikidataResult[count]);
-
-        // Increment counter
-        count++;
-
-    });
-
-    return wikidataResult;
-
-};
-
-
-let handleVIAFBody = (body, viafurls) => {
-
-    // Initialize response
-    let VIAFresult = [];
-
-    if (body.result === null)
-        return VIAFresult;
-
-    let parsedcode = [];
-
-    body.result.forEach((d) => {
-        // Populate result
-        if (['uniformtitleexpression', 'uniformtitlework'].indexOf(d.nametype) < 0 && viafurls.indexOf('https://viaf.org/viaf/' + d.viafid) === -1 && parsedcode.indexOf(d.viafid) === -1 ) {
-            parsedcode.push(d.viafid);
-
-            let item = {};
-
-            item.nome = d.term;
-            item.viafurl = 'https://viaf.org/viaf/' + d.viafid;
-            item.tipologia = d.nametype;
-            if (d.hasOwnProperty('iccu'))
-                item.sbn = "IT_ICCU_" + d.iccu.substring(0, 4).toUpperCase() + "_" + d.iccu.substring(4, 10);
-
-            item.item = JSON.stringify(item);
-
-            VIAFresult.push(item)
-        }
-    });
-
-    return VIAFresult;
-
-};*/
-
 // Functions
 function authorOptions(name, surname){
 
@@ -243,11 +172,11 @@ function authorLink(body) {
     let optionSbn = body.optionSbn;
 
     // Single variables as arrays
-    if(!Array.isArray(optionWikidata))
+    if(optionWikidata && !Array.isArray(optionWikidata))
         optionWikidata = [optionWikidata];
-    if(!Array.isArray(optionViaf))
+    if(optionViaf && !Array.isArray(optionViaf))
         optionViaf = [optionViaf];
-    if(!Array.isArray(optionSbn))
+    if(optionSbn && !Array.isArray(optionSbn))
         optionSbn = [optionSbn];
 
     // Queries params and requests
