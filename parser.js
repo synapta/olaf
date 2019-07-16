@@ -5,6 +5,8 @@ const parseString    = require('xml2js').parseString;
 // Parse author
 function parseAuthor(body){
 
+    console.log(body);
+
     // Author map
     let authorMap = {
         'authorUri': 'personURI',
@@ -103,29 +105,30 @@ function parseAuthorOptions(bodies, callback) {
             // Compose options object
             let options = wikidataOptions.concat(viafOptions);
             // Get viaf details
-            options.forEach((option) => {
-                // Parse option
-                if(option.optionViaf) {
-                    let viafUriParameters = option.optionViaf.split('/');
-                    getViafDetails(viafUriParameters[viafUriParameters.length - 1], (result) => {
-                        // Store result
-                        option.optionTitles = result.optionTitles;
-                        if (!option.optionBirthDate && result.optionBirthDate !== '0')
-                            option.optionBirthDate = result.optionBirthDate;
-                        if (!option.optionDeathDate && result.optionDeathDate !== '0')
-                            option.optionDeathDate = result.optionDeathDate;
-                        console.log(parseCounter);
-                        console.log(options.length);
-                        console.log(result.optionTitles);
-                        // Callback
-                        if (++parseCounter === options.length) {
+            if(options.length > 0) {
+                options.forEach((option) => {
+                    // Parse option
+                    if (option.optionViaf) {
+                        let viafUriParameters = option.optionViaf.split('/');
+                        getViafDetails(viafUriParameters[viafUriParameters.length - 1], (result) => {
+                            // Store result
+                            option.optionTitles = result.optionTitles;
+                            if (!option.optionBirthDate && result.optionBirthDate !== '0')
+                                option.optionBirthDate = result.optionBirthDate;
+                            if (!option.optionDeathDate && result.optionDeathDate !== '0')
+                                option.optionDeathDate = result.optionDeathDate;
                             // Callback
-                            callback({'options': options, 'fields': authorFields});
-                        }
-                    });
-                } else
-                    parseCounter++;
-            });
+                            if (++parseCounter === options.length) {
+                                // Callback
+                                callback({'options': options, 'fields': authorFields});
+                            }
+                        });
+                    } else
+                        parseCounter++;
+                });
+            } else
+                // Callback
+                callback({'options': [], 'fields': authorFields});
         });
     });
 
@@ -262,7 +265,6 @@ function getViafDetails(optionViaf, callback){
             optionDeathDate = viafRecord.deathDate;
 
             // Store titles
-            //console.log(viafRecord);
             if (viafRecord.titles) {
                 // Store works
                 let optionTitles = viafRecord.titles.work;

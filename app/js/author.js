@@ -79,7 +79,7 @@ function authorSkip(authorUri) {
                 // Store last action in session
                 sessionStorage.setItem("action", "skip");
                 // Reload page
-                location.reload();
+                location.href = '/get/' + params.userToken + '/author';
             } else
                 alert("Errore");
         }
