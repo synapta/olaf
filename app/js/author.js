@@ -72,7 +72,7 @@ function authorSkip(authorUri) {
     $.ajax({
         url: '/api/v1/' + params.userToken + '/author-skip/',
         method: 'POST',
-        data: {'authorUri': authorUri},
+        data: {'authorId': authorUri},
         dataType: 'json',
         success: response => {
             if(response.status === 'success') {
