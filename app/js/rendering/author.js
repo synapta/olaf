@@ -21,6 +21,7 @@ function renderAuthorOptions(options){
         let output = Mustache.render(template, options);
         // Show output
         $('#author-options').html(output);
+        $('.ui.accordion').accordion();
     });
 }
 

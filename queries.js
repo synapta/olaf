@@ -19,7 +19,7 @@ let authorSelect = (authorId) => {
                         ?contribution bf2:agent ?personURI .
                         
                         ${authorId ? `
-                            FILTER (?personURI = <http://dati.cobis.to.it/agent/${authorUri}>)
+                            FILTER (?personURI = <http://dati.cobis.to.it/agent/${authorId}>)
                         ` : `
                             MINUS {?personURI owl:sameAs ?wd}
                             MINUS {?personURI cobis:hasViafURL ?vf}
@@ -219,7 +219,7 @@ function authorLink(body) {
 function authorSkip(body) {
 
     // Get body params
-    let authorUri = body.authorUri;
+    let authorUri = body.authorId;
     // Return query
     return composeQuery(cobisInsertSkip(authorUri));
 

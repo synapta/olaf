@@ -1,3 +1,7 @@
+// Requirements
+const nodeRequest    = require('request');
+const parseString    = require('xml2js').parseString;
+
 // Parse author
 function parseAuthor(body){
 
@@ -93,12 +97,35 @@ function parseAuthorOptions(bodies, callback) {
 
     // Parse wikidata body
     let knownViaf = [];
+    let parseCounter = 0;
     parseWikidataOptions(wikidataBody, knownViaf, (wikidataOptions) => {
         parseViafOptions(viafBody, knownViaf, (viafOptions) => {
             // Compose options object
             let options = wikidataOptions.concat(viafOptions);
-            // Callback
-            callback({'options': options, 'fields': authorFields});
+            // Get viaf details
+            options.forEach((option) => {
+                // Parse option
+                if(option.optionViaf) {
+                    let viafUriParameters = option.optionViaf.split('/');
+                    getViafDetails(viafUriParameters[viafUriParameters.length - 1], (result) => {
+                        // Store result
+                        option.optionTitles = result.optionTitles;
+                        if (!option.optionBirthDate && result.optionBirthDate !== '0')
+                            option.optionBirthDate = result.optionBirthDate;
+                        if (!option.optionDeathDate && result.optionDeathDate !== '0')
+                            option.optionDeathDate = result.optionDeathDate;
+                        console.log(parseCounter);
+                        console.log(options.length);
+                        console.log(result.optionTitles);
+                        // Callback
+                        if (++parseCounter === options.length) {
+                            // Callback
+                            callback({'options': options, 'fields': authorFields});
+                        }
+                    });
+                } else
+                    parseCounter++;
+            });
         });
     });
 
@@ -112,6 +139,7 @@ function parseWikidataOptions(wikidataBody, knownViaf, callback) {
         'optionName': 'nome',
         'optionType': 'tipologia',
         'optionDescription': 'descrizione',
+        'optionTitles': null,
         'optionBirthDate': 'birthDate',
         'optionDeathDate': 'deathDate',
         'optionImage': 'immagine',
@@ -162,6 +190,7 @@ function parseViafOptions(viafBody, knownViaf, callback) {
         'optionName': 'term',
         'optionType': 'nametype',
         'optionDescription': null,
+        'optionTitles': null,
         'optionBirthDate': null,
         'optionDeathDate': null,
         'optionImage': null,
@@ -190,6 +219,7 @@ function parseViafOptions(viafBody, knownViaf, callback) {
                         viafOption[key] = result[viafMap[key]];
                         if(key === 'optionViaf') {
                             knownViaf.push(viafOption[key]);
+                            // Get titles for option
                             viafOption[key] = 'https://viaf.org/viaf/' + viafOption[key];
                         }
                         if(key === 'optionSbn')
@@ -207,6 +237,65 @@ function parseViafOptions(viafBody, knownViaf, callback) {
 
     // Callback
     callback(viafOptions);
+
+}
+
+function getViafDetails(optionViaf, callback){
+
+    // Store titles
+    let viafQuery = 'https://www.viaf.org/viaf/search?query=cql.any+=+"' + optionViaf + '"&maximumRecords=1&httpAccept=application/json';
+    let titles = [];
+    let optionBirthDate = null;
+    let optionDeathDate = null;
+
+    nodeRequest(viafQuery, (err, res, body) => {
+
+        // Parse response
+        let viafResponse = JSON.parse(body);
+        if(viafResponse.searchRetrieveResponse.records) {
+
+            // Store VIAF record
+            let viafRecord = viafResponse.searchRetrieveResponse.records[0].record.recordData;
+
+            // Store birthDate and deathDate
+            optionBirthDate = viafRecord.birthDate;
+            optionDeathDate = viafRecord.deathDate;
+
+            // Store titles
+            //console.log(viafRecord);
+            if (viafRecord.titles) {
+                // Store works
+                let optionTitles = viafRecord.titles.work;
+                // Parse works
+                if (optionTitles) {
+                    if (!Array.isArray(optionTitles))
+                        optionTitles = [optionTitles];
+                    optionTitles.forEach((optionTitle) => {
+
+                        // Store title sources
+                        if(optionTitle.sources) {
+                            let titleSrcs = optionTitle.sources.s;
+                            if (!Array.isArray(titleSrcs))
+                                titleSrcs = [titleSrcs];
+                        }
+
+                        // Store title name
+                        let titleName = optionTitle.title;
+                        titles.push(titleName)
+
+                    })
+                }
+            }
+        }
+
+        // Check titles emptiness
+        if(titles.length === 0)
+            titles = null;
+
+        // Callback
+        callback({'optionTitles': titles, 'optionBirthDate': optionBirthDate, 'optionDeathDate': optionDeathDate});
+
+    });
 
 }
 

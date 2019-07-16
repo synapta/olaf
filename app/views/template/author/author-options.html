@@ -28,6 +28,26 @@
                     </div>
                 </div>
             </div>
+            {{#optionTitles.length}}
+            <a class="ui red ribbon label">Testi dell'autore</a>
+            <div class="ui items">
+                <div class="ui accordion">
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        Visualizza tutti
+                    </div>
+                    <div class="content">
+                        <ul class="ui bulleted list card-box">
+                            {{#optionTitles}}
+                                <li>
+                                    <div class="item">{{.}}</div>
+                                </li>
+                            {{/optionTitles}}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {{/optionTitles.length}}
             <a class="ui red ribbon label">Esplora in...</a>
             <div class="center aligned card-box">
                 {{#optionWikidata}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikidata</a>{{/optionWikidata}}

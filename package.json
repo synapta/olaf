@@ -27,6 +27,7 @@
     "semantic-ui-grid": "^2.4.1",
     "sugar": "latest",
     "underscore": "^1.9.1",
-    "http": "latest"
+    "http": "latest",
+    "xml2js": "latest"
   }
 }
