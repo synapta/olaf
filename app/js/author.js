@@ -43,8 +43,9 @@ function authorMatch(){
     });
 
     // Render author matches
-    renderAuthorMatchesContainer(author, params.userToken, Object.values(selectedOptions));
-    renderAuthorMatches(selectionInput);
+    renderAuthorMatchesContainer(author, params.userToken, Object.values(selectedOptions), () => {
+        renderAuthorMatches(selectionInput);
+    });
 
 }
 

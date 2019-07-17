@@ -57,7 +57,7 @@ function renderSelectedAuthors(element, selected, count){
 }
 
 // Render author matches
-function renderAuthorMatchesContainer(author, token, selectedOptions){
+function renderAuthorMatchesContainer(author, token, selectedOptions, callback){
     $.get('/views/template/author/matches.html', (template) => {
 
         // Generate container
@@ -69,6 +69,9 @@ function renderAuthorMatchesContainer(author, token, selectedOptions){
             output = Mustache.render(template, {'options': selectedOptions});
             $('#matches-options').html(output);
         });
+
+        // Callback
+        callback();
 
     });
 }
