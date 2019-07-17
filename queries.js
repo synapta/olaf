@@ -117,10 +117,17 @@ let wikidataQuery = (name, surname) => {
             SERVICE wikibase:mwapi {
                 bd:serviceParam wikibase:api "EntitySearch" .
                 bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-                bd:serviceParam mwapi:search "${name + " " + surname}" .
+                bd:serviceParam mwapi:search "${name + ' ' + surname}" .
                 bd:serviceParam mwapi:language "it" .
                 ?item wikibase:apiOutputItem mwapi:item .
                 ?num wikibase:apiOrdinal true .
+            }
+            
+            OPTIONAL {
+                ?book wdt:P31 wd:Q571 .
+                ?book wdt:P50 ?item .
+                ?book rdfs:label ?bookLabel .
+                filter (lang(?bookLabel) = "it")
             }
 
             OPTIONAL {

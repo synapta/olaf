@@ -5,8 +5,6 @@ const parseString    = require('xml2js').parseString;
 // Parse author
 function parseAuthor(body){
 
-    console.log(body);
-
     // Author map
     let authorMap = {
         'authorUri': 'personURI',
@@ -111,17 +109,31 @@ function parseAuthorOptions(bodies, callback) {
                     if (option.optionViaf) {
                         let viafUriParameters = option.optionViaf.split('/');
                         getViafDetails(viafUriParameters[viafUriParameters.length - 1], (result) => {
-                            // Store result
-                            option.optionTitles = result.optionTitles;
+
+                            // Store titles
+                            if(result.optionTitles) {
+                                // Generate object
+                                let optionTitlesObject = {'titlesSource': 'VIAF', 'titlesItem': result.optionTitles};
+                                // Handle Wikidata titles
+                                if(!option.optionTitles)
+                                    option.optionTitles = [optionTitlesObject];
+                                else
+                                    option.optionTitles.push(optionTitlesObject);
+                            }
+
+                            // Store birthDate
                             if (!option.optionBirthDate && result.optionBirthDate !== '0')
                                 option.optionBirthDate = result.optionBirthDate;
+
+                            // Store deathDate
                             if (!option.optionDeathDate && result.optionDeathDate !== '0')
                                 option.optionDeathDate = result.optionDeathDate;
+
                             // Callback
-                            if (++parseCounter === options.length) {
+                            if (++parseCounter === options.length)
                                 // Callback
                                 callback({'options': options, 'fields': authorFields});
-                            }
+
                         });
                     } else
                         parseCounter++;
@@ -142,7 +154,7 @@ function parseWikidataOptions(wikidataBody, knownViaf, callback) {
         'optionName': 'nome',
         'optionType': 'tipologia',
         'optionDescription': 'descrizione',
-        'optionTitles': null,
+        'optionTitles': 'titles',
         'optionBirthDate': 'birthDate',
         'optionDeathDate': 'deathDate',
         'optionImage': 'immagine',
@@ -171,6 +183,9 @@ function parseWikidataOptions(wikidataBody, knownViaf, callback) {
                 } else if(key === 'optionBirthDate' || key === 'optionDeathDate')
                     // Handle dates
                     wikidataOption[key] = wikidataOption[key].substr(0, 10);
+                else if(key === 'optionTitles')
+                    // Handle Wikidata titles
+                    wikidataOption[key] = [{'titlesSource': 'Wikidata', 'titlesItem': wikidataOption[key].split('###')}];
             } else
                 wikidataOption[key] = null;
         });
