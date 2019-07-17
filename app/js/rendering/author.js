@@ -27,6 +27,7 @@ function renderAuthorOptions(options){
         // Show output
         $('#author-options').html(output);
         $('.ui.accordion').accordion();
+        $('#loader').fadeOut();
     });
 }
 

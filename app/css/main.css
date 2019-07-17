@@ -67,6 +67,20 @@
     overflow: hidden;
 }
 
+/* Loader */
+
+#loader
+{
+    position: absolute;
+    width: 100%;
+    height: calc(100vh - 65px);
+    left: 0;
+    top: 65px;
+    background-color: #FFFFFF;
+    z-index: 10;
+    padding-top: calc(50vh - 90px);
+}
+
 /* Author options */
 
 .author-image
