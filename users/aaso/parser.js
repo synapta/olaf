@@ -1,6 +1,5 @@
 // Requirements
 const nodeRequest    = require('request');
-const parseString    = require('xml2js').parseString;
 
 // Parse author
 function parseAuthor(body){

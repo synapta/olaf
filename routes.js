@@ -3,14 +3,18 @@ const express        = require('express');
 const bodyParser     = require('body-parser');
 const nodeRequest    = require('request');
 const promiseRequest = require('request-promise');
-const queries        = require('./queries');
-const parser         = require('./parser');
+
+// Modules
+let queries          = null;
+let parser           = null;
 
 // Token validation
 function validateToken(token) {
 
     // Get valid tokens
-    let validTokens = ['cobis'];
+    let validTokens = ['cobis', 'aaso', 'amt', 'cai', 'cmus', 'dssp',
+                       'fga', 'ibmp', 'inaf', 'inrim', 'oato', 'plev',
+                       'slvm', 'toas'];
 
     // Check if token is valid
     return validTokens.includes(token);
@@ -31,10 +35,16 @@ module.exports = function (app) {
         let token = request.params.token;
 
         // Validate token
-        if (validateToken(token))
-        // Next route
+        if (validateToken(token)) {
+
+            // Load modules
+            queries = require('./users/' + token + '/queries');
+            parser = require('./users/' + token + '/parser');
+
+            // Next route
             next();
-        else {
+
+        } else {
             // Set not allowed response
             response.status(403);
             response.send('Not allowed to read this resource.');
