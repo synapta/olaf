@@ -98,40 +98,42 @@ function authorSend(){
 }
 
 // Get author, render author card, options and author labels
-$.ajax({
+$(document).ready(() => {
+    showUserToken(params.userToken);
+    $.ajax({
 
-    url: '/api/v1/' + params.userToken + '/author/' + ((params.authorId) ? params.authorId : ''),
-    method: 'GET',
-    dataType: 'json',
-    success: response => {
+        url: '/api/v1/' + params.userToken + '/author/' + ((params.authorId) ? params.authorId : ''),
+        method: 'GET',
+        dataType: 'json',
+        success: response => {
 
-        // Store author response
-        author = response;
-        // Render author card
-        renderAuthorCard(response);
+            // Store author response
+            author = response;
+            // Render author card
+            renderAuthorCard(response);
 
-        // Then get and render author options
-        $.ajax({
+            // Then get and render author options
+            $.ajax({
 
-            url: '/api/v1/' + params.userToken + '/author-options/?firstName=' + encodeURI(author.authorName.nameFirst) + '&lastName=' + encodeURI(author.authorName.nameLast),
-            method: 'GET',
-            dataType: 'json',
-            success: response => {
+                url: '/api/v1/' + params.userToken + '/author-options/?firstName=' + encodeURI(author.authorName.nameFirst) + '&lastName=' + encodeURI(author.authorName.nameLast),
+                method: 'GET',
+                dataType: 'json',
+                success: response => {
 
-                // Render author options
-                renderAuthorOptions({'options': response.options});
-                // Check empty response
-                if(response.options.length === 0) {
-                    alert('Non sono presenti match per questo autore. Verrà saltato automaticamente');
-                    authorSkip(author.authorUri);
+                    // Render author options
+                    renderAuthorOptions({'options': response.options});
+                    // Check empty response
+                    if(response.options.length === 0) {
+                        alert('Non sono presenti match per questo autore. Verrà saltato automaticamente');
+                        authorSkip(author.authorUri);
+                    }
+
+                    // Get author selection fields
+                    authorFields = response.fields;
+
                 }
+            });
 
-                // Get author selection fields
-                authorFields = response.fields;
-
-            }
-        });
-
-    }
+        }
+    });
 });
-

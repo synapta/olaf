@@ -1,3 +1,8 @@
+// Render user token
+function showUserToken(userToken){
+    $('#user-token').html(userToken);
+}
+
 // Render author card
 function renderAuthorCard(author){
     $.get('/views/template/author/author-card.html', (template) => {
