@@ -108,7 +108,7 @@ $(document).ready(() => {
         success: response => {
 
             // Store author response
-            author = response;
+            author = response.authorResponse;
             // Render author card
             renderAuthorCard(response.authorResponse);
             // Render author options
