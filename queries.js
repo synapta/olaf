@@ -63,7 +63,7 @@ let cobisInsertWikidata = (authorUri, optionWikidata) => {
 let cobisInsertViaf = (authorUri, optionViaf) => {
     return `PREFIX cobis: <http://dati.cobis.to.it/vocab/>
             INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
-                <${authorUri}> cobis:hasViafURL "${optionViaf}"
+                <${authorUri}> cobis:hasViafURL <${optionViaf}>
             }`;
 };
 

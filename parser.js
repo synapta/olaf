@@ -177,6 +177,8 @@ function parseWikidataOptions(wikidataBody, knownViaf, callback) {
             if(binding[wikidataMap[key]] && binding[wikidataMap[key]].value !== '') {
                 wikidataOption[key] = binding[wikidataMap[key]].value;
                 if(key === 'optionViaf') {
+                    // Replace https
+                    wikidataOption[key] = wikidataOption[key].replace('https', 'http');
                     // Handle VIAF
                     let viafUriParameters = wikidataOption[key].split('/');
                     knownViaf.push(viafUriParameters[viafUriParameters.length - 1]);
@@ -238,7 +240,7 @@ function parseViafOptions(viafBody, knownViaf, callback) {
                         if(key === 'optionViaf') {
                             knownViaf.push(viafOption[key]);
                             // Get titles for option
-                            viafOption[key] = 'https://viaf.org/viaf/' + viafOption[key];
+                            viafOption[key] = 'http://viaf.org/viaf/' + viafOption[key];
                         }
                         if(key === 'optionSbn')
                             viafOption[key] = "IT_ICCU_" + viafOption[key].substring(0, 4).toUpperCase() + "_" + viafOption[key].substring(4, 10);
