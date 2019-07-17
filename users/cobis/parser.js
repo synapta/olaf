@@ -165,7 +165,7 @@ function parseWikidataOptions(wikidataBody, knownViaf, callback) {
         'optionBirthDate': 'birthDate',
         'optionDeathDate': 'deathDate',
         'optionImage': 'immagine',
-        'optionWikiperdiaIt': 'itwikipedia',
+        'optionWikipediaIt': 'itwikipedia',
         'optionTreccani': 'treccani',
         'optionViaf': 'viafurl',
         'optionSbn': 'sbn'
