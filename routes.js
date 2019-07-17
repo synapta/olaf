@@ -60,15 +60,27 @@ module.exports = function (app) {
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
 
-        // Compose query
-        let query = queries.authorSelect(request.params.authorId);
+        // Compose author query
+        let queryAuthor = queries.authorSelect(request.params.authorId);
 
         // Make request
-        nodeRequest(query, (err, res, body) => {
+        nodeRequest(queryAuthor, (err, res, body) => {
+
             // Handle and send author
             let author = parser.parseAuthor(JSON.parse(body));
-            // Send response
-            response.json(author);
+            // Query options
+            let requests = queries.authorOptions(author.authorName.nameFirst, author.authorName.nameLast);
+            // Map requests to make Promise
+            requests = requests.map(query => promiseRequest(query));
+
+            // Make options queries
+            Promise.all(requests).then((bodies) => {
+                // Parse result
+                parser.parseAuthorOptions(bodies.map(body => JSON.parse(body)), (optionsResponse) => {
+                    // Send back options and author response
+                    response.json({'authorResponse': author, 'optionsResponse': optionsResponse});
+                });
+            });
         });
 
     });

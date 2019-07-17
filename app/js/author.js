@@ -110,29 +110,18 @@ $(document).ready(() => {
             // Store author response
             author = response;
             // Render author card
-            renderAuthorCard(response);
+            renderAuthorCard(response.authorResponse);
+            // Render author options
+            renderAuthorOptions({'options': response.optionsResponse.options});
 
-            // Then get and render author options
-            $.ajax({
+            // Check empty response
+            if(response.optionsResponse.options.length === 0) {
+                alert('Non sono presenti match per questo autore. Verrà saltato automaticamente');
+                authorSkip(author.authorUri);
+            }
 
-                url: '/api/v1/' + params.userToken + '/author-options/?firstName=' + encodeURI(author.authorName.nameFirst) + '&lastName=' + encodeURI(author.authorName.nameLast),
-                method: 'GET',
-                dataType: 'json',
-                success: response => {
-
-                    // Render author options
-                    renderAuthorOptions({'options': response.options});
-                    // Check empty response
-                    if(response.options.length === 0) {
-                        alert('Non sono presenti match per questo autore. Verrà saltato automaticamente');
-                        authorSkip(author.authorUri);
-                    }
-
-                    // Get author selection fields
-                    authorFields = response.fields;
-
-                }
-            });
+            // Set author fields
+            authorFields = response.optionsResponse.fields;
 
         }
     });

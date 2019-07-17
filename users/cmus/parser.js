@@ -120,6 +120,14 @@ function parseAuthorOptions(bodies, callback) {
                                     option.optionTitles.push(optionTitlesObject);
                             }
 
+                            // Store occupations
+                            if(result.optionOccupations) {
+                                // Merge occupations into description
+                                if(option.optionDescription)
+                                    result.optionOccupations.unshift(option.optionDescription);
+                                option.optionDescription = result.optionOccupations.join(', ');
+                            }
+
                             // Store birthDate
                             if (!option.optionBirthDate && result.optionBirthDate !== '0')
                                 option.optionBirthDate = result.optionBirthDate;
@@ -130,7 +138,7 @@ function parseAuthorOptions(bodies, callback) {
 
                             // Callback
                             if (++parseCounter === options.length)
-                                // Callback
+                            // Callback
                                 callback({'options': options, 'fields': authorFields});
 
                         });
@@ -138,7 +146,7 @@ function parseAuthorOptions(bodies, callback) {
                         parseCounter++;
                 });
             } else
-                // Callback
+            // Callback
                 callback({'options': [], 'fields': authorFields});
         });
     });
@@ -182,10 +190,10 @@ function parseWikidataOptions(wikidataBody, knownViaf, callback) {
                     let viafUriParameters = wikidataOption[key].split('/');
                     knownViaf.push(viafUriParameters[viafUriParameters.length - 1]);
                 } else if(key === 'optionBirthDate' || key === 'optionDeathDate')
-                    // Handle dates
+                // Handle dates
                     wikidataOption[key] = wikidataOption[key].substr(0, 10);
                 else if(key === 'optionTitles')
-                    // Handle Wikidata titles
+                // Handle Wikidata titles
                     wikidataOption[key] = [{'titlesSource': 'Wikidata', 'titlesItem': wikidataOption[key].split('###')}];
             } else
                 wikidataOption[key] = null;
@@ -262,8 +270,10 @@ function parseViafOptions(viafBody, knownViaf, callback) {
 function getViafDetails(optionViaf, callback){
 
     // Store titles
-    let viafQuery = 'https://www.viaf.org/viaf/search?query=cql.any+=+"' + optionViaf + '"&maximumRecords=1&httpAccept=application/json';
+    let viafQuery = 'https://www.viaf.org/viaf/' + optionViaf + '/?httpAccept=application/json';
+    //let viafQuery = 'https://www.viaf.org/viaf/search?query=cql.any+=+"' + optionViaf + '"&maximumRecords=1&httpAccept=application/json';
     let titles = [];
+    let occupations = [];
     let optionBirthDate = null;
     let optionDeathDate = null;
 
@@ -271,47 +281,51 @@ function getViafDetails(optionViaf, callback){
 
         // Parse response
         let viafResponse = JSON.parse(body);
-        if(viafResponse.searchRetrieveResponse.records) {
-
-            // Store VIAF record
-            let viafRecord = viafResponse.searchRetrieveResponse.records[0].record.recordData;
+        if(viafResponse) {
 
             // Store birthDate and deathDate
-            optionBirthDate = viafRecord.birthDate;
-            optionDeathDate = viafRecord.deathDate;
+            optionBirthDate = viafResponse.birthDate;
+            optionDeathDate = viafResponse.deathDate;
 
             // Store titles
-            if (viafRecord.titles) {
-                // Store works
-                let optionTitles = viafRecord.titles.work;
+            if (viafResponse.titles){
                 // Parse works
-                if (optionTitles) {
-                    if (!Array.isArray(optionTitles))
+                if(viafResponse.titles.work) {
+                    let optionTitles = viafResponse.titles.work;
+                    if(!Array.isArray(optionTitles))
                         optionTitles = [optionTitles];
                     optionTitles.forEach((optionTitle) => {
-
-                        // Store title sources
-                        if(optionTitle.sources) {
-                            let titleSrcs = optionTitle.sources.s;
-                            if (!Array.isArray(titleSrcs))
-                                titleSrcs = [titleSrcs];
-                        }
-
                         // Store title name
-                        let titleName = optionTitle.title;
-                        titles.push(titleName)
-
+                        titles.push(optionTitle.title);
                     })
                 }
             }
+
+            // Store occupations
+            if(viafResponse.occupation){
+                // Parse occupations
+                if(viafResponse.occupation.data) {
+                    let optionOccupations = viafResponse.occupation.data;
+                    if(!Array.isArray(optionOccupations))
+                        optionOccupations = [optionOccupations];
+                    optionOccupations.forEach((optionOccupation) => {
+                        // Store occupation name
+                        occupations.push(optionOccupation.text);
+                    })
+                }
+
+            }
+
         }
 
-        // Check titles emptiness
+        // Check titles and occupations emptiness
         if(titles.length === 0)
             titles = null;
+        if(occupations.length === 0)
+            occupations = null;
 
         // Callback
-        callback({'optionTitles': titles, 'optionBirthDate': optionBirthDate, 'optionDeathDate': optionDeathDate});
+        callback({'optionTitles': titles, 'optionOccupations': occupations, 'optionBirthDate': optionBirthDate, 'optionDeathDate': optionDeathDate});
 
     });
 
