@@ -1,5 +1,6 @@
 // Requirements
 const nodeRequest    = require('request');
+const fuzz           = require('fuzzball');
 
 // Parse author
 function parseAuthor(body){
@@ -72,7 +73,7 @@ function parseAuthorTitles(authorTitles){
 
     // Split titles
     let titles = authorTitles.split('###');
-    return {'titlesNumber': titles.length, 'titlesItems': [titles[0], titles[1], titles[2]]}
+    return {'titlesNumber': titles.length, 'titlesItem': titles}
 
 }
 
@@ -80,12 +81,12 @@ function parseAuthorRoles(authorRoles){
 
     // Split titles
     let roles = authorRoles.split('###');
-    return {'rolesNumber': roles.length, 'rolesItems': roles}
+    return {'rolesNumber': roles.length, 'rolesItem': roles}
 
 }
 
 // Parse author options
-function parseAuthorOptions(bodies, callback) {
+function parseAuthorOptions(author, bodies, callback) {
 
     // Set author labels
     let authorFields = ["optionWikidata", "optionViaf", "optionSbn"];
@@ -138,15 +139,20 @@ function parseAuthorOptions(bodies, callback) {
 
                             // Callback
                             if (++parseCounter === options.length)
-                                // Callback
-                                callback({'options': options, 'fields': authorFields});
+                            // Option similarity
+                                getAuthorSimilarOptions(author, options, (result) => {
+                                    // Sort result
+                                    result = result.sort((a, b) => (b.optionSuggested - a.optionSuggested));
+                                    // Callback
+                                    callback({'options': result, 'fields': authorFields});
+                                });
 
                         });
                     } else
                         parseCounter++;
                 });
             } else
-                // Callback
+            // Callback
                 callback({'options': [], 'fields': authorFields});
         });
     });
@@ -168,7 +174,8 @@ function parseWikidataOptions(wikidataBody, knownViaf, callback) {
         'optionWikipediaIt': 'itwikipedia',
         'optionTreccani': 'treccani',
         'optionViaf': 'viafurl',
-        'optionSbn': 'sbn'
+        'optionSbn': 'sbn',
+        'optionSuggested': null
     };
 
     // Results array
@@ -190,10 +197,10 @@ function parseWikidataOptions(wikidataBody, knownViaf, callback) {
                     let viafUriParameters = wikidataOption[key].split('/');
                     knownViaf.push(viafUriParameters[viafUriParameters.length - 1]);
                 } else if(key === 'optionBirthDate' || key === 'optionDeathDate')
-                    // Handle dates
+                // Handle dates
                     wikidataOption[key] = wikidataOption[key].substr(0, 10);
                 else if(key === 'optionTitles')
-                    // Handle Wikidata titles
+                // Handle Wikidata titles
                     wikidataOption[key] = [{'titlesSource': 'Wikidata', 'titlesItem': wikidataOption[key].split('###')}];
             } else
                 wikidataOption[key] = null;
@@ -224,7 +231,8 @@ function parseViafOptions(viafBody, knownViaf, callback) {
         'optionWikiperdiaIt': null,
         'optionTreccani': null,
         'optionViaf': 'viafid',
-        'optionSbn': 'iccu'
+        'optionSbn': 'iccu',
+        'optionSuggested': null
     };
 
     // Results array
@@ -271,7 +279,6 @@ function getViafDetails(optionViaf, callback){
 
     // Store titles
     let viafQuery = 'https://www.viaf.org/viaf/' + optionViaf + '/?httpAccept=application/json';
-    //let viafQuery = 'https://www.viaf.org/viaf/search?query=cql.any+=+"' + optionViaf + '"&maximumRecords=1&httpAccept=application/json';
     let titles = [];
     let occupations = [];
     let optionBirthDate = null;
@@ -331,13 +338,49 @@ function getViafDetails(optionViaf, callback){
 
 }
 
+function getAuthorSimilarOptions(author, options, callback){
+
+    // Parse all options
+    options.forEach((option) => {
+        if(author.authorTitles) {
+
+            // Match author by titles
+            let optionTitles = [];
+            if (option.optionTitles) {
+                option.optionTitles.forEach((titles) => {
+                    optionTitles = optionTitles.concat(titles.titlesItem);
+                })
+            }
+
+            // Match with author titles
+            author.authorTitles.titlesItem.forEach((title) => {
+                if (optionTitles.length > 0) {
+                    // Threshold 0.8 match result
+                    let results = fuzz.extract(title, optionTitles, {scorer: fuzz.token_set_ratio, cutoff: 80});
+                    // Check similarity
+                    results.forEach((result) => {
+                        if (result.length > 0)
+                        // Set option suggested
+                            option.optionSuggested = true;
+                    });
+                }
+            });
+        }
+    });
+
+    // Callback suggested options
+    callback(options);
+
+
+}
+
 // Exports
 exports.parseAuthor = (body) => {
     return parseAuthor(body);
 };
 
-exports.parseAuthorOptions = (bodies, callback) => {
-    parseAuthorOptions(bodies, (options) => {
+exports.parseAuthorOptions = (author, bodies, callback) => {
+    parseAuthorOptions(author, bodies, (options) => {
         callback(options);
     });
 };

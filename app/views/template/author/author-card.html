@@ -9,19 +9,19 @@
         {{#authorTitles}}
         <a href="{{authorUri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesNumber}}) - Visualizza tutte</a>
         <ul class="ui bulleted list card-box">
-            {{#titlesItems}}
+            {{#titlesItem}}
             <li>
                 <div class="item title">{{.}}</div>
             </li>
-            {{/titlesItems}}
+            {{/titlesItem}}
         </ul>
         {{/authorTitles}}
         {{#authorRoles}}
         <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
         <div class="ui bulleted list card-box">
-            {{#rolesItems}}
+            {{#rolesItem}}
             <div class="item">{{.}}</div>
-            {{/rolesItems}}
+            {{/rolesItem}}
         </div>
         {{/authorRoles}}
         <div class="ui divider"></div>

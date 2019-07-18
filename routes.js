@@ -76,9 +76,30 @@ module.exports = function (app) {
             // Make options queries
             Promise.all(requests).then((bodies) => {
                 // Parse result
-                parser.parseAuthorOptions(bodies.map(body => JSON.parse(body)), (optionsResponse) => {
+                parser.parseAuthorOptions(author, bodies.map(body => JSON.parse(body)), (optionsResponse) => {
+
+                    /*// Try to find best match between options and author
+                    optionsResponse.options.forEach((option) => {
+
+                        // Get all titles
+                        let optionTitles = [];
+                        if(option.optionTitles) {
+                            option.optionTitles.forEach((titles) => {
+                                optionTitles = optionTitles.concat(titles.titlesItem);
+                            })
+                        }
+
+                        // Match with author titles
+                        author.authorTitles.titlesItems.forEach((title) => {
+                            let results = fuzz.extract(title, optionTitles, {scorer: fuzz.token_set_ratio, cutoff: 60});
+                            console.log(results);
+                        })
+
+                    });*/
+
                     // Send back options and author response
                     response.json({'authorResponse': author, 'optionsResponse': optionsResponse});
+
                 });
             });
         });

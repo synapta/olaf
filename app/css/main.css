@@ -26,6 +26,21 @@
     margin-bottom: 20px;
 }
 
+ul.card-box
+{
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 0px !important;
+    padding-left: 20px;
+    max-height: 100px;
+    overflow-y: scroll;
+}
+
+ul.card-box > li
+{
+    padding-left: 20px !important;
+}
+
 /* Author card */
 
 .author-name

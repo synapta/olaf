@@ -2,9 +2,14 @@
     {{#options}}
     <div class="column">
         <div data-item="{{optionItem}}" class="ui raised segment author-option">
+            {{#optionSuggested}}
+            <a class="ui blue ribbon label">Autore consigliato</a>
+            {{/optionSuggested}}
             <div class="author-name">
                 <div class="author-title">{{optionName}}</div>
-                <div class="author-subtitle">{{optionType}}</div>
+                <div class="author-subtitle">
+                    <span>{{optionType}}</span>
+                </div>
             </div>
             <a class="ui red ribbon label">Candidato</a>
             <div class="ui items">

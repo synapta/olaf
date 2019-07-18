@@ -28,6 +28,6 @@
     "sugar": "latest",
     "underscore": "^1.9.1",
     "http": "latest",
-    "xml2js": "latest"
+    "fuzzball": "latest"
   }
 }
