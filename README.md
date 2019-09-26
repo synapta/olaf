@@ -7,10 +7,10 @@
 `npm start`
 
 
-##
+## Struttura del JSON
 
 Attualmente il prototipo di JSON che viene accettato da olaf è:
-```JSON
+```
 {
   "authorUri": "personURI", // Identificativo dell'agent
   "authorName": "personName", // Nome proprio dell'agent
