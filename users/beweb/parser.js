@@ -48,6 +48,17 @@ function parseAuthorBirthAndDate(author){
 
 }
 
+function parseAuthorWikimediaCommon(author){
+
+    // Extract author form url
+    let extractAuthor = /https?:\/\/\w{2,3}\.wikipedia\.org\/wiki\/(\w+)(?:\/.*)?/m;
+    // Get author string
+    let authorFromUrl = author.authorCommons.match(extractAuthor)[1];
+
+    author.authorCommons = 'https://commons.wikimedia.org/wiki/Category:' + authorFromUrl;
+
+}
+
 function parseAuthor(body){
 
     // Author map
@@ -61,9 +72,7 @@ function parseAuthor(body){
         'authorBirthPlace': 'Luogo_di_nascita_Luogo_istituzione',
         'authorDeathPlace': 'Luogo_di_morte_Data_soppressione',
         'authorGenre': 'Info_di_genere',
-        'authorWikipedia': 'Wikipedia',
-        'authorViaf': 'VIAF',
-        "authorIsni": 'ISNI'
+        'authorCommons': 'Wikipedia',
     };
 
     // Author object
@@ -86,7 +95,9 @@ function parseAuthor(body){
         if(author.authorRoles)
             author.authorRoles = parseAuthorRoles(author.authorRoles);
         if(author.authorBirthDate || author.authorDeathDate || author.authorBirthPlace || author.authorDeathPlace)
-            parseAuthorBirthAndDate(author)
+            parseAuthorBirthAndDate(author);
+        if(author.authorCommons)
+            parseAuthorWikimediaCommon(author);
 
     }
 
