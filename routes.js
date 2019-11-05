@@ -14,14 +14,14 @@ function validateToken(token) {
     // Get valid tokens
     let validTokens = ['cobis', 'aaso', 'amt', 'cai', 'cmus', 'dssp',
                        'fga', 'ibmp', 'inaf', 'inrim', 'oato', 'plev',
-                       'slvm', 'toas'];
+                       'slvm', 'toas', 'beweb'];
 
     // Check if token is valid
     return validTokens.includes(token);
 
 }
 
-module.exports = function (app) {
+module.exports = function(app) {
 
     // Setting up express
     app.use('/', express.static('./app'));
@@ -29,7 +29,7 @@ module.exports = function (app) {
     app.use(bodyParser.json());
 
     // Token middleware
-    app.all(['/api/v1/:token/*', '/get/:token/*'], function (request, response, next) {
+    app.all(['/api/v1/:token/*', '/get/:token/*'], (request, response, next) => {
 
         // Get token
         let token = request.params.token;
@@ -53,7 +53,7 @@ module.exports = function (app) {
     });
 
     // Frontend
-    app.get(['/get/:token/author/', '/get/:token/author/:authorId'], function (request, response) {
+    app.get(['/get/:token/author/', '/get/:token/author/:authorId'], (request, response) => {
         response.sendFile('author.html', {root: __dirname + '/app/views'});
     });
 
@@ -61,13 +61,56 @@ module.exports = function (app) {
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
 
         // Compose author query
-        let queryAuthor = queries.authorSelect(request.params.authorId);
+        let token = request.params.token;
+        // TODO: da far tornare alla normalità una volta terminato l'import da Beweb
+        let queryAuthor = token === 'beweb' ? '' : queries.authorSelect(request.params.authorId);
 
         // Make request
         nodeRequest(queryAuthor, (err, res, body) => {
 
+            // TODO: da far tornare alla normalità una volta terminato l'import da Beweb
+            let bewebAuthor = {
+
+                Idrecord: "CEIAF0000004",
+                Visualizzazione_su_BEWEB: "Papa Benedetto XIII",
+                Categoria: "Persona",
+                Codice_SBN: "CFIV009838",
+                Intestazione: [
+                    "Benedictus <papa ; 13.>",
+                    "Papa Benedetto XIII <Gravina in Puglia, 1650 - Roma, 1730>"
+                ],
+                Fonti_archivistiche_e_bibliografiche: [
+                    "De Caro Gaspare",
+                    "http://www.treccani.it/enciclopedia/papa-benedetto-xiii_(Dizionario-Biografico)/",
+                    "ICCU, banca dati SBN"
+                ],
+                Varianti: [
+                    "Orsini, Pietro Francesco",
+                    "Benedetto",
+                    "Vincenzo Maria"
+                ],
+                Info_di_genere: "M",
+                Data_di_nascita_Data_istituzione: "02/02/1650",
+                Luogo_di_nascita_Luogo_istituzione: "Gravina in Puglia",
+                Data_di_morte_Luogo_soppressione: "21/02/1730",
+                Luogo_di_morte_Data_soppressione: "Roma",
+                Qualifica: [
+                    "Papa"
+                ],
+                Wikipedia: "https://it.wikipedia.org/wiki/Papa_Benedetto_XIII",
+                VIAF: "http://viaf.org/viaf/7549012",
+                ISNI: "http://www.isni.org/0000000107747711",
+                Link: [
+                    "http://w2.vatican.va/content/vatican/it/holy-father/benedetto-xiii.html",
+                    "http://www.treccani.it/enciclopedia/papa-benedetto-xiii_(Dizionario-Biografico)"
+                ]
+
+            };
+
             // Handle and send author
-            let author = parser.parseAuthor(JSON.parse(body));
+            let author = parser.parseAuthor(bewebAuthor);
+            console.log(author);
+
             // Query options
             let requests = queries.authorOptions(author.authorName.nameFirst, author.authorName.nameLast);
             // Map requests to make Promise
