@@ -16,31 +16,27 @@ let authorSelect = (authorId) => {
                    (GROUP_CONCAT(distinct(?title); separator="###") as ?title) WHERE {
 
                 {
-                
-                    GRAPH<http://dati.cobis.to.it/AMT/>{
-                        SELECT ?personURI (COUNT(DISTINCT ?contribution) AS ?titlesCount) WHERE {
-    
-                            ?contribution bf2:agent ?personURI .
-                            ?instance bf2:instanceOf ?work .
-                            ?work bf2:contribution ?contribution .
-                            ?contribution bf2:agent ?personURI .
-                            
-                            ${authorId ? `
-                                FILTER (?personURI = <http://dati.cobis.to.it/agent/${authorId}>)
-                            ` : `
-                                MINUS {?personURI owl:sameAs ?wd}
-                                MINUS {?personURI cobis:hasViafURL ?vf}
-                                MINUS {?personURI olaf:skipped ?skipped}
-                            `}
-    
-                        } GROUP BY ?personURI
-                          ${authorId ? `` : `
-                              ORDER BY DESC(?titlesCount)
-                              LIMIT 1                      
-                              OFFSET ${Math.floor(Math.random() * 49)}
-                          `}
-                    }
-                    
+                    SELECT ?personURI (COUNT(DISTINCT ?contribution) AS ?titlesCount) WHERE {
+
+                        ?contribution bf2:agent ?personURI .
+                        ?instance bf2:instanceOf ?work .
+                        ?work bf2:contribution ?contribution .
+                        ?contribution bf2:agent ?personURI .
+                        
+                        ${authorId ? `
+                            FILTER (?personURI = <http://dati.cobis.to.it/agent/${authorId}>)
+                        ` : `
+                            MINUS {?personURI owl:sameAs ?wd}
+                            MINUS {?personURI cobis:hasViafURL ?vf}
+                            MINUS {?personURI olaf:skipped ?skipped}
+                        `}
+
+                    } GROUP BY ?personURI
+                      ${authorId ? `` : `
+                          ORDER BY DESC(?titlesCount)
+                          LIMIT 1                      
+                          OFFSET ${Math.floor(Math.random() * 49)}
+                      `}
                 }
 
                 ?instance bf2:instanceOf ?work .
@@ -90,105 +86,133 @@ let cobisInsertSkip = (authorUri) => {
 
 let wikidataQuery = (name, surname) => {
 
-    return `
-        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-        PREFIX wd: <http://www.wikidata.org/entity/>
-        
-        SELECT (?item as ?wikidata) 
-               (SAMPLE (?nome) as ?nome) 
-               (GROUP_CONCAT(DISTINCT ?tipologia) as ?tipologia) 
-               (SAMPLE (?num) as ?num) 
-               (SAMPLE (?descrizione) as ?descrizione) 
-               (SAMPLE (?altLabel) as ?altLabel)
-               (GROUP_CONCAT(DISTINCT ?bookLabel;separator='###') as ?titles)
-               (SAMPLE (?birthDate) as ?birthDate) 
-               (SAMPLE (?deathDate) as ?deathDate) 
-               (SAMPLE (?immagine) as ?immagine) 
-               (SAMPLE (?itwikipedia) as ?itwikipedia) 
-               (SAMPLE (?enwikipedia) as ?enwikipedia) 
-               (SAMPLE (?viafurl) as ?viafurl)
-               (SAMPLE (?treccani) as ?treccani)  (SAMPLE (?sbn) as ?sbn)
-        WHERE {
-
-            SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "it,en,fr,es,ge".
+    return `PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+            PREFIX wd: <http://www.wikidata.org/entity/>
+            
+            SELECT (?item as ?wikidata) 
+                   (SAMPLE(?nome) as ?nome) 
+                   (SAMPLE(?tipologia) as ?tipologia) 
+                   (SAMPLE(?num) as ?num) 
+                   (SAMPLE(?descrizione) as ?descrizione) 
+                   (SAMPLE(?altLabel) as ?altLabel)
+                   (SAMPLE(?bookLabel) as ?titles)
+                   (SAMPLE(?positionHeld) as ?positionHeld)
+                   (SAMPLE(?gender) as ?gender)
+                   (SAMPLE(?birthDate) as ?birthDate) 
+                   (SAMPLE(?birthPlace) as ?birthPlace) 
+                   (SAMPLE(?deathDate) as ?deathDate)
+                   (SAMPLE(?deathPlace) as ?deathPlace) 
+                   (SAMPLE(?immagine) as ?immagine) 
+                   (SAMPLE(?wikimediaCommons) as ?wikimediaCommons)
+                   (SAMPLE(?itwikipedia) as ?itwikipedia) 
+                   (SAMPLE(?enwikipedia) as ?enwikipedia) 
+                   (SAMPLE(?viafurl) as ?viafurl)
+                   (SAMPLE(?treccani) as ?treccani)
+                   (SAMPLE(?sbn) as ?sbn)
+            
+            WHERE {
+            
+              SERVICE wikibase:label {
+                bd:serviceParam wikibase:language "it,en,fr,es,ge" .
                 ?item rdfs:label ?nome .
-                ?type rdfs:label ?tipologia.
+                ?positionHeldID rdfs:label ?positionHeld .
+                ?birthPlaceID rdfs:label ?birthPlace .
+                ?deathPlaceID rdfs:label ?deathPlace .
                 ?item skos:altLabel ?altLabel .
                 ?item schema:description ?descrizione
-            }
-
-            SERVICE wikibase:mwapi {
+              }
+            
+              SERVICE wikibase:mwapi {
                 bd:serviceParam wikibase:api "EntitySearch" .
                 bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-                bd:serviceParam mwapi:search "${name + ' ' + surname}" .
+                bd:serviceParam mwapi:search "Papa Benedetto XIII" .
                 bd:serviceParam mwapi:language "it" .
                 ?item wikibase:apiOutputItem mwapi:item .
                 ?num wikibase:apiOrdinal true .
-            }
+              }
             
-            OPTIONAL {
+              OPTIONAL {
                 ?book wdt:P31 wd:Q571 .
                 ?book wdt:P50 ?item .
                 ?book rdfs:label ?bookLabel .
                 filter (lang(?bookLabel) = "it")
-            }
-
-            OPTIONAL {
+              }
+              
+              OPTIONAL {
+                ?item wdt:P39 ?positionHeldID
+              }
+              
+              OPTIONAL {
+                ?item wdt:P21 ?genderID .
+                VALUES (?genderID ?gender) {(wd:Q6581097 'M') (wd:Q6581072 'F')}
+              }
+            
+              OPTIONAL {
                 ?item wdt:P569 ?birthDate .
-            }
-
-            OPTIONAL {
+                ?item wdt:P19 ?birthPlaceID .
+              }
+            
+              OPTIONAL {
                 ?item wdt:P570 ?deathDate .
-            }
-
-            OPTIONAL {
+                ?item wdt:P20 ?deathPlaceID .
+              }
+            
+              OPTIONAL {
                 ?item wdt:P18 ?immagine .
-            }
-
-            OPTIONAL {
+              }
+              
+              OPTIONAL {
+                ?item wdt:P373 ?wikimediaCommons
+              }
+            
+              OPTIONAL {
                 ?item wdt:P3365 ?treccani .
-            }
-
-            OPTIONAL {
+              }
+            
+              OPTIONAL {
                 ?itwikipedia schema:about ?item .
                 FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
-            }
-
-            OPTIONAL {
+              }
+            
+              OPTIONAL {
                 ?enwikipedia schema:about ?item .
                 FILTER(CONTAINS(STR(?enwikipedia), 'en.wikipedia.org'))
-            }
-
-            OPTIONAL {
+              }
+            
+              OPTIONAL {
                 ?item wdt:P214 ?viaf
                 BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
-            }
-
-            OPTIONAL {
+              }
+            
+              OPTIONAL {
                 ?item wdt:P396 ?sbn_raw
                 BIND(REPLACE(STR(?sbn_raw), "\\\\\\\\", "_") as ?sbn)
-            }
-
-            MINUS{
+              }
+            
+              MINUS{
                 ?item wdt:P31 wd:Q15632617
-            }
-
-            MINUS{
+              }
+            
+              MINUS{
                 ?item wdt:P31 wd:Q4167410
-            }
-
-            MINUS{
+              }
+            
+              MINUS{
                 ?item wdt:P31 ?class.
                 ?class wdt:P279* wd:Q234460
                 VALUES ?class {wd:Q838948 wd:Q14204246}
+              }
+            
+              ?item wdt:P31 ?type .
+              OPTIONAL{
+                VALUES (?type ?tipologia) {(wd:Q5 'Persona') (wd:Q8436 'Famiglia')}
+              }
+              BIND(IF(!BOUND(?tipologia), 'Ente', ?tipologia) AS ?tipologia)
+            
             }
-
-            ?item wdt:P31 ?type .
-
-        }
-        GROUP BY ?item
-        ORDER BY ASC(?num) LIMIT 20`
+            
+            GROUP BY ?item
+            ORDER BY ASC(?num) LIMIT 20`.replace(/\s+|\r+|\t+/g, ' ');
 };
 
 // Functions

@@ -1,30 +1,145 @@
 <div class="column">
     <div class="ui raised segment">
+
         <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Autore</a>
+
         <p class="author-name">
             <a target="_blank" href="{{authorUri}}">
                 <i id="author-link" class="fas fa-external-link-alt"></i> {{authorName.nameFull}}
             </a>
         </p>
+
+        {{#authorCategory}}
+            <a class="ui blue ribbon label"> <i class="fas fa-book"></i> Categoria</a>
+            <p class="card-box">
+                {{authorCategory.label}}, {{authorGender.label}}
+            </p>
+        {{/authorCategory}}
+
+        {{#authorBirth}}
+            <a class="ui blue ribbon label"> <i class="fas fa-star"></i> Data di nascita</a>
+            <p class="card-box">
+                {{authorBirth.birthDate}}, {{authorBirth.birthPlace}}
+            </p>
+        {{/authorBirth}}
+
+        {{#authorDeath}}
+            <a class="ui blue ribbon label"> <i class="fas fa-cross"></i> Data di morte</a>
+            <p class="card-box">
+                {{authorDeath.deathDate}}, {{authorDeath.deathPlace}}
+            </p>
+        {{/authorDeath}}
+
         {{#authorTitles}}
-        <a href="{{authorUri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesNumber}}) - Visualizza tutte</a>
-        <ul class="ui bulleted list card-box">
-            {{#titlesItem}}
-            <li>
-                <div class="item title">{{.}}</div>
-            </li>
-            {{/titlesItem}}
-        </ul>
+            <a href="{{authorUri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesNumber}}) - Visualizza tutte</a>
+            <ul class="ui bulleted list card-box">
+                {{#titlesItem}}
+                <li>
+                    <div class="item title">{{.}}</div>
+                </li>
+                {{/titlesItem}}
+            </ul>
         {{/authorTitles}}
+
         {{#authorRoles}}
-        <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
-        <div class="ui bulleted list card-box">
-            {{#rolesItem}}
-            <div class="item">{{.}}</div>
-            {{/rolesItem}}
-        </div>
+            <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
+            <div class="ui bulleted list card-box">
+                {{#rolesItem}}
+                <div class="item">{{.}}</div>
+                {{/rolesItem}}
+            </div>
         {{/authorRoles}}
+
+        {{#authorHasOtherFields}}
+
+            <a class="ui blue ribbon label"> <i class="fas fa-info"></i> Altri campi</a>
+
+            {{#authorHeading.length}}
+                <div class="ui items">
+                    <div class="ui accordion">
+                        <div class="title">
+                            <i class="dropdown icon"></i>
+                            Intestazioni
+                        </div>
+                        <div class="content">
+                            <ul class="ui bulleted list card-box">
+                                {{#authorHeading}}
+                                <li>
+                                    <div class="item">{{.}}</div>
+                                </li>
+                                {{/authorHeading}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {{/authorHeading.length}}
+
+            {{#authorVariant.length}}
+                <div class="ui items">
+                    <div class="ui accordion">
+                        <div class="title">
+                            <i class="dropdown icon"></i>
+                            Varianti
+                        </div>
+                        <div class="content">
+                            <ul class="ui bulleted list card-box">
+                                {{#authorVariant}}
+                                <li>
+                                    <div class="item">{{.}}</div>
+                                </li>
+                                {{/authorVariant}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {{/authorVariant.length}}
+
+            {{#authorSources.length}}
+                <div class="ui items">
+                    <div class="ui accordion">
+                        <div class="title">
+                            <i class="dropdown icon"></i>
+                            Fonti archivistiche
+                        </div>
+                        <div class="content">
+                            <ul class="ui bulleted list card-box">
+                                {{#authorSources}}
+                                <li>
+                                    <div class="item">{{.}}</div>
+                                </li>
+                                {{/authorSources}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {{/authorSources.length}}
+
+            {{#authorLinks.length}}
+                <div class="ui items">
+                    <div class="ui accordion">
+                        <div class="title">
+                            <i class="dropdown icon"></i>
+                            Interlink esterni
+                        </div>
+                        <div class="content">
+                            <ul class="ui bulleted list card-box">
+                                {{#authorLinks}}
+                                <li>
+                                    <div class="item">
+                                        <a target="_blank" href="{{.}}">{{.}}</a>
+                                    </div>
+                                </li>
+                                {{/authorLinks}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {{/authorLinks.length}}
+
+        {{/authorHasOtherFields}}
+
         <div class="ui divider"></div>
+
         <div class="card-box">
             <div id="send-button">
                 <div class="fluid ui labeled button" tabindex="0">
@@ -38,5 +153,6 @@
             </div>
             <div onclick="authorSkip('{{authorUri}}')" data-identifier="{{authorUri}}" class="fluid ui button">Salta autore</div>
         </div>
+
     </div>
 </div>

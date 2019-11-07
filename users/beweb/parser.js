@@ -3,15 +3,15 @@ const nodeRequest    = require('request');
 const fuzz           = require('fuzzball');
 
 // Parse author
-function parseAuthorName(authorName){
+function parseAuthorName(author){
 
     // Initialize name object
     let nameObject = {};
     // Store complete name
-    nameObject['nameFull'] = authorName;
+    nameObject['nameFull'] = author.authorName;
 
     // Split name
-    let tokens = authorName.split(', ');
+    let tokens = author.authorName.split(', ');
 
     // Parse name
     let surname = tokens[0].split('<')[0].trim() || "";
@@ -24,13 +24,13 @@ function parseAuthorName(authorName){
     nameObject['nameLast'] = surname;
 
     // Return name object
-    return nameObject;
+    author.authorName = nameObject;
 
 }
 
-function parseAuthorRoles(authorRoles){
+function parseAuthorRoles(author){
 
-    return {'rolesNumber': authorRoles.length, 'rolesItem': authorRoles}
+    author.authorRoles = {'rolesNumber': author.authorRoles.length, 'rolesItem': author.authorRoles}
 
 }
 
@@ -59,20 +59,60 @@ function parseAuthorWikimediaCommon(author){
 
 }
 
+function translateToWikidataDictionaries(author){
+
+    // Collect all needed dictionaries
+    let wikidataMale = 'https://www.wikidata.org/wiki/Q6581097';
+    let wikidataFemale = 'https://www.wikidata.org/wiki/Q6581072';
+    let wikidataHuman = 'https://www.wikidata.org/wiki/Q5';
+    let wikidataFamily = 'https://www.wikidata.org/wiki/Q8436';
+    let wikidataEntity = null;
+
+    if(author.authorGender) {
+        // Create new dictionary
+        let wikidataGender = author.authorGender === 'M' ? wikidataMale : wikidataFemale;
+        // Update gender field
+        author.authorGender = {'label': author.authorGender, 'dictionary': wikidataGender}
+    }
+
+    if(author.authorCategory) {
+
+        let wikidataCategory = null;
+
+        // Create new dictionary
+        if(author.authorCategory === 'Persona')
+            wikidataCategory = wikidataHuman;
+        else if(author.authorCategory === 'Famiglia')
+            wikidataCategory = wikidataFamily;
+        else
+            wikidataCategory = wikidataEntity;
+
+        // Update category field
+        author.authorCategory = {'label': author.authorCategory, 'dictionary': wikidataCategory}
+
+    }
+
+}
+
 function parseAuthor(body){
 
     // Author map
     let authorMap = {
-        'authorUri': null,
+        'authorUri': 'Idrecord',
         'authorName': 'Visualizzazione_su_BEWEB',
         'authorTitles': null,
         'authorRoles': 'Qualifica',
+        'authorCategory': 'Categoria',
         'authorBirthDate': 'Data_di_nascita_Data_istituzione',
         'authorDeathDate': 'Data_di_morte_Luogo_soppressione',
         'authorBirthPlace': 'Luogo_di_nascita_Luogo_istituzione',
         'authorDeathPlace': 'Luogo_di_morte_Data_soppressione',
-        'authorGenre': 'Info_di_genere',
+        'authorGender': 'Info_di_genere',
         'authorCommons': 'Wikipedia',
+        'authorHeading': 'Intestazione',
+        'authorVariant': 'Varianti',
+        'authorSources': 'Fonti_archivistiche_e_bibliografiche',
+        'authorLinks': 'Link'
     };
 
     // Author object
@@ -89,25 +129,27 @@ function parseAuthor(body){
                 author[key] = null;
         });
 
-        // Parse name, titles and roles
+        // Parse name, titles, roles and commons
         if(author.authorName)
-            author.authorName = parseAuthorName(author.authorName);
+            parseAuthorName(author);
         if(author.authorRoles)
-            author.authorRoles = parseAuthorRoles(author.authorRoles);
+            parseAuthorRoles(author);
         if(author.authorBirthDate || author.authorDeathDate || author.authorBirthPlace || author.authorDeathPlace)
             parseAuthorBirthAndDate(author);
         if(author.authorCommons)
             parseAuthorWikimediaCommon(author);
+
+        // Get wikidata dictionaries
+        translateToWikidataDictionaries(author);
+
+        if(author.authorHeading || author.authorVariant || author.authorSources || author.authorLinks)
+            author.authorHasOtherFields = true;
 
     }
 
     return author;
 
 }
-
-/*
-------------------------------------------------------------------------------------------------------------------------
- */
 
 // Parse author options
 function parseAuthorOptions(author, bodies, callback) {
@@ -153,6 +195,11 @@ function parseAuthorOptions(author, bodies, callback) {
                                 option.optionDescription = result.optionOccupations.join(', ');
                             }
 
+                            // Store gender
+                            if(result.optionGender) {
+                                option.optionGender = result.optionGender;
+                            }
+
                             // Store birthDate
                             if (!option.optionBirthDate && result.optionBirthDate !== '0')
                                 option.optionBirthDate = result.optionBirthDate;
@@ -162,14 +209,15 @@ function parseAuthorOptions(author, bodies, callback) {
                                 option.optionDeathDate = result.optionDeathDate;
 
                             // Callback
-                            if (++parseCounter === options.length)
-                            // Option similarity
+                            if (++parseCounter === options.length) {
+                                // Option similarity
                                 getAuthorSimilarOptions(author, options, (result) => {
                                     // Sort result
                                     result = result.sort((a, b) => (b.optionSuggested - a.optionSuggested));
                                     // Callback
                                     callback({'options': result, 'fields': authorFields});
                                 });
+                            }
 
                         });
                     } else
@@ -191,11 +239,16 @@ function parseWikidataOptions(wikidataBody, knownViaf, callback) {
         'optionName': 'nome',
         'optionType': 'tipologia',
         'optionDescription': 'descrizione',
+        'optionPositionHeld': 'positionHeld',
+        'optionGender': 'gender',
         'optionTitles': 'titles',
         'optionBirthDate': 'birthDate',
+        'optionBirthPlace': 'birthPlace',
         'optionDeathDate': 'deathDate',
+        'optionDeathPlace': 'deathPlace',
         'optionImage': 'immagine',
         'optionWikipediaIt': 'itwikipedia',
+        'optionWikimediaCommons': 'wikimediaCommons',
         'optionTreccani': 'treccani',
         'optionViaf': 'viafurl',
         'optionSbn': 'sbn',
@@ -248,6 +301,7 @@ function parseViafOptions(viafBody, knownViaf, callback) {
         'optionName': 'term',
         'optionType': 'nametype',
         'optionDescription': null,
+        'optionGender': null,
         'optionTitles': null,
         'optionBirthDate': null,
         'optionDeathDate': null,
@@ -268,28 +322,44 @@ function parseViafOptions(viafBody, knownViaf, callback) {
     let results = viafBody.result;
     if(results) {
         results.forEach((result) => {
+
             // Generate new option
             let viafOption = {};
+
             // Check VIAF id
             if (!knownViaf.includes(result['viafid']) && !invalidFields.includes(result['nametype'])) {
+
                 // Map result
                 Object.keys(viafMap).forEach((key) => {
                     if (viafMap[key] && result[viafMap[key]] && result[viafMap[key]] !== '') {
+
                         viafOption[key] = result[viafMap[key]];
+
                         if(key === 'optionViaf') {
                             knownViaf.push(viafOption[key]);
                             // Get titles for option
                             viafOption[key] = 'http://viaf.org/viaf/' + viafOption[key];
                         }
+
                         if(key === 'optionSbn')
                             viafOption[key] = "IT_ICCU_" + viafOption[key].substring(0, 4).toUpperCase() + "_" + viafOption[key].substring(4, 10);
+
                     } else
                         viafOption[key] = null;
                 });
+
                 // Parse option for selection
                 viafOption['optionItem'] = JSON.stringify(viafOption);
+
+                // Vocabulary parsing
+                if(viafOption.optionType === 'personal')
+                    viafOption.optionType = 'Persona';
+                else
+                    viafOption.optionType = 'Ente';
+
                 // Push option
                 viafOptions.push(viafOption);
+
             }
         });
     }
@@ -307,42 +377,65 @@ function getViafDetails(optionViaf, callback){
     let occupations = [];
     let optionBirthDate = null;
     let optionDeathDate = null;
+    let optionGender = null;
 
     nodeRequest(viafQuery, (err, res, body) => {
 
         // Parse response
         let viafResponse = JSON.parse(body);
+
         if(viafResponse) {
 
             // Store birthDate and deathDate
             optionBirthDate = viafResponse.birthDate;
             optionDeathDate = viafResponse.deathDate;
 
+            // Store gender
+            if(viafResponse.fixed){
+
+                if(viafResponse.fixed.gender === 'a')
+                    optionGender = 'F';
+                else if(viafResponse.fixed.gender === 'b')
+                    optionGender = 'M'
+
+            }
+
+            console.log(optionViaf);
+
             // Store titles
             if (viafResponse.titles){
                 // Parse works
                 if(viafResponse.titles.work) {
+
                     let optionTitles = viafResponse.titles.work;
+
                     if(!Array.isArray(optionTitles))
                         optionTitles = [optionTitles];
+
                     optionTitles.forEach((optionTitle) => {
                         // Store title name
                         titles.push(optionTitle.title);
                     })
+
                 }
             }
 
             // Store occupations
             if(viafResponse.occupation){
+
                 // Parse occupations
                 if(viafResponse.occupation.data) {
+
                     let optionOccupations = viafResponse.occupation.data;
+
                     if(!Array.isArray(optionOccupations))
                         optionOccupations = [optionOccupations];
+
                     optionOccupations.forEach((optionOccupation) => {
                         // Store occupation name
                         occupations.push(optionOccupation.text);
                     })
+
                 }
 
             }
@@ -356,7 +449,12 @@ function getViafDetails(optionViaf, callback){
             occupations = null;
 
         // Callback
-        callback({'optionTitles': titles, 'optionOccupations': occupations, 'optionBirthDate': optionBirthDate, 'optionDeathDate': optionDeathDate});
+        callback({
+            'optionTitles': titles,
+            'optionOccupations': occupations,
+            'optionBirthDate': optionBirthDate,
+            'optionDeathDate': optionDeathDate,
+            'optionGender': optionGender});
 
     });
 

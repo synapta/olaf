@@ -109,7 +109,6 @@ module.exports = function(app) {
 
             // Handle and send author
             let author = parser.parseAuthor(bewebAuthor);
-            console.log(author);
 
             // Query options
             let requests = queries.authorOptions(author.authorName.nameFirst, author.authorName.nameLast);

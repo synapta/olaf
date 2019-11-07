@@ -8,7 +8,7 @@
             <div class="author-name">
                 <div class="author-title">{{optionName}}</div>
                 <div class="author-subtitle">
-                    <span>{{optionType}}</span>
+                    <span>{{optionType}}{{#optionGender}}, {{.}}{{/optionGender}}</span>
                 </div>
             </div>
             <a class="ui red ribbon label">Candidato</a>
@@ -21,8 +21,9 @@
                     </div>
                     <div class="middle aligned content">
                         {{#optionDescription}}<p>{{.}}</p>{{/optionDescription}}
-                        {{#optionBirthDate}}<p><b>Data di nascita:</b> {{.}}</p>{{/optionBirthDate}}
-                        {{#optionDeathDate}}<p><b>Data di morte: </b>{{.}}</p>{{/optionDeathDate}}
+                        {{#optionPositionHeld}}<p><b>Occupazione:</b> {{.}}</p>{{/optionPositionHeld}}
+                        {{#optionBirthDate}}<p><b>Data di nascita:</b> {{.}}{{#optionBirthPlace}}, {{.}}{{/optionBirthPlace}}</p>{{/optionBirthDate}}
+                        {{#optionDeathDate}}<p><b>Data di morte: </b>{{.}}{{#optionDeathPlace}}, {{.}}{{/optionDeathPlace}}</p>{{/optionDeathDate}}
                         {{^optionDescription}}
                             {{^optionBirthDate}}
                                 {{^optionDeathDate}}
@@ -62,6 +63,7 @@
                 {{#optionViaf}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">VIAF</a>{{/optionViaf}}
                 {{#optionTreccani}}<a class="ui center aligned blue label" href="http://www.treccani.it/enciclopedia/{{.}}" target="_blank">Treccani</a>{{/optionTreccani}}
                 {{#optionSbn}}<a class="ui center aligned blue label" href="http://id.sbn.it/af/{{.}}" target="_blank">SBN</a>{{/optionSbn}}
+                {{#optionWikimediaCommons}}<a class="ui center aligned blue label" href="https://commons.wikimedia.org/wiki/Category:{{.}}" target="_blank">Wikimedia Commons</a>{{/optionWikimediaCommons}}
             </div>
             <div class="ui divider"></div>
             <button onclick="authorSelect(this, this.parentElement.getAttribute('data-item'))" class="ui fluid green button author-selection">Seleziona candidato</button>

@@ -12,9 +12,7 @@ function renderAuthorCard(author){
         // Change page title
         document.title = author.authorName.nameFull + ' - OLAF';
         // Send output
-        $('#author-card')
-            .html(output)
-            .css({width: $('#author-card').parent().width(), position: 'fixed'});
+        $('#author-card').html(output);
 
     });
 }
