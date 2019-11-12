@@ -16,28 +16,28 @@ let authorSelect = (authorId) => {
                    (GROUP_CONCAT(distinct(?title); separator="###") as ?title) WHERE {
 
                 {
+                    ${authorId ? '': `
+                    MINUS {?personURI owl:sameAs ?wd}
+                    MINUS {?personURI cobis:hasViafURL ?vf}
+                    MINUS {?personURI olaf:skipped ?skipped}
+                    `}
                 
                     GRAPH<http://dati.cobis.to.it/IBMP/>{
                         SELECT ?personURI (COUNT(DISTINCT ?contribution) AS ?titlesCount) WHERE {
-    
                             ?contribution bf2:agent ?personURI .
                             ?instance bf2:instanceOf ?work .
                             ?work bf2:contribution ?contribution .
                             ?contribution bf2:agent ?personURI .
                             
+
                             ${authorId ? `
                                 FILTER (?personURI = <http://dati.cobis.to.it/agent/${authorId}>)
-                            ` : `
-                                MINUS {?personURI owl:sameAs ?wd}
-                                MINUS {?personURI cobis:hasViafURL ?vf}
-                                MINUS {?personURI olaf:skipped ?skipped}
-                            `}
+                            ` : ''}
     
                         } GROUP BY ?personURI
                           ${authorId ? `` : `
-                              ORDER BY DESC(?titlesCount)
-                              LIMIT 1                      
-                              OFFSET ${Math.floor(Math.random() * 49)}
+                              ORDER BY DESC(?titlesCount)                     
+                              
                           `}
                     }
                     
@@ -55,7 +55,8 @@ let authorSelect = (authorId) => {
                 OPTIONAL {?contribution bf2:role/rdfs:label ?personRole . }
 
             } GROUP BY ?personURI ?personName
-              ${authorId ? `LIMIT 1` : ``}`;
+              LIMIT 1
+              OFFSET ${Math.floor(Math.random() * 49)}`;
 };
 
 let cobisInsertWikidata = (authorUri, optionWikidata) => {
