@@ -107,7 +107,7 @@ let wikidataQuery = (name, surname) => {
         WHERE {
 
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "it,en,fr,es,ge".
+                bd:serviceParam wikibase:language "it, en".
                 ?item rdfs:label ?nome .
                 ?type rdfs:label ?tipologia.
                 ?item skos:altLabel ?altLabel .

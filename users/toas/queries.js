@@ -96,11 +96,12 @@ let wikidataQuery = (name, surname) => {
         
         SELECT (?item as ?wikidata) 
                (SAMPLE (?nome) as ?nome) 
-               (GROUP_CONCAT(DISTINCT ?tipologia) as ?tipologia) 
+               (SAMPLE(?tipologia) as ?tipologia) 
                (SAMPLE (?num) as ?num) 
                (SAMPLE (?descrizione) as ?descrizione) 
                (SAMPLE (?altLabel) as ?altLabel)
-               (GROUP_CONCAT(DISTINCT ?bookLabel;separator='###') as ?titles)
+               (SAMPLE(?bookLabel ) as ?titles)
+
                (SAMPLE (?birthDate) as ?birthDate) 
                (SAMPLE (?deathDate) as ?deathDate) 
                (SAMPLE (?immagine) as ?immagine) 
