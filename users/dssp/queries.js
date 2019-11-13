@@ -56,7 +56,7 @@ let authorSelect = (authorId) => {
 
             } GROUP BY ?personURI ?personName
               LIMIT 1
-              OFFSET ${Math.floor(Math.random() * 49)}`;
+              ${authorId ? '': `OFFSET ${Math.floor(Math.random() * 49)}`}`;
 };
 
 let cobisInsertWikidata = (authorUri, optionWikidata) => {
