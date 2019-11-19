@@ -1,0 +1,105 @@
+{{#authorRoles.rolesNumber}}
+    <p class="card-box"><b>Ruoli</b></p>
+    {{#authorRoles.rolesItem}}
+        <div class="add_match">
+            <div data-label="optionDescription" data-value="{{.}}" onclick="matchField('optionDescription', '{{.}}')" class="ui compact icon button field_selection">
+                <i class="fas fa-check"></i>
+            </div>
+            <span>{{.}}</span>
+        </div>
+    {{/authorRoles.rolesItem}}
+{{/authorRoles.rolesNumber}}
+
+{{#authorName}}
+    <p class="card-box"><b>Nome</b></p>
+    <div class="add_match">
+        <div data-label="optionSbn" data-value="{{nameFull}}" onclick="matchField('optionName', '{{nameFull}}')" class="ui compact icon button field_selection">
+            <i class="fas fa-check"></i>
+        </div>
+        <span>{{nameFull}}</span>
+    </div>
+{{/authorName}}
+
+{{#authorCategory.label}}
+    <p class="card-box"><b>Tipo</b></p>
+    <div class="add_match">
+        <div data-label="optionType" data-value="{{authorCategory.label}}" onclick="matchField('optionType', '{{authorCategory.label}}')" class="ui compact icon button field_selection">
+            <i class="fas fa-check"></i>
+        </div>
+        <span>{{authorCategory.label}}</span>
+    </div>
+{{/authorCategory.label}}
+
+{{#authorGender.label}}
+    <p class="card-box"><b>Genere</b></p>
+    <div class="add_match">
+        <div data-label="optionGender" data-value="{{authorGender.label}}" onclick="matchField('optionGender', '{{authorGender.label}}')" class="ui compact icon button field_selection">
+            <i class="fas fa-check"></i>
+        </div>
+        <span>{{authorGender.label}}</span>
+    </div>
+{{/authorGender.label}}
+
+{{#authorHeading.length}}
+    <p class="card-box"><b>Intestazioni</b></p>
+    {{#authorHeading}}
+        <div class="add_match">
+            <div data-label="optionHeading" data-value="{{.}}" onclick="matchField('optionHeading', '{{.}}')" class="ui compact icon button field_selection">
+                <i class="fas fa-check"></i>
+            </div>
+            <span>{{.}}</span>
+        </div>
+    {{/authorHeading}}
+{{/authorHeading.length}}
+
+{{#authorVariant.length}}
+    <p class="card-box"><b>Varianti</b></p>
+    {{#authorVariant}}
+    <div class="add_match">
+        <div data-label="optionVariant" data-value="{{.}}" onclick="matchField('optionVariant', '{{.}}')" class="ui compact icon button field_selection">
+            <i class="fas fa-check"></i>
+        </div>
+        <span>{{.}}</span>
+    </div>
+    {{/authorVariant}}
+{{/authorVariant.length}}
+
+{{#authorBirth.birthPlace}}
+    <p class="card-box"><b>Luogo di nascita</b></p>
+    <div class="add_match">
+        <div data-label="optionBirthPlace" data-value="{{.}}" onclick="matchField('optionBirthPlace', '{{.}}')" class="ui compact icon button field_selection">
+            <i class="fas fa-check"></i>
+        </div>
+        <span>{{.}}</span>
+    </div>
+{{/authorBirth.birthPlace}}
+
+{{#authorBirth.birthDate}}
+    <p class="card-box"><b>Data di nascita</b></p>
+    <div class="add_match">
+        <div data-label="optionBirthDate" data-value="{{.}}" onclick="matchField('optionBirthDate', '{{.}}')" class="ui compact icon button field_selection">
+            <i class="fas fa-check"></i>
+        </div>
+        <span>{{.}}</span>
+    </div>
+{{/authorBirth.birthDate}}
+
+{{#authorDeath.deathPlace}}
+    <p class="card-box"><b>Luogo di nascita</b></p>
+    <div class="add_match">
+        <div data-label="optionDeathPlace" data-value="{{.}}" onclick="matchField('optionDeathPlace', '{{.}}')" class="ui compact icon button field_selection">
+            <i class="fas fa-check"></i>
+        </div>
+        <span>{{.}}</span>
+    </div>
+{{/authorDeath.deathPlace}}
+
+{{#authorDeath.deathDate}}
+    <p class="card-box"><b>Data di nascita</b></p>
+    <div class="add_match">
+        <div data-label="optionDeathDate" data-value="{{.}}" onclick="matchField('optionDeathDate', '{{.}}')" class="ui compact icon button field_selection">
+            <i class="fas fa-check"></i>
+        </div>
+        <span>{{.}}</span>
+    </div>
+{{/authorDeath.deathDate}}

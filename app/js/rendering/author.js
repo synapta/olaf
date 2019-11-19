@@ -61,6 +61,22 @@ function renderSelectedAuthors(element, selected, count){
 }
 
 // Render author matches
+function renderBewebAuthorMatchesContainer(author, token, selectedOptions, callback) {
+    $.get('/views/template/beweb/matches.html', (template) => {
+
+        let grouping = groupBewebAuthorFields(author, selectedOptions);
+
+        // Generate form container
+        let output = Mustache.render(template, {'grouping': grouping});
+        $('.container').html(output).promise().done(() => {
+            $('.ui.accordion').accordion();
+        });
+
+        callback();
+
+    });
+}
+
 function renderAuthorMatchesContainer(author, token, selectedOptions, callback){
     $.get('/views/template/author/matches.html', (template) => {
 
@@ -78,6 +94,24 @@ function renderAuthorMatchesContainer(author, token, selectedOptions, callback){
         callback();
 
     });
+}
+
+function renderBewebAuthorMatches(selectionInput){
+
+    $.get('/views/template/beweb/selection-input.html', (template) => {
+        Object.keys(selectionInput).forEach((key) => {
+
+            // Clear list
+            $('#' + key).find('.selection_list').html('');
+
+            // Populate list
+            selectionInput[key].forEach((item) => {
+                $('#' + key).find('.selection_list').append(Mustache.render(template, {'value': item, 'key': key}));
+            });
+
+        })
+    });
+
 }
 
 function renderAuthorMatches(selectionInput){
@@ -124,11 +158,35 @@ function renderAuthorMatches(selectionInput){
 function fieldMatching(label, value){
 
     // Store selection
-    let selection = $('.field_selection[data-label="' + label + '"][data-value="' + value + '"]');
-    // Change icon
-    if(selection.hasClass('green'))
-        selection.removeClass('green').html('<i class="fas fa-plus"></i>');
-    else
-        selection.addClass('green').html('<i class="fas fa-check"></i>');
+    let selection = $('.field_selection[data-label="' + label + '"][data-value="' + value + '" i]');
+
+    if(!selection.hasClass('label')) {
+
+        // Change icon
+        if (selection.hasClass('green'))
+            selection.removeClass('green').html('<i class="fas fa-plus"></i>');
+        else
+            selection.addClass('green').html('<i class="fas fa-check"></i>');
+
+    }
+
+}
+
+function deleteInput(el, label, value){
+
+    // Remove field
+    removeField(label, value);
+
+    // Delete parent of current item
+    $(el).parent().remove();
+
+}
+
+function addNewInput(label){
+
+    // Add new input to selection list
+    $.get('/views/template/beweb/selection-input.html', (template) => {
+        $('#' + label).find('.selection_list').append(Mustache.render(template, {'value': '', 'key': label}))
+    });
 
 }

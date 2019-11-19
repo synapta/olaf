@@ -121,6 +121,8 @@ module.exports = function(app) {
                 parser.parseAuthorOptions(author, bodies.map(body => JSON.parse(body)), (optionsResponse) => {
 
                     // Send back options and author response
+                    console.log({'authorResponse': author, 'optionsResponse': optionsResponse});
+                    console.log(optionsResponse.options[0]);
                     response.json({'authorResponse': author, 'optionsResponse': optionsResponse});
 
                 });

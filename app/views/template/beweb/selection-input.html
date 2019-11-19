@@ -1,0 +1,13 @@
+<!--<div class="ui label">
+    <input class="ui label" value="{{value}}"/>
+    <i onclick="deleteInput(this, '{{key}}', '{{value}}')" class="fas fa-times"></i>
+</div>-->
+
+<div style="margin-bottom: 10px;">
+    <div style="width: calc(100% - 35px)" class="ui small input">
+        <input type="text" value="{{value}}" placeholder="Inserisci valore...">
+    </div>
+    <div onclick="deleteInput(this, '{{key}}', '{{value}}')" class="ui mini red icon button">
+        <i class="fas fa-minus"></i>
+    </div>
+</div>

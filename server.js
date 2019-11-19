@@ -12,5 +12,5 @@ require('./routes.js')(app);
 var server = app.listen(3645, function() {
     var host = server.address().address;
     var port = server.address().port;
-    console.log('Server listening at http://%s:%s', host, port);
+    console.log('Server listening at http://localhost:%s', port);
 });

@@ -1,0 +1,167 @@
+<style>
+    .column {
+        border-bottom: 1px dashed #cdcdcd;
+    }
+    .label {
+        margin: 2.5px !important;
+        cursor: pointer;
+    }
+    .label .label {
+        margin: 0 !important;
+        padding: 0;
+    }
+    h2 {
+        display: inline;
+    }
+</style>
+
+<form id="matches-form" action="{{action}}" type="" method="post">
+
+    <div class="ui accordion">
+
+        <div class="active title">
+            <i class="dropdown icon"></i>
+            <h2>Nome</h2>
+        </div>
+
+        <div class="active content">
+            <table class="ui fixed table">
+
+                <thead>
+                    <tr>
+                        <th>Autore finale</th>
+                        <th>Autore originale</th>
+                        <th>Scelta 1</th>
+                        <th>Scelta 2</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {{#grouping.Nome}}
+                        <tr>
+                            <td id="{{label}}">
+
+                                <div style="margin-bottom: 10px;">
+                                    <div onclick="addNewInput('{{label}}')" class="ui mini green icon button">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <b>{{dictionary}}</b>
+                                </div>
+
+                                <div class="selection_list"></div>
+
+                            </td>
+                            {{#values}}
+                            <td>
+                                {{#value}}
+                                    <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                                        {{.}}
+                                        <i style="margin-left: 5px" class="fas fa-plus"></i>
+                                    </a>
+                                {{/value}}
+                            </td>
+                            {{/values}}
+                        </tr>
+                    {{/grouping.Nome}}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="active title">
+            <i class="dropdown icon"></i>
+            <h2>Informazioni biografiche</h2>
+        </div>
+
+        <div class="active content">
+            <table class="ui fixed table">
+
+                <thead>
+                <tr>
+                    <th>Autore finale</th>
+                    <th>Autore originale</th>
+                    <th>Scelta 1</th>
+                    <th>Scelta 2</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                    {{#grouping.Bio}}
+                        <tr>
+                            <td id="{{label}}">
+
+                                <div style="margin-bottom: 10px;">
+                                    <div onclick="addNewInput('{{label}}')" class="ui mini green icon button">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <b>{{dictionary}}</b>
+                                </div>
+
+                                <div class="selection_list"></div>
+
+                            </td>
+                            {{#values}}
+                                <td>
+                                    {{#value}}
+                                        <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                                            {{.}}
+                                            <i style="margin-left: 5px" class="fas fa-plus"></i>
+                                        </a>
+                                    {{/value}}
+                                </td>
+                            {{/values}}
+                        </tr>
+                    {{/grouping.Bio}}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="active title">
+            <i class="dropdown icon"></i>
+            <h2>Identificativi</h2>
+        </div>
+
+        <div class="active content">
+            <table class="ui fixed table">
+
+                <thead>
+                    <tr>
+                        <th>Autore finale</th>
+                        <th>Autore originale</th>
+                        <th>Scelta 1</th>
+                        <th>Scelta 2</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {{#grouping.Identificativi}}
+                        <tr>
+                            <td id="{{label}}">
+
+                                <div style="margin-bottom: 10px;">
+                                    <div onclick="addNewInput('{{label}}')" class="ui mini green icon button">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <b>{{dictionary}}</b>
+                                </div>
+
+                                <div class="selection_list"></div>
+                            </td>
+                            {{#values}}
+                                <td>
+                                    {{#value}}
+                                        <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                                            {{.}}
+                                            <i style="margin-left: 5px" class="fas fa-plus"></i>
+                                        </a>
+                                    {{/value}}
+                                </td>
+                            {{/values}}
+                        </tr>
+                    {{/grouping.Identificativi}}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</form>
