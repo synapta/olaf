@@ -1,57 +1,15 @@
+const crypto = require('crypto');
+
+const SECRET_KEY = 'edQ5ZtumF6iKAY3UvAXO';
+
 // Queries
 let authorSelect = (authorId) => {
-    return `PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
-            PREFIX schema: <http://schema.org/>
-            PREFIX dcterm: <http://purl.org/dc/terms/>
-            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            PREFIX owl: <http://www.w3.org/2002/07/owl#>
-            PREFIX bookType: <http://dati.cobis.to.it/vocabulary/bookType/>
-            PREFIX olaf: <http://olaf.synapta.io/onto/>
+    if (!authorId) {
+      authorId = 'CEIAF0000004';
+    }
 
-            SELECT ?personURI 
-                   ?personName 
-                   (SAMPLE(?description) as ?description) 
-                   (SAMPLE(?link) as ?link) 
-                   (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) 
-                   (GROUP_CONCAT(distinct(?title); separator="###") as ?title) WHERE {
-
-                {
-                    SELECT ?personURI (COUNT(DISTINCT ?contribution) AS ?titlesCount) WHERE {
-
-                        ?contribution bf2:agent ?personURI .
-                        ?instance bf2:instanceOf ?work .
-                        ?work bf2:contribution ?contribution .
-                        ?contribution bf2:agent ?personURI .
-                        
-                        ${authorId ? `
-                            FILTER (?personURI = <http://dati.cobis.to.it/agent/${authorId}>)
-                        ` : `
-                            MINUS {?personURI owl:sameAs ?wd}
-                            MINUS {?personURI cobis:hasViafURL ?vf}
-                            MINUS {?personURI olaf:skipped ?skipped}
-                        `}
-
-                    } GROUP BY ?personURI
-                      ${authorId ? `` : `
-                          ORDER BY DESC(?titlesCount)
-                          LIMIT 1                      
-                          OFFSET ${Math.floor(Math.random() * 49)}
-                      `}
-                }
-
-                ?instance bf2:instanceOf ?work .
-                ?work bf2:contribution ?contribution .
-                ?contribution bf2:agent ?personURI .
-                ?instance bf2:title ?titleURI .
-                ?titleURI rdfs:label ?title .
-
-                OPTIONAL {?personURI schema:description ?description . }
-                OPTIONAL {?personURI foaf:isPrimaryTopicOf ?link . }
-                OPTIONAL {?personURI schema:name ?personName . }
-                OPTIONAL {?contribution bf2:role/rdfs:label ?personRole . }
-
-            } GROUP BY ?personURI ?personName
-              ${authorId ? `LIMIT 1` : ``}`;
+    let hash = crypto.createHash('md5').update(SECRET_KEY + authorId + 'getSource').digest("hex");
+    return 'mode=getSource&id=' + authorId + '&check=' + hash;
 };
 
 let cobisInsertWikidata = (authorUri, optionWikidata) => {
@@ -282,10 +240,9 @@ function authorSkip(body) {
 function composeQuery(query) {
 
     // Query parameters
-    let queryUrl = 'https://dati.cobis.to.it/sparql?default-graph-uri=&query=';
-    let queryFormat = '&format=json';
+    let queryUrl = 'http://testbbcc.glauco.it/AFXD/API/olaf/Services.do?';
 
-    return queryUrl + encodeURIComponent(query) + queryFormat;
+    return queryUrl + query;
 
 }
 
