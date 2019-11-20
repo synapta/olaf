@@ -182,47 +182,13 @@ function authorOptions(name, surname){
 }
 
 function authorLink(body) {
-
-    // Get body params
-    let authorUri = body.authorUri;
-    let optionWikidata = body.optionWikidata;
-    let optionViaf = body.optionViaf;
-    let optionSbn = body.optionSbn;
-
-    // Single variables as arrays
-    if(optionWikidata && !Array.isArray(optionWikidata))
-        optionWikidata = [optionWikidata];
-    if(optionViaf && !Array.isArray(optionViaf))
-        optionViaf = [optionViaf];
-    if(optionSbn && !Array.isArray(optionSbn))
-        optionSbn = [optionSbn];
-
-    // Queries params and requests
-    let links = {'wikidata': optionWikidata, 'viaf': optionViaf, 'sbn': optionSbn};
-    let requests = [];
-
+    //TODO parse body to beweb obj
+    
     // Generate requests
-    Object.keys(links).forEach((key) => {
-
-        // Parse query
-        if(links[key] !== undefined) {
-            if (key === 'wikidata') {
-                optionWikidata.forEach((option) => {
-                    requests.push(composeQuery(cobisInsertWikidata(authorUri, option)));
-                });
-            } else if (key === 'viaf') {
-                optionViaf.forEach((option) => {
-                    requests.push(composeQuery(cobisInsertViaf(authorUri, option)));
-                });
-            } else if (key === 'sbn' && !authorUri.includes('IT_ICCU')){
-                optionSbn.forEach((option) => {
-                    requests.push(composeQuery(cobisInsertSbn(authorUri, option)));
-                })
-            }
-        }
-
-    });
-
+    let requests = [];
+    // Parse query
+    let hash = crypto.createHash('md5').update(SECRET_KEY + body.id + 'updEntita').digest("hex");
+    requests.push(composeQuery("id=" + body.id + "&mode=updEntita&check=" + hash + "&dati=" + encodeURIComponent(json.stringify(body))));
     return requests;
 
 }
