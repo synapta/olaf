@@ -134,10 +134,12 @@ module.exports = function(app) {
         let requests = queries.authorSkip(request.body);
 
         // Send requests
-        nodeRequest(requests, (err, res, body) => {
+        /*nodeRequest(requests, (err, res, body) => {
             // Send response
             response.json({'status': 'success'});
-        });
+        });*/
+
+        response.json({'skipped': true});
 
     });
 

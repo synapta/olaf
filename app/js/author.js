@@ -9,6 +9,8 @@ let selectionInput = {};
 let authorFields = null;
 
 // Field grouping
+let selectionLimit = 2;
+
 let fieldsGrouping = {
     'Nome': [
         'name',
@@ -102,17 +104,24 @@ function authorSelect(element, item){
     let parsedItem = JSON.parse(item);
     let selected = null;
 
-    // Store or remove author from selected list
-    if(Object.keys(selectedOptions).includes(stringedItem)) {
-        delete selectedOptions[stringedItem];
-        selected = true;
-    } else {
-        selectedOptions[stringedItem] = parsedItem;
-        selected = false;
-    }
+    console.log(selectedOptions);
 
-    // Render selected items
-    renderSelectedAuthors(element, selected, Object.keys(selectedOptions).length);
+    if(Object.keys(selectedOptions).length < selectionLimit) {
+
+        // Store or remove author from selected list
+        if (Object.keys(selectedOptions).includes(stringedItem)) {
+            delete selectedOptions[stringedItem];
+            selected = true;
+        } else {
+            selectedOptions[stringedItem] = parsedItem;
+            selected = false;
+        }
+
+        // Render selected items
+        renderSelectedAuthors(element, selected, Object.keys(selectedOptions).length);
+
+    } else
+        alert('Hai selezionato troppi autori');
 
 }
 
