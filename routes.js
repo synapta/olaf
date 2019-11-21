@@ -70,6 +70,7 @@ module.exports = function(app) {
 
             // Handle and send author
             let author = parser.parseAuthor(JSON.parse(body));
+            console.log(JSON.parse(body));
 
             // Query options
             let requests = queries.authorOptions(author.authorName.nameFirst, author.authorName.nameLast);
@@ -82,8 +83,6 @@ module.exports = function(app) {
                 parser.parseAuthorOptions(author, bodies.map(body => JSON.parse(body)), (optionsResponse) => {
 
                     // Send back options and author response
-                    console.log({'authorResponse': author, 'optionsResponse': optionsResponse});
-                    console.log(optionsResponse.options[0]);
                     response.json({'authorResponse': author, 'optionsResponse': optionsResponse});
 
                 });

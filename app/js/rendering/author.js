@@ -181,12 +181,3 @@ function deleteInput(el, label, value){
     $(el).parent().remove();
 
 }
-
-function addNewInput(label){
-
-    // Add new input to selection list
-    $.get('/views/template/beweb/selection-input.html', (template) => {
-        $('#' + label).find('.selection_list').append(Mustache.render(template, {'value': '', 'key': label}))
-    });
-
-}

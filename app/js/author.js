@@ -217,8 +217,6 @@ function groupBewebAuthorFields(author, selectedOptions) {
                     newKey = newKey.charAt(0).toLowerCase() + newKey.slice(1);
                     newOption[newKey] = option[key][item];
 
-                    console.log(newOption);
-
                 })
             } else {
 
@@ -253,6 +251,29 @@ function groupBewebAuthorFields(author, selectedOptions) {
     });
 
     return grouping;
+
+}
+
+function addNewInput(label){
+
+    // Add new input to selection list
+    if(!selectionInput[label]) {
+        selectionInput[label] = []
+    }
+
+    // Append empty input
+    selectionInput[label].unshift("");
+    // Slice current collection
+    // Evaluate array limit
+    Object.keys(fieldsLimit).forEach((label) => {
+        if(fieldsLimit[label] && selectionInput[label])
+            selectionInput[label] = selectionInput[label].slice(0, fieldsLimit[label]);
+    });
+
+    if(params.userToken !== 'beweb')
+        renderAuthorMatches(selectionInput);
+    else
+        renderBewebAuthorMatches(selectionInput);
 
 }
 
