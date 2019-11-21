@@ -66,8 +66,10 @@ function renderBewebAuthorMatchesContainer(author, token, selectedOptions, callb
 
         let grouping = groupBewebAuthorFields(author, selectedOptions);
 
+        console.log(grouping);
+
         // Generate form container
-        let output = Mustache.render(template, {'grouping': grouping});
+        let output = Mustache.render(template, {'grouping': grouping, 'header': author.authorName.nameFull});
         $('.container').html(output).promise().done(() => {
             $('.ui.accordion').accordion();
         });
