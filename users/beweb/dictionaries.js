@@ -21,7 +21,7 @@ module.exports.bewebDictionary = {
 
 /**
  * Dictionary to map Wikidata fields to OLAF option fields
- **/
+ * **/
 module.exports.wikidataDictionary = {
     optionWikidata        : 'wikidata',
     optionName            : 'nome',
@@ -45,7 +45,7 @@ module.exports.wikidataDictionary = {
 
 /**
  * Dictionary to map VIAF fields to OLAF option fields
- **/
+ * **/
 module.exports.viafDictionary = {
     optionWikidata    : null,
     optionName        : 'term',
@@ -65,7 +65,7 @@ module.exports.viafDictionary = {
 
 /**
  * Active selectable fields
- **/
+ * **/
 module.exports.selectableFields = [
     'optionWikidata',
     'optionViaf',

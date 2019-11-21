@@ -61,8 +61,6 @@ module.exports = function(app) {
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
 
         // Compose author query
-        let token = request.params.token;
-        // TODO: da far tornare alla normalità una volta terminato l'import da Beweb
         let queryAuthor = queries.authorSelect(request.params.authorId);
 
         // Make request

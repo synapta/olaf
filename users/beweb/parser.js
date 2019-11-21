@@ -4,7 +4,9 @@ const fuzz           = require('fuzzball');
 const dictionaries   = require('./dictionaries');
 
 
-// Parse author
+/**
+ * Parse author response in order to obtain OLAF author object
+ * **/
 function parseAuthorName(author){
 
     // Initialize name object
@@ -97,13 +99,13 @@ function parseAuthor(body){
 
         // Map fields
         Object.keys(authorMap).map(key => {
-            if (body[authorMap[key]] && body[authorMap[key]] !== '')
+            if (body[authorMap[key]])
                 author[key] = body[authorMap[key]];
             else
                 author[key] = null;
         });
 
-        // Parse name, titles, roles and commons
+        // Parse name, titles and roles
         if(author.authorName)
             parseAuthorName(author);
         if(author.authorRoles)
@@ -123,7 +125,10 @@ function parseAuthor(body){
 
 }
 
-// Parse author options
+/**
+ * Extract feasible options for current author.
+ * Compare Wikidata results and VIAF results in order to remove duplicates.
+ * **/
 function parseAuthorOptions(author, bodies, callback) {
 
     // Set author labels
@@ -213,8 +218,10 @@ function parseWikidataOptions(wikidataBody, knownViaf, callback) {
     // Parse results
     let bindings = wikidataBody.results.bindings;
     bindings.forEach((binding) => {
+
         // Generate new option
         let wikidataOption = {};
+
         // Map result
         Object.keys(wikidataMap).forEach((key) => {
             if(binding[wikidataMap[key]] && binding[wikidataMap[key]].value !== '') {
@@ -234,10 +241,12 @@ function parseWikidataOptions(wikidataBody, knownViaf, callback) {
             } else
                 wikidataOption[key] = null;
         });
+
         // Parse option for selection
         wikidataOption['optionItem'] = JSON.stringify(wikidataOption);
         // Push option
         wikidataOptions.push(wikidataOption)
+        
     });
 
     // Callback
