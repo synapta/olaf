@@ -9,13 +9,12 @@ function parseAuthorName(author){
 
     // Initialize name object
     let nameObject = {};
-    // Store complete name
+
+    // Store full name
     nameObject['nameFull'] = author.authorName;
 
-    // Split name
+    // Split and parse full name
     let tokens = author.authorName.split(', ');
-
-    // Parse name
     let surname = tokens[0].split('<')[0].trim() || "";
     let name = "";
     if(tokens[1])
@@ -25,13 +24,14 @@ function parseAuthorName(author){
     nameObject['nameFirst'] = name;
     nameObject['nameLast'] = surname;
 
-    // Return name object
+    // SUpdate author object
     author.authorName = nameObject;
 
 }
 
 function parseAuthorRoles(author){
 
+    // Store roles and roles length
     author.authorRoles = {'rolesNumber': author.authorRoles.length, 'rolesItem': author.authorRoles}
 
 }
@@ -47,17 +47,6 @@ function parseAuthorBirthAndDate(author){
     delete author.authorBirthPlace;
     delete author.authorDeathDate;
     delete author.authorDeathPlace;
-
-}
-
-function parseAuthorWikimediaCommon(author){
-
-    // Extract author form url
-    let extractAuthor = /https?:\/\/\w{2,3}\.wikipedia\.org\/wiki\/(\w+)(?:\/.*)?/m;
-    // Get author string
-    let authorFromUrl = author.authorCommons.match(extractAuthor)[1];
-
-    author.authorCommons = 'https://commons.wikimedia.org/wiki/Category:' + authorFromUrl;
 
 }
 
@@ -121,8 +110,6 @@ function parseAuthor(body){
             parseAuthorRoles(author);
         if(author.authorBirthDate || author.authorDeathDate || author.authorBirthPlace || author.authorDeathPlace)
             parseAuthorBirthAndDate(author);
-        if(author.authorCommons)
-            parseAuthorWikimediaCommon(author);
 
         // Get wikidata dictionaries
         translateToWikidataDictionaries(author);
@@ -140,21 +127,7 @@ function parseAuthor(body){
 function parseAuthorOptions(author, bodies, callback) {
 
     // Set author labels
-    let authorFields = [
-        "optionWikidata",
-        "optionViaf",
-        "optionSbn",
-        "optionName",
-        "optionType",
-        "optionGender",
-        "optionDescription",
-        "optionHeading",
-        "optionVariant",
-        "optionBirthPlace",
-        "optionBirthDate",
-        "optionDeathPlace",
-        "optionDeathDate",
-    ];
+    let authorFields = dictionaries.selectableFields;
 
     // Store bodies
     let wikidataBody = bodies[0];
