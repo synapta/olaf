@@ -193,7 +193,7 @@ function matchField(label, value){
 
 function removeField(label, field){
 
-    if(label && field) {
+    if(label) {
         if (selectionInput[label]
             .map(field => field.toLowerCase())
             .includes(field.toLowerCase())
