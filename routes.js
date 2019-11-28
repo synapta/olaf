@@ -57,6 +57,15 @@ module.exports = function(app) {
         response.sendFile('author.html', {root: __dirname + '/app/views'});
     });
 
+    app.post(['/get/:token/author-match/'], (request, response) => {
+
+        // Store posted options
+        let options = JSON.parse(request.body.options);
+
+        response.sendFile('author-match.html', {root: __dirname + '/app/views'});
+
+    });
+
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
 
@@ -66,23 +75,47 @@ module.exports = function(app) {
         // Make request
         nodeRequest(queryAuthor, (err, res, body) => {
 
+            body = {
+                "Idrecord": "CEIAF0000004",
+                "Visualizzazione_su_BEWEB": "Papa Benedetto XIII",
+                "Categoria": "Persona",
+                "Codice_SBN": "CFIV009838",
+                "Intestazione": ["Benedictus <papa ; 13.>",
+                    "Papa Benedetto XIII <Gravina in Puglia, 1650 - Roma, 1730>"],
+                "Fonti_archivistiche_e_bibliografiche": ["De Caro Gaspare", "http://www.treccani.it/enciclopedia/papa-benedetto-xiii_(Dizionario-Biografico)/",
+                    "ICCU, banca dati SBN"],
+                "Varianti": ["Orsini, Pietro Francesco",
+                    "Benedetto",
+                    "Vincenzo Maria"],
+                "Info_di_genere": "M",
+                "Data_di_nascita_Data_istituzione": "02/02/1650",
+                "Luogo_di_nascita_Luogo_istituzione": "Gravina in Puglia",
+                "Data_di_morte_Luogo_soppressione": "21/02/1730",
+                "Luogo_di_morte_Data_soppressione": "Roma",
+                "Qualifica": ["Papa"],
+                "Wikipedia": "https://it.wikipedia.org/wiki/Papa_Benedetto_XIII",
+                "VIAF": "http://viaf.org/viaf/7549012",
+                "ISNI": "http://www.isni.org/0000000107747711",
+                "Link": ["http://w2.vatican.va/content/vatican/it/holy-father/benedetto-xiii.html",
+                    "http://www.treccani.it/enciclopedia/papa-benedetto-xiii_(Dizionario-Biografico)/"]
+
+            };
+            body = JSON.stringify(body);
+
             // Handle and send author
             let author = parser.parseAuthor(JSON.parse(body));
-            console.log(JSON.parse(body));
 
             // Query options
-            let requests = queries.authorOptions(author.authorName.nameFirst, author.authorName.nameLast);
+            let requests = queries.authorOptions(author.name, '');
             // Map requests to make Promise
             requests = requests.map(query => promiseRequest(query));
 
             // Make options queries
             Promise.all(requests).then((bodies) => {
                 // Parse result
-                parser.parseAuthorOptions(author, bodies.map(body => JSON.parse(body)), (optionsResponse) => {
-
+                parser.parseAuthorOptions(author, bodies.map(body => JSON.parse(body)), (options) => {
                     // Send back options and author response
-                    response.json({'authorResponse': author, 'optionsResponse': optionsResponse});
-
+                    response.json({'author': author, 'options': options});
                 });
             });
         });

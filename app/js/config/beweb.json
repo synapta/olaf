@@ -1,0 +1,213 @@
+{
+  "limit" : 2,
+  "selection": "left",
+  "fields": {
+    "uri": {
+      "input": "Idrecord",
+      "wikidata": null,
+      "viaf": null,
+      "group": null,
+      "limit": 1,
+      "label": "Id record",
+      "select": true
+    },
+    "name": {
+      "input": "Visualizzazione_su_BEWEB",
+      "wikidata": "nome",
+      "viaf": "term",
+      "group": "Nome",
+      "limit": 1,
+      "label": "Visualizzazione su BEWEB",
+      "select": true
+    },
+    "titles": {
+      "input": null,
+      "wikidata": "titles",
+      "viaf": null,
+      "group": null,
+      "limit": null,
+      "label": null,
+      "select": false
+    },
+    "roles": {
+      "input": "Qualifica",
+      "wikidata": "positionHeld",
+      "viaf": null,
+      "group": null,
+      "limit": null,
+      "label": "Qualifica",
+      "select": false
+    },
+    "type": {
+      "input": "Categoria",
+      "wikidata": "tipologia",
+      "viaf": "nametype",
+      "group": "Bio",
+      "limit": 1,
+      "label": "Categoria",
+      "select": true
+    },
+    "description": {
+      "input": null,
+      "wikidata": "descrizione",
+      "viaf": null,
+      "group": null,
+      "limit": null,
+      "label": null,
+      "select": false
+    },
+    "birthDate": {
+      "input": "Data_di_nascita_Data_istituzione",
+      "wikidata": "birthDate",
+      "viaf": null,
+      "group": "Bio",
+      "limit": 1,
+      "label": "Data di nascita/Data istituzione",
+      "select": true
+    },
+    "deathDate": {
+      "input": "Data_di_morte_Data_soppressione",
+      "wikidata": "deathDate",
+      "viaf": null,
+      "group": "Bio",
+      "limit": 1,
+      "label": "Data di morte/Luogo soppressione",
+      "select": true
+    },
+    "birthPlace": {
+      "input": "Luogo_di_nascita_Luogo_istituzione",
+      "wikidata": "birthPlace",
+      "viaf": null,
+      "group": "Bio",
+      "limit": 1,
+      "label": "Luogo di nascita/Luogo istituzione",
+      "select": true
+    },
+    "deathPlace": {
+      "input": "Luogo_di_morte_Luogo_soppressione",
+      "wikidata": "deathPlace",
+      "viaf": null,
+      "group": "Bio",
+      "limit": 1,
+      "label": "Luogo di morte/Data soppressione",
+      "select": true
+    },
+    "image": {
+      "input": null,
+      "wikidata": "immagine",
+      "viaf": null,
+      "group": null,
+      "limit": 1,
+      "label": "Immagine",
+      "select": false
+    },
+    "gender": {
+      "input": "Info_di_genere",
+      "wikidata": "gender",
+      "viaf": null,
+      "group": "Bio",
+      "limit": 1,
+      "label": "Info di genere",
+      "select": true
+    },
+    "heading": {
+      "input": "Intestazione",
+      "wikidata": null,
+      "viaf": null,
+      "group": null,
+      "limit": null,
+      "label": "Intestazione",
+      "select": false
+    },
+    "variant": {
+      "input": "Varianti",
+      "wikidata": null,
+      "viaf": null,
+      "group": "Nome",
+      "limit": null,
+      "label": "Varianti",
+      "select": true
+    },
+    "sources": {
+      "input": "Fonti_archivistiche_e_bibliografiche",
+      "wikidata": null,
+      "viaf": null,
+      "group": null,
+      "limit": null,
+      "label": "Fonti archivistiche e bibliografiche",
+      "select": false
+    },
+    "links": {
+      "input": "Link",
+      "wikidata": null,
+      "viaf": null,
+      "group": null,
+      "limit": null,
+      "label": "Link",
+      "select": false
+    },
+    "wikipediaIt": {
+      "input": null,
+      "wikidata": "itwikipedia",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "Wikipedia",
+      "select": true
+    },
+    "wikipediaId": {
+      "input": null,
+      "wikidata": "wikidata",
+      "viaf": null,
+      "group": null,
+      "limit": 1,
+      "label": "Id Wikipedia",
+      "select": false
+    },
+    "wikimediaCommons": {
+      "input": "Commons",
+      "wikidata": "wikimediaCommons",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "Commons",
+      "select": true
+    },
+    "treccani": {
+      "input": null,
+      "wikidata": "treccani",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "Treccani",
+      "select": true
+    },
+    "viaf": {
+      "input": null,
+      "wikidata": "viafurl",
+      "viaf": "viafid",
+      "group": "Identificativi",
+      "limit": null,
+      "label": "VIAF",
+      "select": true
+    },
+    "sbn": {
+      "input": null,
+      "wikidata": "sbn",
+      "viaf": "iccu",
+      "group": "Identificativi",
+      "limit": null,
+      "label": "SBN",
+      "select": true
+    },
+    "suggested": {
+      "input": null,
+      "wikidata": null,
+      "viaf": null,
+      "group": null,
+      "limit": null,
+      "label": null,
+      "select": false
+    }
+  }
+}

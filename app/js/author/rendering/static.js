@@ -10,7 +10,7 @@ function renderAuthorCard(author){
         // Generate output
         let output = Mustache.render(template, author);
         // Change page title
-        document.title = author.authorName.nameFull + ' - OLAF';
+        document.title = author.name + ' - OLAF';
         // Send output
         $('#author-card').html(output);
 
@@ -30,27 +30,28 @@ function renderAuthorOptions(options){
 }
 
 // Render selected authors
-function renderSelectedAuthors(element, selected, count){
+function renderSelectedOptions(el, selected, length){
 
     // Get class list
-    let classList = element.classList;
+    let classList = el.classList;
 
     // Select or deselect element
     if(!selected) {
         classList.remove('green');
         classList.add('red');
-        element.innerHTML = 'Deseleziona elemento';
+        el.innerHTML = 'Deseleziona elemento';
     } else {
         classList.remove('red');
         classList.add('green');
-        element.innerHTML = 'Seleziona elemento';
+        el.innerHTML = 'Seleziona elemento';
     }
 
     // Set count label
     let button = document.getElementById('selected-options-send');
-    document.getElementById('selected-options-counter').innerHTML = count;
+    document.getElementById('selected-options-counter').innerHTML = length;
+
     // Set button behavior
-    if(count > 0) {
+    if(length > 0) {
         button.classList.add('primary');
         button.classList.remove('disabled');
     } else {
@@ -69,7 +70,13 @@ function renderBewebAuthorMatchesContainer(author, token, selectedOptions, callb
         console.log(grouping);
 
         // Generate form container
-        let output = Mustache.render(template, {'grouping': grouping, 'header': author.authorName.nameFull});
+        let output = Mustache.render(template, {
+            'grouping': grouping,
+            'header': author.authorName.nameFull,
+            'firstImage': authorImages[1],
+            'secondImage': authorImages[0]
+        });
+
         $('.container').html(output).promise().done(() => {
             $('.ui.accordion').accordion();
         });

@@ -1,127 +1,26 @@
-// Author object
-let author = null;
-// Extract and store params from url
-let params = parseUrl(window.location.href, {'userToken': 4, 'authorId': 6});
-
-// Selection and matching
-let selectedOptions = {};
-let selectionInput = {};
-let authorFields = null;
-
-// Field grouping
-let selectionLimit = 2;
-
-let fieldsGrouping = {
-    'Nome': [
-        'name',
-        'variant'
-    ],
-    'Bio': [
-        'type',
-        'gender',
-        'birthDate',
-        'birthPlace',
-        'deathDate',
-        'deathPlace'
-    ],
-    'Identificativi': [
-        'wikidata',
-        'wikipediaIt',
-        'wikimediaCommons',
-        'treccani',
-        'viaf',
-        'sbn'
-    ]
-};
-
-let fieldsLimit = {
-    'name': 1,
-    'variant': null,
-    'type': 1,
-    'gender': 1,
-    'birthDate': 1,
-    'birthPlace': 1,
-    'deathDate': 1,
-    'deathPlace': 1,
-    'wikidata': 1,
-    'wikipediaIt': 1,
-    'wikimediaCommons': 1,
-    'treccani': 1,
-    'viaf': null,
-    'sbn': null
-};
-
-let fieldsLabels = {
-    'uri': 'Id record',
-    'name': 'Visualizzazione su BEWEB',
-    'roles': 'Qualifica',
-    'type': 'Categoria',
-    'birthDate': 'Data di nascita/Data istituzione',
-    'deathDate': 'Data di morte/Luogo soppressione',
-    'birthPlace': 'Luogo di nascita/Luogo istituzione',
-    'deathPlace': 'Luogo di morte/Data soppressione',
-    'gender': 'Info di genere',
-    'commons': 'Wikipedia',
-    'heading': 'Intestazione',
-    'variant': 'Varianti',
-    'sources': 'Fonti archivistiche e bibliografiche',
-    'links': 'Link',
-    'wikidata': 'Wikidata',
-    'wikipediaIt': 'Wikipedia',
-    'wikimediaCommons': 'Commons',
-    'treccani': 'Treccani',
-    'viaf': 'VIAF',
-    'sbn': 'SBN'
-};
-
-let subfieldsSelection = {
-    authorName: {
-        from: ['nameFull'],
-        to: ['authorName']
-    },
-    authorGender: {
-        from: ['label'],
-        to: ['authorGender']
-    },
-    authorCategory: {
-        from: ['label'],
-        to: ['authorType']
-    },
-    authorBirth: {
-        from: ['birthDate', 'birthPlace'],
-        to: ['authorBirthDate', 'authorBirthPlace']
-    },
-    authorDeath: {
-        from: ['deathDate', 'deathPlace'],
-        to: ['authorDeathDate', 'authorDeathPlace']
-    }
-};
-
-function authorSelect(element, item){
+/*function authorSelect(element, item){
 
     // Parse item
     let stringedItem = item;
     let parsedItem = JSON.parse(item);
     let selected = null;
 
-    console.log(selectedOptions);
-
-    if(Object.keys(selectedOptions).length < selectionLimit) {
-
-        // Store or remove author from selected list
-        if (Object.keys(selectedOptions).includes(stringedItem)) {
-            delete selectedOptions[stringedItem];
-            selected = true;
-        } else {
+    // Store or remove author from selected list
+    if (Object.keys(selectedOptions).includes(stringedItem)) {
+        delete selectedOptions[stringedItem];
+        selected = true;
+    } else {
+        if(Object.keys(selectedOptions).length < selectionLimit) {
             selectedOptions[stringedItem] = parsedItem;
             selected = false;
+        } else {
+            alert('Sono stati selezionati troppi autori.');
+            return;
         }
+    }
 
-        // Render selected items
-        renderSelectedAuthors(element, selected, Object.keys(selectedOptions).length);
-
-    } else
-        alert('Hai selezionato troppi autori');
+    // Render selected items
+    renderSelectedAuthors(element, selected, Object.keys(selectedOptions).length);
 
 }
 
@@ -215,6 +114,10 @@ function groupBewebAuthorFields(author, selectedOptions) {
 
     options.forEach((option, index) => {
 
+        // Store image for each option
+        authorImages.push(option.optionImage);
+
+        // Initialize new option object
         let newOption = {};
 
         Object.keys(option).forEach((key) => {
@@ -314,34 +217,136 @@ function authorSend(){
     // Send form
     document.getElementById('matches-form').submit();
 
+}*/
+
+// Author object
+let author = null;
+let options = [];
+
+// Load configuration
+let config = null;
+
+// Extract and store params from url
+let params = parseUrl(window.location.href, {'userToken': 4, 'authorId': 6});
+
+// Selection and matching
+let selectedOptions = {};
+let selectedFields = {};
+
+function authorSelect(el, optionString){
+
+    // Parse item
+    let option = JSON.parse(optionString);
+    let selected = null;
+
+    // Toggle option selection
+    if(optionString in selectedOptions){
+
+        // Toggle selection flag
+        selected = true;
+        // Delete current selected option
+        delete selectedOptions[optionString];
+
+    } else {
+
+        // Check selection limit
+        if(Object.keys(selectedOptions).length >= config.limit) {
+            alert('Sono stati selezionati troppi autori.');
+            return;
+        }
+
+        // Toggle selection flag
+        selected = false;
+        // Store current selected option
+        selectedOptions[optionString] = option;
+
+    }
+
+    // Render selected items
+    renderSelectedOptions(el, selected, Object.keys(selectedOptions).length);
+
+}
+
+function authorMatch(){
+
+    // Initial field selection
+    if(config.selection){
+
+        // Get selection fields from config
+        let selectionFields = Object.keys(config.fields).filter(el => config.fields[el].select);
+        let targets = null;
+
+        if(config.selection === 'left')
+            targets = [author];
+        else
+            targets = options;
+
+        // Populate selection with selection fields
+        targets.forEach(target => {
+            selectionFields.forEach(field => {
+
+                // Check if field is empty and initialize it
+                if (!selectedFields[field])
+                    selectedFields[field] = [];
+
+                // Append current field to selected fields collection
+                if (target[field] && !selectedFields[field].includes(target[field])) {
+                    if(Array.isArray(target[field]))
+                        selectedFields[field] = selectedFields[field].concat(target[field]);
+                    else
+                        selectedFields[field].push(target[field]);
+                }
+
+            })
+        })
+
+    }
+
+    // Render author matching container
+    renderAuthorMatchesContainer(author, params.userToken, Object.values(selectedOptions), () => {
+        renderAuthorMatches(selectedFields);
+    });
+
 }
 
 // Get author, render author card, options and author labels
 $(document).ready(() => {
+
+    // Print current user in navbar field
     showUserToken(params.userToken);
-    $.ajax({
 
-        url: '/api/v1/' + params.userToken + '/author/' + ((params.authorId) ? params.authorId : ''),
-        method: 'GET',
-        dataType: 'json',
-        success: response => {
+    // Load configuration
+    $.get(`/js/config/${params.userToken}.json`, (json) => {
 
-            // Store author response
-            author = response.authorResponse;
-            // Render author card
-            renderAuthorCard(response.authorResponse);
-            // Render author options
-            renderAuthorOptions({'options': response.optionsResponse.options});
+        // Store config
+        config = json;
 
-            // Check empty response
-            if(response.optionsResponse.options.length === 0) {
-                alert('Non sono presenti match per questo autore. Verrà saltato automaticamente');
-                authorSkip(author.authorUri);
+        // Get current author and its options
+        $.ajax({
+
+            url: '/api/v1/' + params.userToken + '/author/' + (params.authorId ? params.authorId : ''),
+            method: 'GET',
+            dataType: 'json',
+
+            success: response => {
+
+                // Store author response
+                author = response.author;
+                options = response.options;
+
+                // Render author card
+                renderAuthorCard(author);
+                // Render author options
+                renderAuthorOptions({'options': options});
+
+                // Check empty response
+                if(options.length === 0) {
+                    alert('Non sono presenti match per questo autore. Verrà saltato automaticamente');
+                    authorSkip(author.uri);
+                }
+
             }
-
-            // Set author fields
-            authorFields = response.optionsResponse.fields;
-
-        }
+        });
     });
+
 });

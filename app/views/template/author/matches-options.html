@@ -4,151 +4,151 @@
         <div class="ui items">
             <div class="item">
                 <div class="ui small image">
-                    <div class="author-image" style="background-image: url({{#optionImage}}{{.}}{{/optionImage}});">
-                        {{^optionImage}}<i class="fas fa-user"></i>{{/optionImage}}
+                    <div class="author-image" style="background-image: url({{#image}}{{.}}{{/image}});">
+                        {{^image}}<i class="fas fa-user"></i>{{/image}}
                     </div>
                 </div>
                 <div class="middle aligned content">
                     <div class="author-name">
-                        <div class="author-title">{{optionName}}</div>
-                        <div class="author-subtitle">{{optionType}}</div>
+                        <div class="author-title">{{name}}</div>
+                        <div class="author-subtitle">{{type}}</div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="ui divider"></div>
 
-        {{#optionWikidata.length}}
+        {{#wikidata.length}}
             <p class="card-box"><b>Wikidata</b></p>
-            {{#optionWikidata}}
+            {{#wikidata}}
                 <div class="add_match">
-                    <div data-label="optionWikidata" data-value="{{.}}" onclick="matchField('optionWikidata', '{{.}}')" class="ui compact green icon button field_selection">
+                    <div data-label="wikidata" data-value="{{.}}" onclick="matchField('wikidata', '{{.}}')" class="ui compact green icon button field_selection">
                         <i class="fas fa-check"></i>
                     </div>
                     <span>{{.}}</span>
                 </div>
-            {{/optionWikidata}}
-        {{/optionWikidata.length}}
+            {{/wikidata}}
+        {{/wikidata.length}}
 
-        {{#optionViaf.length}}
+        {{#viaf.length}}
             <p class="card-box"><b>VIAF</b></p>
-            {{#optionViaf}}
+            {{#viaf}}
                 <div class="add_match">
-                    <div data-label="optionViaf" data-value="{{.}}" onclick="matchField('optionViaf', '{{.}}')" class="ui compact green icon button field_selection">
+                    <div data-label="viaf" data-value="{{.}}" onclick="matchField('viaf', '{{.}}')" class="ui compact green icon button field_selection">
                         <i class="fas fa-check"></i>
                     </div>
                     <span>{{.}}</span>
                 </div>
-            {{/optionViaf}}
-        {{/optionViaf.length}}
+            {{/viaf}}
+        {{/viaf.length}}
 
-        {{#optionSbn.length}}
+        {{#sbn.length}}
             <p class="card-box"><b>SBN</b></p>
-            {{#optionSbn}}
+            {{#sbn}}
                 <div class="add_match">
-                    <div data-label="optionSbn" data-value="{{.}}" onclick="matchField('optionSbn', '{{.}}')" class="ui compact green icon button field_selection">
+                    <div data-label="sbn" data-value="{{.}}" onclick="matchField('sbn', '{{.}}')" class="ui compact green icon button field_selection">
                         <i class="fas fa-check"></i>
                     </div>
                     <span>{{.}}</span>
                 </div>
-            {{/optionSbn}}
-        {{/optionSbn.length}}
+            {{/sbn}}
+        {{/sbn.length}}
 
-        {{#optionName.length}}
+        {{#name.length}}
             <p class="card-box"><b>Nome</b></p>
-            {{#optionName}}
+            {{#name}}
                 <div class="add_match">
-                    <div data-label="optionName" data-value="{{.}}" onclick="matchField('optionName', '{{.}}')" class="ui compact green icon button field_selection">
+                    <div data-label="name" data-value="{{.}}" onclick="matchField('name', '{{.}}')" class="ui compact green icon button field_selection">
                         <i class="fas fa-check"></i>
                     </div>
                     <span>{{.}}</span>
                 </div>
-            {{/optionName}}
-        {{/optionName.length}}
+            {{/name}}
+        {{/name.length}}
 
-        {{#optionType.length}}
+        {{#type.length}}
             <p class="card-box"><b>Tipo</b></p>
-            {{#optionType}}
+            {{#type}}
                 <div class="add_match">
-                    <div data-label="optionType" data-value="{{.}}" onclick="matchField('optionType', '{{.}}')" class="ui compact green icon button field_selection">
+                    <div data-label="type" data-value="{{.}}" onclick="matchField('type', '{{.}}')" class="ui compact green icon button field_selection">
                         <i class="fas fa-check"></i>
                     </div>
                     <span>{{.}}</span>
                 </div>
-            {{/optionType}}
-        {{/optionType.length}}
+            {{/type}}
+        {{/type.length}}
 
-        {{#optionGender.length}}
+        {{#gender.length}}
             <p class="card-box"><b>Genere</b></p>
-            {{#optionGender}}
+            {{#gender}}
                 <div class="add_match">
-                    <div data-label="optionGender" data-value="{{.}}" onclick="matchField('optionGender', '{{.}}')" class="ui compact green icon button field_selection">
+                    <div data-label="gender" data-value="{{.}}" onclick="matchField('gender', '{{.}}')" class="ui compact green icon button field_selection">
                         <i class="fas fa-check"></i>
                     </div>
                     <span>{{.}}</span>
                 </div>
-            {{/optionGender}}
-        {{/optionGender.length}}
+            {{/gender}}
+        {{/gender.length}}
 
-        {{#optionDescription.length}}
+        {{#description.length}}
             <p class="card-box"><b>Titolo</b></p>
-            {{#optionDescription}}
+            {{#description}}
                 <div class="add_match">
-                    <div data-label="optionDescription" data-value="{{.}}" onclick="matchField('optionDescription', '{{.}}')" class="ui compact green icon button field_selection">
+                    <div data-label="description" data-value="{{.}}" onclick="matchField('description', '{{.}}')" class="ui compact green icon button field_selection">
                         <i class="fas fa-check"></i>
                     </div>
                     <span>{{.}}</span>
                 </div>
-            {{/optionDescription}}
-        {{/optionDescription.length}}
+            {{/description}}
+        {{/description.length}}
 
-        {{#optionBirthPlace.length}}
+        {{#birthPlace.length}}
             <p class="card-box"><b>Luogo di nascita</b></p>
-            {{#optionBirthPlace}}
+            {{#birthPlace}}
                 <div class="add_match">
-                    <div data-label="optionBirthPlace" data-value="{{.}}" onclick="matchField('optionBirthPlace', '{{.}}')" class="ui compact green icon button field_selection">
+                    <div data-label="birthPlace" data-value="{{.}}" onclick="matchField('birthPlace', '{{.}}')" class="ui compact green icon button field_selection">
                         <i class="fas fa-check"></i>
                     </div>
                     <span>{{.}}</span>
                 </div>
-            {{/optionBirthPlace}}
-        {{/optionBirthPlace.length}}
+            {{/birthPlace}}
+        {{/birthPlace.length}}
 
-        {{#optionBirthDate.length}}
+        {{#birthDate.length}}
             <p class="card-box"><b>Data di nascita</b></p>
-            {{#optionBirthDate}}
+            {{#birthDate}}
                 <div class="add_match">
-                    <div data-label="optionBirthDate" data-value="{{.}}" onclick="matchField('optionBirthDate', '{{.}}')" class="ui compact green icon button field_selection">
+                    <div data-label="birthDate" data-value="{{.}}" onclick="matchField('birthDate', '{{.}}')" class="ui compact green icon button field_selection">
                         <i class="fas fa-check"></i>
                     </div>
                     <span>{{.}}</span>
                 </div>
-            {{/optionBirthDate}}
-        {{/optionBirthDate.length}}
+            {{/birthDate}}
+        {{/birthDate.length}}
 
-        {{#optionDeathPlace.length}}
+        {{#deathPlace.length}}
             <p class="card-box"><b>Luogo di morte</b></p>
-            {{#optionDeathPlace}}
+            {{#deathPlace}}
                 <div class="add_match">
-                    <div data-label="optionDeathPlace" data-value="{{.}}" onclick="matchField('optionDeathPlace', '{{.}}')" class="ui compact green icon button field_selection">
+                    <div data-label="deathPlace" data-value="{{.}}" onclick="matchField('deathPlace', '{{.}}')" class="ui compact green icon button field_selection">
                         <i class="fas fa-check"></i>
                     </div>
                     <span>{{.}}</span>
                 </div>
-            {{/optionDeathPlace}}
-        {{/optionDeathPlace.length}}
+            {{/deathPlace}}
+        {{/deathPlace.length}}
 
-        {{#optionDeathDate.length}}
+        {{#deathDate.length}}
             <p class="card-box"><b>Data di morte</b></p>
-            {{#optionDeathDate}}
+            {{#deathDate}}
                 <div class="add_match">
-                    <div data-label="optionDeathDate" data-value="{{.}}" onclick="matchField('optionDeathDate', '{{.}}')" class="ui compact green icon button field_selection">
+                    <div data-label="deathDate" data-value="{{.}}" onclick="matchField('deathDate', '{{.}}')" class="ui compact green icon button field_selection">
                         <i class="fas fa-check"></i>
                     </div>
                     <span>{{.}}</span>
                 </div>
-            {{/optionDeathDate}}
-        {{/optionDeathDate.length}}
+            {{/deathDate}}
+        {{/deathDate.length}}
 
     </div>
 {{/options}}

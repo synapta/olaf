@@ -232,14 +232,14 @@ function composeQueryWikidata(name, surname){
 
 }
 
-function composeQueryVIAF(name, surname){
+function composeQueryVIAF(name){
 
     // Compose query
     return {
         method: 'GET',
         url: 'https://www.viaf.org/viaf/AutoSuggest',
         qs: {
-            query: name + " " + surname
+            query: name
         },
         headers: {
             'cache-control': 'no-cache',

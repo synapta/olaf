@@ -1,70 +1,70 @@
-{{#authorRoles.rolesNumber}}
+{{#roles.length}}
     <p class="card-box"><b>Ruoli</b></p>
-    {{#authorRoles.rolesItem}}
+    {{#roles}}
         <div class="add_match">
             <div data-label="optionDescription" data-value="{{.}}" onclick="matchField('optionDescription', '{{.}}')" class="ui compact icon button field_selection">
                 <i class="fas fa-check"></i>
             </div>
             <span>{{.}}</span>
         </div>
-    {{/authorRoles.rolesItem}}
-{{/authorRoles.rolesNumber}}
+    {{/roles}}
+{{/roles.length}}
 
-{{#authorName}}
+{{#name}}
     <p class="card-box"><b>Nome</b></p>
     <div class="add_match">
-        <div data-label="optionSbn" data-value="{{nameFull}}" onclick="matchField('optionName', '{{nameFull}}')" class="ui compact icon button field_selection">
+        <div data-label="optionSbn" data-value="{{.}}" onclick="matchField('optionName', '{{.}}')" class="ui compact icon button field_selection">
             <i class="fas fa-check"></i>
         </div>
-        <span>{{nameFull}}</span>
+        <span>{{.}}</span>
     </div>
-{{/authorName}}
+{{/name}}
 
-{{#authorCategory.label}}
+{{#type}}
     <p class="card-box"><b>Tipo</b></p>
     <div class="add_match">
-        <div data-label="optionType" data-value="{{authorCategory.label}}" onclick="matchField('optionType', '{{authorCategory.label}}')" class="ui compact icon button field_selection">
+        <div data-label="optionType" data-value="{{type}}" onclick="matchField('optionType', '{{type}}')" class="ui compact icon button field_selection">
             <i class="fas fa-check"></i>
         </div>
         <span>{{authorCategory.label}}</span>
     </div>
-{{/authorCategory.label}}
+{{/type}}
 
-{{#authorGender.label}}
+{{#gender}}
     <p class="card-box"><b>Genere</b></p>
     <div class="add_match">
-        <div data-label="optionGender" data-value="{{authorGender.label}}" onclick="matchField('optionGender', '{{authorGender.label}}')" class="ui compact icon button field_selection">
+        <div data-label="optionGender" data-value="{{.}}" onclick="matchField('optionGender', '{{.}}')" class="ui compact icon button field_selection">
             <i class="fas fa-check"></i>
         </div>
-        <span>{{authorGender.label}}</span>
+        <span>{{.}}</span>
     </div>
-{{/authorGender.label}}
+{{/gender}}
 
-{{#authorHeading.length}}
+{{#heading.length}}
     <p class="card-box"><b>Intestazioni</b></p>
-    {{#authorHeading}}
+    {{#heading}}
         <div class="add_match">
             <div data-label="optionHeading" data-value="{{.}}" onclick="matchField('optionHeading', '{{.}}')" class="ui compact icon button field_selection">
                 <i class="fas fa-check"></i>
             </div>
             <span>{{.}}</span>
         </div>
-    {{/authorHeading}}
-{{/authorHeading.length}}
+    {{/heading}}
+{{/heading.length}}
 
-{{#authorVariant.length}}
+{{#variant.length}}
     <p class="card-box"><b>Varianti</b></p>
-    {{#authorVariant}}
+    {{#variant}}
     <div class="add_match">
         <div data-label="optionVariant" data-value="{{.}}" onclick="matchField('optionVariant', '{{.}}')" class="ui compact icon button field_selection">
             <i class="fas fa-check"></i>
         </div>
         <span>{{.}}</span>
     </div>
-    {{/authorVariant}}
-{{/authorVariant.length}}
+    {{/variant}}
+{{/variant.length}}
 
-{{#authorBirth.birthPlace}}
+{{#birthPlace}}
     <p class="card-box"><b>Luogo di nascita</b></p>
     <div class="add_match">
         <div data-label="optionBirthPlace" data-value="{{.}}" onclick="matchField('optionBirthPlace', '{{.}}')" class="ui compact icon button field_selection">
@@ -72,9 +72,9 @@
         </div>
         <span>{{.}}</span>
     </div>
-{{/authorBirth.birthPlace}}
+{{/birthPlace}}
 
-{{#authorBirth.birthDate}}
+{{#birthDate}}
     <p class="card-box"><b>Data di nascita</b></p>
     <div class="add_match">
         <div data-label="optionBirthDate" data-value="{{.}}" onclick="matchField('optionBirthDate', '{{.}}')" class="ui compact icon button field_selection">
@@ -82,9 +82,9 @@
         </div>
         <span>{{.}}</span>
     </div>
-{{/authorBirth.birthDate}}
+{{/birthDate}}
 
-{{#authorDeath.deathPlace}}
+{{#deathPlace}}
     <p class="card-box"><b>Luogo di nascita</b></p>
     <div class="add_match">
         <div data-label="optionDeathPlace" data-value="{{.}}" onclick="matchField('optionDeathPlace', '{{.}}')" class="ui compact icon button field_selection">
@@ -92,9 +92,9 @@
         </div>
         <span>{{.}}</span>
     </div>
-{{/authorDeath.deathPlace}}
+{{/deathPlace}}
 
-{{#authorDeath.deathDate}}
+{{#deathDate}}
     <p class="card-box"><b>Data di nascita</b></p>
     <div class="add_match">
         <div data-label="optionDeathDate" data-value="{{.}}" onclick="matchField('optionDeathDate', '{{.}}')" class="ui compact icon button field_selection">
@@ -102,4 +102,4 @@
         </div>
         <span>{{.}}</span>
     </div>
-{{/authorDeath.deathDate}}
+{{/deathDate}}
