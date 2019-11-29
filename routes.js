@@ -71,36 +71,10 @@ module.exports = function(app) {
 
         // Compose author query
         let queryAuthor = queries.authorSelect(request.params.authorId);
+        console.log(queryAuthor);
 
         // Make request
         nodeRequest(queryAuthor, (err, res, body) => {
-
-            body = {
-                "Idrecord": "CEIAF0000004",
-                "Visualizzazione_su_BEWEB": "Papa Benedetto XIII",
-                "Categoria": "Persona",
-                "Codice_SBN": "CFIV009838",
-                "Intestazione": ["Benedictus <papa ; 13.>",
-                    "Papa Benedetto XIII <Gravina in Puglia, 1650 - Roma, 1730>"],
-                "Fonti_archivistiche_e_bibliografiche": ["De Caro Gaspare", "http://www.treccani.it/enciclopedia/papa-benedetto-xiii_(Dizionario-Biografico)/",
-                    "ICCU, banca dati SBN"],
-                "Varianti": ["Orsini, Pietro Francesco",
-                    "Benedetto",
-                    "Vincenzo Maria"],
-                "Info_di_genere": "M",
-                "Data_di_nascita_Data_istituzione": "02/02/1650",
-                "Luogo_di_nascita_Luogo_istituzione": "Gravina in Puglia",
-                "Data_di_morte_Luogo_soppressione": "21/02/1730",
-                "Luogo_di_morte_Data_soppressione": "Roma",
-                "Qualifica": ["Papa"],
-                "Wikipedia": "https://it.wikipedia.org/wiki/Papa_Benedetto_XIII",
-                "VIAF": "http://viaf.org/viaf/7549012",
-                "ISNI": "http://www.isni.org/0000000107747711",
-                "Link": ["http://w2.vatican.va/content/vatican/it/holy-father/benedetto-xiii.html",
-                    "http://www.treccani.it/enciclopedia/papa-benedetto-xiii_(Dizionario-Biografico)/"]
-
-            };
-            body = JSON.stringify(body);
 
             // Handle and send author
             let author = parser.parseAuthor(JSON.parse(body));

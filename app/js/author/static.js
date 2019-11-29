@@ -309,6 +309,98 @@ function authorMatch(){
 
 }
 
+function groupSelectionLabels(){
+
+    // Initialize grouping object
+    let groupedFields = {};
+
+    Object.keys(config.fields).forEach((key) => {
+
+        // Store group for each field
+        let field = key;
+        let group = config.fields[key].group;
+
+        // Group available fields
+        if(group) {
+            if (!groupedFields[group])
+                groupedFields[group] = [field];
+            else
+                groupedFields[group].push(field);
+        }
+
+    });
+
+    return groupedFields;
+
+}
+
+function groupSelectionFields(){
+
+    // Initialize grouping objects
+    let groupedLabels = groupSelectionLabels();
+    let groupedFields = {};
+
+    // Concat options
+    let choices = [author].concat(options);
+
+    // Initialize grouping
+    Object.keys(groupedLabels).forEach((group) => {
+
+        // Initialize grouping objects
+        groupedFields[group] = [];
+        // Iterate over grouped fields
+        groupedLabels[group].forEach((field) => {
+
+            // Set up field object
+            let fieldObject = {'label': field, 'dictionary': groupedFields[field], 'values': []};
+
+            // Iterate over options
+            choices.forEach((choice) => {
+                fieldObject.values.push({'field': field, 'value': choice[field]});
+            });
+
+            // Append field object
+            groupedFields[group].push(fieldObject);
+
+        });
+
+    });
+
+    return groupedFields;
+
+}
+
+function matchField(label, value){
+
+    // Toggle field selection
+    if(selectedFields[label]) {
+        if (selectedFields[label].map(item => item.toLowerCase()).includes(value.toLowerCase()))
+            selectedFields[label] = selectedFields[label].filter(item => item.toLowerCase() !== value.toLowerCase());
+        else
+            selectedFields[label].unshift(value);
+    } else {
+        selectedFields[label] = [];
+        selectedFields[label].unshift(value);
+    }
+
+    // Evaluate current array limit
+    // TODO: potrebbe succedere che facciamo una classe per la config che restituisce gli oggetti che ti interessano
+    Object.keys(fieldsLimit).forEach((label) => {
+        if(fieldsLimit[label] && selectionInput[label])
+            selectionInput[label] = selectionInput[label].slice(0, fieldsLimit[label]);
+    });
+
+    // Handle button rendering
+    fieldMatching(label, value);
+
+    // Render author matches
+    if(params.userToken !== 'beweb')
+        renderAuthorMatches(selectionInput);
+    else
+        renderBewebAuthorMatches(selectionInput);
+
+}
+
 // Get author, render author card, options and author labels
 $(document).ready(() => {
 

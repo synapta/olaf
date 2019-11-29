@@ -85,61 +85,69 @@ class Option {
         };
 
         // Query VIAF endpoint in order to get more author data
-        await requests('https://www.viaf.org/viaf/' + this.getViafId() + '/?httpAccept=application/json').then((response) => {
+        if(this.getViafId()) {
+            await requests('https://www.viaf.org/viaf/' + this.getViafId() + '/?httpAccept=application/json').then((response) => {
 
-            // Store response as JSON
-            response = JSON.parse(response);
+                // Store response as JSON
+                response = JSON.parse(response);
 
-            // Store birth and death dates
-            if(!this.birthDate)
-                this.birthDate = response.birthDate;
+                // Store birth and death dates
+                if (!this.birthDate)
+                    this.birthDate = response.birthDate;
 
-            if(!this.deathDate)
-                this.deathDate = response.deathDate;
+                if (!this.deathDate)
+                    this.deathDate = response.deathDate;
 
-            if(this.type === 'personal')
-                this.type = viafDictionary[this.type];
+                if (this.type === 'personal')
+                    this.type = viafDictionary[this.type];
 
-            // Store option titles
-            if (response.titles && response.titles.work) {
+                // Store option titles
+                if (response.titles && response.titles.work) {
 
-                // Collect titles
-                this.titles = response.titles.work.map(el => el.title);
+                    // Collect titles
+                    this.titles = response.titles.work.map(el => el.title);
 
-                // If titles is not an array, convert titles as array
-                if(!Array.isArray(this.titles))
-                    this.titles = [this.titles];
+                    // If titles is not an array, convert titles as array
+                    if (!Array.isArray(this.titles))
+                        this.titles = [this.titles];
 
-            }
+                }
 
-            // Store option roles
-            if(response.occupation && response.occupation.data) {
+                // Store option roles
+                if (response.occupation && response.occupation.data) {
 
-                // Collect titles
-                this.roles = response.occupation.data.map(el => el.text);
+                    // Collect titles
+                    this.roles = response.occupation.data.map(el => el.text);
 
-                // If titles is not an array, convert titles as array
-                if(!Array.isArray(this.roles))
-                    this.titles = [this.roles];
+                    // If titles is not an array, convert titles as array
+                    if (!Array.isArray(this.roles))
+                        this.titles = [this.roles];
 
-            }
+                }
 
-            // Store option gender
-            if(!this.gender && response.fixed)
-                this.gender = viafDictionary[response.fixed];
+                // Store option gender
+                if (!this.gender && response.fixed)
+                    this.gender = viafDictionary[response.fixed];
 
-        }).catch((err) => {
-            throw err;
-        });
+            }).catch((err) => {
+                throw err;
+            });
+        }
 
     }
 
     getViafId() {
 
         // Extract tokens from VIAF uri
-        let uriTokens = this.viaf.split('/');
+        if(this.viaf) {
 
-        return uriTokens[uriTokens.length - 1];
+            // Return splitted token
+            let uriTokens = this.viaf.split('/');
+            return uriTokens[uriTokens.length - 1];
+
+        }
+
+        return null;
 
     }
 

@@ -1,14 +1,12 @@
 function renderAuthorMatchesContainer(author, token, selectedOptions, callback) {
     $.get('/views/template/beweb/matches.html', (template) => {
 
-        let grouping = groupBewebAuthorFields(author, selectedOptions);
+        let grouping = groupSelectionFields();
 
         // Generate form container
         let output = Mustache.render(template, {
             'grouping': grouping,
-            'header': author.authorName.nameFull,
-            'firstImage': authorImages[1],
-            'secondImage': authorImages[0]
+            'header': author.name
         });
 
         $('.container').html(output).promise().done(() => {
@@ -21,8 +19,8 @@ function renderAuthorMatchesContainer(author, token, selectedOptions, callback) 
 }
 
 function renderAuthorMatches(selectionInput){
-
     $.get('/views/template/beweb/selection-input.html', (template) => {
+
         Object.keys(selectionInput).forEach((key) => {
 
             // Clear list
@@ -35,5 +33,4 @@ function renderAuthorMatches(selectionInput){
 
         })
     });
-
 }

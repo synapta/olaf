@@ -31,6 +31,7 @@ function parseAuthorOptions(author, bodies, callback) {
     // Enrich all options with VIAF and return them
     Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
         options.map(el => el.getString());
+        console.log(author.variant[0].und);
         callback(options);
     });
 
