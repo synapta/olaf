@@ -352,7 +352,7 @@ function groupSelectionFields(){
         groupedLabels[group].forEach((field) => {
 
             // Set up field object
-            let fieldObject = {'label': field, 'dictionary': groupedFields[field], 'values': []};
+            let fieldObject = {'label': field, 'dictionary': config.fields[field].label, 'values': []};
 
             // Iterate over options
             choices.forEach((choice) => {
@@ -372,6 +372,9 @@ function groupSelectionFields(){
 
 function matchField(label, value){
 
+    // Store fields configuration
+    let fieldsConfig = config.fields;
+
     // Toggle field selection
     if(selectedFields[label]) {
         if (selectedFields[label].map(item => item.toLowerCase()).includes(value.toLowerCase()))
@@ -385,19 +388,38 @@ function matchField(label, value){
 
     // Evaluate current array limit
     // TODO: potrebbe succedere che facciamo una classe per la config che restituisce gli oggetti che ti interessano
-    Object.keys(fieldsLimit).forEach((label) => {
-        if(fieldsLimit[label] && selectionInput[label])
-            selectionInput[label] = selectionInput[label].slice(0, fieldsLimit[label]);
+    Object.keys(selectedFields).forEach((field) => {
+        if(fieldsConfig[field] && fieldsConfig[field].limit)
+            selectedFields[field] = selectedFields[field].slice(0, fieldsConfig[field].limit);
     });
 
     // Handle button rendering
     fieldMatching(label, value);
-
     // Render author matches
-    if(params.userToken !== 'beweb')
-        renderAuthorMatches(selectionInput);
-    else
-        renderBewebAuthorMatches(selectionInput);
+    renderAuthorMatches(selectedFields);
+
+}
+
+function addNewField(label){
+
+    // Store fields configuration
+    let fieldsConfig = config.fields;
+
+    // Add new input to selection list
+    if(!selectedFields[label])
+        selectedFields[label] = [];
+
+    // Append empty selection
+    selectedFields[label].unshift("");
+
+    // Slice current collection
+    // Evaluate array limit
+    Object.keys(selectedFields).forEach((field) => {
+        if(fieldsConfig[field] && fieldsConfig[field].limit)
+            selectedFields[field] = selectedFields[field].slice(0, fieldsConfig[field].limit);
+    });
+
+    renderAuthorMatches(selectedFields);
 
 }
 
