@@ -93,13 +93,13 @@
       "select": true
     },
     "image": {
-      "input": null,
+      "input": "Immagine",
       "wikidata": "immagine",
       "viaf": null,
-      "group": null,
+      "group": "Nome",
       "limit": 1,
       "label": "Immagine",
-      "select": false
+      "select": true
     },
     "gender": {
       "input": "Info_di_genere",
@@ -123,10 +123,11 @@
       "input": "Varianti",
       "wikidata": null,
       "viaf": null,
-      "group": "Nome",
+      "group": "Varianti",
       "limit": null,
       "label": "Varianti",
-      "select": true
+      "select": true,
+      "composite": true
     },
     "sources": {
       "input": "Fonti_archivistiche_e_bibliografiche",
@@ -147,7 +148,7 @@
       "select": false
     },
     "wikipediaIt": {
-      "input": null,
+      "input": "Wikipedia",
       "wikidata": "itwikipedia",
       "viaf": null,
       "group": "Identificativi",
@@ -173,13 +174,31 @@
       "label": "Commons",
       "select": true
     },
+    "wikidata": {
+      "input": "Wikidata",
+      "wikidata": "wikidata",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "Wikidata",
+      "select": true
+    },
     "treccani": {
-      "input": null,
+      "input": "Enciclopedia_Treccani",
       "wikidata": "treccani",
       "viaf": null,
       "group": "Identificativi",
       "limit": 1,
       "label": "Treccani",
+      "select": true
+    },
+    "ch": {
+      "input": "Catholic_Hierarchy",
+      "wikidata": "ch",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "Catholic Hierarchy",
       "select": true
     },
     "viaf": {
@@ -198,6 +217,69 @@
       "group": "Identificativi",
       "limit": null,
       "label": "SBN",
+      "select": true
+    },
+    "lcnaf": {
+      "input": "LCNAF",
+      "wikidata": "LCNAF",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "LCNAF",
+      "select": true
+    },
+    "gnd": {
+      "input": "GND",
+      "wikidata": "GND",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "GND",
+      "select": true
+    },
+    "bnf": {
+      "input": "BNF",
+      "wikidata": "BNF",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "BNF",
+      "select": true
+    },
+    "ulan": {
+      "input": "ULAN",
+      "wikidata": "ULAN",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "ULAN",
+      "select": true
+    },
+    "bav": {
+      "input": "BAV",
+      "wikidata": "BAV",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "BAV",
+      "select": true
+    },
+    "cerl": {
+      "input": "CERL",
+      "wikidata": "CERL",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "CERL",
+      "select": true
+    },
+    "isni": {
+      "input": "ISNI",
+      "wikidata": "ISNI",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "ISNI",
       "select": true
     },
     "suggested": {

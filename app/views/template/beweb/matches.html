@@ -48,7 +48,7 @@
                             <td valign="top" id="{{label}}">
 
                                 <div style="margin-bottom: 10px;">
-                                    <div onclick="addNewField('{{label}}')" class="ui mini green icon button">
+                                    <div onclick="addNewField('{{label}}')" class="ui mini green icon button add-new-field">
                                         <i class="fas fa-plus"></i>
                                     </div>
                                     <b>{{dictionary}}</b>
@@ -96,7 +96,7 @@
                             <td valign="top" id="{{label}}">
 
                                 <div style="margin-bottom: 10px;">
-                                    <div onclick="addNewField('{{label}}')" class="ui mini green icon button">
+                                    <div onclick="addNewField('{{label}}')" class="ui mini green icon button add-new-field">
                                         <i class="fas fa-plus"></i>
                                     </div>
                                     <b>{{dictionary}}</b>
@@ -144,7 +144,7 @@
                             <td valign="top" id="{{label}}">
 
                                 <div style="margin-bottom: 10px;">
-                                    <div onclick="addNewField('{{label}}')" class="ui mini green icon button">
+                                    <div onclick="addNewField('{{label}}')" class="ui mini green icon button add-new-field">
                                         <i class="fas fa-plus"></i>
                                     </div>
                                     <b>{{dictionary}}</b>
@@ -164,6 +164,54 @@
                             {{/values}}
                         </tr>
                     {{/grouping.Identificativi}}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="active title">
+            <i class="dropdown icon"></i>
+            <h2>Varianti</h2>
+        </div>
+
+        <div class="active content">
+            <table class="ui fixed table">
+
+                <thead>
+                    <tr>
+                        <th>Autore finale</th>
+                        <th>Autore originale</th>
+                        <th>Scelta 1</th>
+                        <th>Scelta 2</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {{#grouping.Varianti}}
+                <tr>
+                    <td valign="top" id="{{label}}">
+
+                        <div style="margin-bottom: 10px;">
+                            <div onclick="addNewField('{{label}}')" class="ui mini green icon button add-new-field">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <b>{{dictionary}}</b>
+                        </div>
+
+                        <div class="selection_list"></div>
+
+                    </td>
+                    {{#values}}
+                    <td>
+                        {{#value}}
+                        <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                            {{.}}
+                            <i style="margin-left: 5px" class="fas fa-plus"></i>
+                        </a>
+                        {{/value}}
+                    </td>
+                    {{/values}}
+                </tr>
+                {{/grouping.Varianti}}
                 </tbody>
             </table>
         </div>

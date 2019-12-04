@@ -1,30 +1,62 @@
-const dictionaries = require('./dictionaries');
-
 /**
  * A class to model author card
  * **/
 class Author {
 
-    constructor(rawBody) {
+    constructor(rawBody, config) {
 
-        // Store request body
+        // Store request body and config
         this.rawBody = rawBody;
+        this.config = config;
+
+        console.log(rawBody);
 
         // Parse author fields
         this._parseBody();
 
     };
 
+    _flatAndStoreCompositeField(key, value) {
+
+        // Collect composite object
+        let compositeObject = {};
+
+        // Collect array elements in a single array
+        if(Array.isArray(value))
+            value.map(el => Object.assign(compositeObject, el));
+        // Or store current composite field
+        else
+            compositeObject = value;
+
+        Object.keys(compositeObject).forEach((objKey) => {
+
+            // Get and format subfield key
+            let subKey = objKey.toLowerCase();
+            subKey = subKey.charAt(0).toUpperCase() + subKey.slice(1);
+
+            // Store current subfield
+            this[key + subKey] = compositeObject[objKey];
+
+        })
+
+    }
+
     _parseBody() {
 
         // Author map
-        let map = dictionaries.bewebDictionary;
+        let map = this.config.getInputDictionary();
 
         // Map fields
         Object.keys(map).map(key => {
-            if (this.rawBody[map[key]])
-                this[key] = this.rawBody[map[key]];
-            else
+            if (this.rawBody[map[key]]) {
+
+                // Handle composite fields
+                if(this.config.isFieldComposite(key))
+                    this._flatAndStoreCompositeField(key, this.rawBody[map[key]]);
+                else
+                    this[key] = this.rawBody[map[key]];
+
+            } else
                 this[key] = null;
         });
 

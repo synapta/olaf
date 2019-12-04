@@ -1,224 +1,3 @@
-/*function authorSelect(element, item){
-
-    // Parse item
-    let stringedItem = item;
-    let parsedItem = JSON.parse(item);
-    let selected = null;
-
-    // Store or remove author from selected list
-    if (Object.keys(selectedOptions).includes(stringedItem)) {
-        delete selectedOptions[stringedItem];
-        selected = true;
-    } else {
-        if(Object.keys(selectedOptions).length < selectionLimit) {
-            selectedOptions[stringedItem] = parsedItem;
-            selected = false;
-        } else {
-            alert('Sono stati selezionati troppi autori.');
-            return;
-        }
-    }
-
-    // Render selected items
-    renderSelectedAuthors(element, selected, Object.keys(selectedOptions).length);
-
-}
-
-function authorMatch(){
-
-    // Group options fields by author fields
-    if(params.userToken !== 'beweb') {
-        Object.values(selectedOptions).forEach((option) => {
-            authorFields.forEach((field) => {
-                if (!selectionInput[field])
-                    selectionInput[field] = [];
-                if (option[field] && !selectionInput[field].includes(option[field])) {
-                    selectionInput[field].push(option[field]);
-                }
-            })
-        });
-    }
-
-    if(params.userToken === 'beweb'){
-        // Render beweb matches
-        renderBewebAuthorMatchesContainer(author, params.userToken, Object.values(selectedOptions), () => {
-            renderBewebAuthorMatches(selectionInput);
-        });
-    } else {
-        // Render author matches
-        renderAuthorMatchesContainer(author, params.userToken, Object.values(selectedOptions), () => {
-            renderAuthorMatches(selectionInput);
-        });
-    }
-
-}
-
-function matchField(label, value){
-
-    // Handle object
-    if(selectionInput[label]) {
-            if (selectionInput[label]
-                .map(item => item.toLowerCase())
-                .includes(value.toLowerCase())
-            ) {
-                if(params.userToken !== 'beweb') {
-                    selectionInput[label] = selectionInput[label].filter((item) => {
-                        return item.toLowerCase() !== value.toLowerCase();
-                    })
-                }
-            } else
-                selectionInput[label].unshift(value);
-    } else {
-        selectionInput[label] = [];
-        selectionInput[label].unshift(value);
-    }
-
-    // Evaluate array limit
-    Object.keys(fieldsLimit).forEach((label) => {
-        if(fieldsLimit[label] && selectionInput[label])
-           selectionInput[label] = selectionInput[label].slice(0, fieldsLimit[label]);
-    });
-
-    // Handle button rendering
-    fieldMatching(label, value);
-
-    // Render author matches
-    if(params.userToken !== 'beweb')
-        renderAuthorMatches(selectionInput);
-    else
-        renderBewebAuthorMatches(selectionInput);
-
-}
-
-function removeField(label, field){
-
-    if(label) {
-        if (selectionInput[label]
-            .map(field => field.toLowerCase())
-            .includes(field.toLowerCase())
-        ) {
-            selectionInput[label] = selectionInput[label].filter((item) => {
-                return item.toLowerCase() !== field.toLowerCase();
-            })
-        }
-    }
-
-}
-
-function groupBewebAuthorFields(author, selectedOptions) {
-
-    // Collect all options
-    let options = [author].concat(selectedOptions);
-    // Grouping object
-    let grouping = {};
-
-    options.forEach((option, index) => {
-
-        // Store image for each option
-        authorImages.push(option.optionImage);
-
-        // Initialize new option object
-        let newOption = {};
-
-        Object.keys(option).forEach((key) => {
-
-            if(key in subfieldsSelection) {
-                subfieldsSelection[key].from.forEach((item, index) => {
-
-                    let newKey = subfieldsSelection[key].to[index].replace(/^(?:option|author)([A-Z])/, '$1');
-                    newKey = newKey.charAt(0).toLowerCase() + newKey.slice(1);
-                    newOption[newKey] = option[key][item];
-
-                })
-            } else {
-
-                // Extract new key from options fields
-                let newKey = key.replace(/^(?:option|author)([A-Z])/, '$1');
-                newKey = newKey.charAt(0).toLowerCase() + newKey.slice(1);
-                newOption[newKey] = option[key];
-
-            }
-
-        });
-
-        options[index] = newOption;
-
-    });
-
-
-    // Initialize grouping
-    Object.keys(fieldsGrouping).forEach((group) => {
-
-        // Initialize grouping objects
-        grouping[group] = [];
-
-        fieldsGrouping[group].forEach((field) => {
-            let fieldObject = {'label': field, 'dictionary': fieldsLabels[field], 'values': []};
-            options.forEach((option) => {
-                fieldObject.values.push({'field': field, 'value': option[field]});
-            });
-            grouping[group].push(fieldObject);
-        });
-
-    });
-
-    return grouping;
-
-}
-
-function addNewInput(label){
-
-    // Add new input to selection list
-    if(!selectionInput[label]) {
-        selectionInput[label] = []
-    }
-
-    // Append empty input
-    selectionInput[label].unshift("");
-    // Slice current collection
-    // Evaluate array limit
-    Object.keys(fieldsLimit).forEach((label) => {
-        if(fieldsLimit[label] && selectionInput[label])
-            selectionInput[label] = selectionInput[label].slice(0, fieldsLimit[label]);
-    });
-
-    if(params.userToken !== 'beweb')
-        renderAuthorMatches(selectionInput);
-    else
-        renderBewebAuthorMatches(selectionInput);
-
-}
-
-function authorSkip(authorUri) {
-
-    // API call
-    $.ajax({
-        url: '/api/v1/' + params.userToken + '/author-skip/',
-        method: 'POST',
-        data: {'authorId': authorUri},
-        dataType: 'json',
-        success: response => {
-            if(response.status === 'success') {
-                // Store last action in session
-                sessionStorage.setItem("action", "skip");
-                // Reload page
-                location.href = '/get/' + params.userToken + '/author';
-            } else
-                alert("Errore");
-        }
-    });
-
-}
-
-function authorSend(){
-
-    // Store last action in session
-    sessionStorage.setItem("action", "match");
-    // Send form
-    document.getElementById('matches-form').submit();
-
-}*/
-
 // Author object
 let author = null;
 let options = [];
@@ -273,6 +52,7 @@ function authorMatch(){
     if(config.selection){
 
         // Get selection fields from config
+        let fieldsConfig = config.fields;
         let selectionFields = Object.keys(config.fields).filter(el => config.fields[el].select);
         let targets = null;
 
@@ -284,19 +64,25 @@ function authorMatch(){
         // Populate selection with selection fields
         targets.forEach(target => {
             selectionFields.forEach(field => {
+                Object.keys(author).filter(el => el.indexOf(field) === 0).forEach((subField) => {
 
-                // Check if field is empty and initialize it
-                if (!selectedFields[field])
-                    selectedFields[field] = [];
+                    // Check if field is empty and initialize it
+                    if (!selectedFields[subField])
+                        selectedFields[subField] = [];
 
-                // Append current field to selected fields collection
-                if (target[field] && !selectedFields[field].includes(target[field])) {
-                    if(Array.isArray(target[field]))
-                        selectedFields[field] = selectedFields[field].concat(target[field]);
-                    else
-                        selectedFields[field].push(target[field]);
-                }
+                    // Append current field to selected fields collection
+                    if (target[subField] && !selectedFields[subField].includes(target[subField])) {
+                        if(Array.isArray(target[subField]))
+                            selectedFields[subField] = selectedFields[subField].concat(target[subField]);
+                        else
+                            selectedFields[subField].push(target[subField]);
+                    }
 
+                    // Slice limited fields
+                    if(fieldsConfig[field].limit)
+                        selectedFields[subField] = selectedFields[subField].slice(0, fieldsConfig[field].limit);
+
+                });
             })
         })
 
@@ -350,18 +136,28 @@ function groupSelectionFields(){
         groupedFields[group] = [];
         // Iterate over grouped fields
         groupedLabels[group].forEach((field) => {
+            Object.keys(author).filter(el => el.indexOf(field) === 0).forEach((subfield) => {
 
-            // Set up field object
-            let fieldObject = {'label': field, 'dictionary': config.fields[field].label, 'values': []};
+                // Check if field is composite
+                let isFieldComposite = config.fields[field].composite;
+                let dictionaryLabel = config.fields[field].label;
 
-            // Iterate over options
-            choices.forEach((choice) => {
-                fieldObject.values.push({'field': field, 'value': choice[field]});
+                // Generate new dictionary label for composite fields
+                if(isFieldComposite)
+                    dictionaryLabel = config.fields[field].label + ' ' + subfield.replace(field, '').toUpperCase();
+
+                // Generate field object
+                let fieldObject = {'label': subfield, 'dictionary': dictionaryLabel, 'values': []};
+
+                // Iterate over options
+                choices.forEach((choice) => {
+                    fieldObject.values.push({'field': subfield, 'value': choice[subfield]});
+                });
+
+                // Append field object
+                groupedFields[group].push(fieldObject);
+
             });
-
-            // Append field object
-            groupedFields[group].push(fieldObject);
-
         });
 
     });
@@ -387,10 +183,15 @@ function matchField(label, value){
     }
 
     // Evaluate current array limit
-    // TODO: potrebbe succedere che facciamo una classe per la config che restituisce gli oggetti che ti interessano
     Object.keys(selectedFields).forEach((field) => {
-        if(fieldsConfig[field] && fieldsConfig[field].limit)
-            selectedFields[field] = selectedFields[field].slice(0, fieldsConfig[field].limit);
+
+        // Get parent field limit
+        let parentField = Object.keys(config.fields).filter(el => field.indexOf(el) === 0)[0];
+
+        // Parse field limit
+        if (fieldsConfig[field] && fieldsConfig[parentField].limit)
+            selectedFields[field] = selectedFields[field].slice(0, fieldsConfig[parentField].limit);
+
     });
 
     // Handle button rendering

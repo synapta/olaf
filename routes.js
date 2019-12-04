@@ -3,10 +3,12 @@ const express        = require('express');
 const bodyParser     = require('body-parser');
 const nodeRequest    = require('request');
 const promiseRequest = require('request-promise');
+const fs             = require('fs');
 
 // Modules
 let queries          = null;
 let parser           = null;
+let config           = null;
 
 // Token validation
 function validateToken(token) {
@@ -37,9 +39,16 @@ module.exports = function(app) {
         // Validate token
         if (validateToken(token)) {
 
+            // Load user config
+            if(!config)
+                config = JSON.parse(fs.readFileSync(`./app/js/config/${token}.json`));
+
             // Load modules
             queries = require('./users/' + token + '/queries');
             parser = require('./users/' + token + '/parser');
+
+            // Initialize configuration
+            parser.configInit(config);
 
             // Next route
             next();
@@ -57,21 +66,11 @@ module.exports = function(app) {
         response.sendFile('author.html', {root: __dirname + '/app/views'});
     });
 
-    app.post(['/get/:token/author-match/'], (request, response) => {
-
-        // Store posted options
-        let options = JSON.parse(request.body.options);
-
-        response.sendFile('author-match.html', {root: __dirname + '/app/views'});
-
-    });
-
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
 
         // Compose author query
         let queryAuthor = queries.authorSelect(request.params.authorId);
-        console.log(queryAuthor);
 
         // Make request
         nodeRequest(queryAuthor, (err, res, body) => {
@@ -92,6 +91,7 @@ module.exports = function(app) {
                     response.json({'author': author, 'options': options});
                 });
             });
+
         });
 
     });

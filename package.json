@@ -28,6 +28,7 @@
     "sugar": "latest",
     "underscore": "^1.9.1",
     "http": "latest",
-    "fuzzball": "latest"
+    "fuzzball": "latest",
+    "fs": "latest"
   }
 }

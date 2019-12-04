@@ -20,16 +20,24 @@ function renderAuthorMatchesContainer(author, token, selectedOptions, callback) 
 
 function renderAuthorMatches(selectionInput){
     $.get('/views/template/beweb/selection-input.html', (template) => {
-
         Object.keys(selectionInput).forEach((key) => {
 
+            let parentKey = Object.keys(config.fields).filter(el => key.indexOf(el) === 0)[0];
+
             // Clear list
-            $('#' + key).find('.selection_list').html('');
+            let fieldBox = $('#' + key);
+            fieldBox.find('.selection_list').html('');
 
             // Populate list
             selectionInput[key].forEach((item) => {
-                $('#' + key).find('.selection_list').append(Mustache.render(template, {'value': item, 'key': key}));
+                fieldBox.find('.selection_list').append(Mustache.render(template, {'value': item, 'key': key}));
             });
+
+            // Render disabled button in case of reached limit
+            if (config.fields[parentKey].limit && config.fields[parentKey].limit <= selectionInput[key].length)
+                fieldBox.find('.add-new-field').addClass('disabled');
+            else
+                fieldBox.find('.add-new-field').removeClass('disabled');
 
         })
     });

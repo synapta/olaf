@@ -1,4 +1,3 @@
-const dictionaries = require('./dictionaries');
 const requests     = require('request-promise');
 
 /**
@@ -6,10 +5,11 @@ const requests     = require('request-promise');
  * **/
 class Option {
 
-    constructor(rawBody, type) {
+    constructor(rawBody, type, config) {
 
-        // Store request body
+        // Store request body and config
         this.rawBody = rawBody;
+        this.config = config;
 
         // Parse current body depending on type
         if (type === 'wikidata')
@@ -22,7 +22,7 @@ class Option {
     async _parseWikidataBody() {
 
         // Get Wikidata Map from module
-        let map = dictionaries.wikidataDictionary;
+        let map = this.config.getWikidataDictionary();
 
         // Parse rawBody in order to populate current object
         Object.keys(map).forEach((key) => {
@@ -49,7 +49,7 @@ class Option {
     _parseViafBody() {
 
         // Get Wikidata Map from module
-        let map = dictionaries.viafDictionary;
+        let map = this.config.getViafDictionary();
 
         // Parse rawBody in order to populate current object
         Object.keys(map).forEach((key) => {

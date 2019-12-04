@@ -4,13 +4,23 @@ const fuzz           = require('fuzzball');
 const dictionaries   = require('./dictionaries');
 const Option         = require('./option').Option;
 const Author         = require('./author').Author;
+const Config         = require('./config').Config;
 
+// Configuration
+let config           = null;
+
+/**
+ * Initialize module with user configuration
+ * **/
+function configInit(configObj) {
+    config = new Config(configObj);
+}
 
 /**
  * Parse author response in order to obtain OLAF author object
  * **/
 function parseAuthor(body){
-    return new Author(body);
+    return new Author(body, config);
 }
 
 /**
@@ -31,7 +41,6 @@ function parseAuthorOptions(author, bodies, callback) {
     // Enrich all options with VIAF and return them
     Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
         options.map(el => el.getString());
-        console.log(author.variant[0].und);
         callback(options);
     });
 
@@ -43,7 +52,7 @@ function parseWikidataOptions(body) {
     let results = body.results.bindings;
 
     // Construct options from query results
-    return results.map(el => new Option(el, 'wikidata'));
+    return results.map(el => new Option(el, 'wikidata', config));
 
 }
 
@@ -58,7 +67,7 @@ function parseViafOptions(body, viafUris) {
     results = results.filter(el => !viafUris.includes(el['viafid']) && !invalidFields.includes(el['nametype']));
 
     // Construct options from query results
-    return results.map(el => new Option(el, 'viaf'));
+    return results.map(el => new Option(el, 'viaf', config));
 
 }
 
@@ -105,4 +114,8 @@ exports.parseAuthor = (body) => {
 
 exports.parseAuthorOptions = (author, bodies, callback) => {
     parseAuthorOptions(author, bodies, callback);
+};
+
+exports.configInit = (configObj) => {
+    configInit(configObj);
 };
