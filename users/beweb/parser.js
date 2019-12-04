@@ -62,7 +62,7 @@ function parseViafOptions(body, viafUris) {
     let invalidFields = ['uniformtitleexpression', 'uniformtitlework'];
 
     // Parse results
-    let results = body.result;
+    let results = body.result || [];
     // Filter current results removing known authors and options with invalid fields
     results = results.filter(el => !viafUris.includes(el['viafid']) && !invalidFields.includes(el['nametype']));
 
