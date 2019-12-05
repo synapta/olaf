@@ -56,6 +56,7 @@ function authorMatch(){
         let selectionFields = Object.keys(config.fields).filter(el => config.fields[el].select);
         let targets = null;
 
+        // Select targets from which import the data
         if(config.selection === 'left')
             targets = [author];
         else
@@ -151,7 +152,20 @@ function groupSelectionFields(){
 
                 // Iterate over options
                 choices.forEach((choice) => {
-                    fieldObject.values.push({'field': subfield, 'value': choice[subfield]});
+                    fieldObject.values.push({
+                        'field': subfield,
+                        'value': choice[subfield],
+                        'parseLink': () => {
+                            return (text, render) => {
+                                return _renderLinkIcon(render, text);
+                            }
+                        },
+                        'parseImage': () => {
+                            return (text, render) => {
+                                return _renderImage(render, text)
+                            }
+                        }
+                    });
                 });
 
                 // Append field object

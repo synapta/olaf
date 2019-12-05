@@ -60,7 +60,7 @@
                             {{#values}}
                             <td>
                                 {{#value}}
-                                    <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                                    <a style="{{#parseImage}}{{.}}{{/parseImage}}" data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
                                         {{.}}
                                         <i style="margin-left: 5px" class="fas fa-plus"></i>
                                     </a>

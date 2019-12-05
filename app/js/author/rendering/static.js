@@ -185,3 +185,44 @@ function deleteInput(el, label, value){
     removeField(label, value);
 
 }
+
+// Lamdas for Mustache rendering
+
+function _decodeHtmlEntities(text) {
+
+    // Decode entities using a fake textarea
+    let txt = document.createElement("textarea");
+    txt.innerHTML = text;
+
+    return txt.value;
+
+}
+
+function _renderLinkIcon(render, text) {
+
+    // Store rendered text
+    let renderedText = render(text);
+
+    // Render link icon in case of link
+    if(renderedText.includes('http') && !renderedText.includes('jpg', 'png'))
+        return `<a class="wrapper_link" target="_blank" href="${render(text)}"><i class="fas fa-external-link-alt"></i></a>`;
+
+    return ''
+}
+
+function _renderImage(render, text) {
+
+    // Store rendered text
+    let renderedText = _decodeHtmlEntities(render(text));
+
+    // Render link icon in case of link
+    if(renderedText.includes('http') && renderedText.includes('jpg', 'png')) {
+        // Parse commons images
+        renderedText = renderedText.replace('https://commons.wikimedia.org/wiki/File:', 'https://upload.wikimedia.org/wikipedia/commons/f/fa/');
+        // Return styles to render image circle in second page
+        return `width: 60px; height: 60px; border-radius: 100%; background-image: url(${renderedText}); background-size: cover; overflow: hidden; color: transparent; margin: 0 auto;`;
+    }
+
+    return ''
+
+}
