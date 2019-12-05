@@ -56,11 +56,14 @@
             {{/titles.length}}
             <a class="ui red ribbon label">Esplora in...</a>
             <div class="center aligned card-box">
-                {{#wikidata}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikidata</a>{{/wikidata}}
+                {{#wikidata}}<a href="{{.}}" target="_blank" class="ui center aligned label basic">Fonte: Wikidata</a>{{/wikidata}}
+                {{#viaf}}<a class="ui center aligned basic label" href="{{.}}" target="_blank">Fonte:  VIAF</a>{{/viaf}}
+                {{#wikipedia}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia IT</a>{{/wikipedia}}
+                {{#isni}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">ISNI</a>{{/isni}}
                 {{#wikipediaIt}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia</a>{{/wikipediaIt}}
-                {{#viaf}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">VIAF</a>{{/viaf}}
-                {{#treccani}}<a class="ui center aligned blue label" href="http://www.treccani.it/enciclopedia/{{.}}" target="_blank">Treccani</a>{{/treccani}}
-                {{#sbn}}<a class="ui center aligned blue label" href="http://id.sbn.it/af/{{.}}" target="_blank">SBN</a>{{/sbn}}
+                {{#treccani}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Treccani</a>{{/treccani}}
+                {{#sbn}}<a class="ui center aligned blue label" href="https://opac.sbn.it/opacsbn/opac/iccu/scheda_authority.jsp?bid={.}}" target="_blank">SBN</a>{{/sbn}}
+                {{#ch}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Catholic Hierarchy</a>{{/ch}}
                 {{#wikimediaCommons}}<a class="ui center aligned blue label" href="https://commons.wikimedia.org/wiki/Category:{{.}}" target="_blank">Wikimedia Commons</a>{{/wikimediaCommons}}
             </div>
             <div class="ui divider"></div>
