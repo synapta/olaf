@@ -5,13 +5,26 @@
     .label {
         margin: 2.5px !important;
         cursor: pointer;
-    }
-    .label .label {
-        margin: 0 !important;
-        padding: 0;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 100%;
     }
     h2 {
         display: inline;
+    }
+    .label-wrapper{
+        display: inline;
+    }
+    .field_selection{
+        max-width: calc(100% - 30px);
+    }
+    .wrapper_link {
+        position: relative;
+        top: -10px;
+    }
+    tr {
+        transition: background-color 500ms;
     }
     tr .fa-check {
         color: #21BA45;
@@ -63,10 +76,13 @@
                             {{#values}}
                             <td>
                                 {{#value}}
-                                    <a style="{{#parseImage}}{{.}}{{/parseImage}}" data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
-                                        <i style="margin-right: 5px" class="fas fa-plus"></i>
-                                        {{.}}
-                                    </a>
+                                    <div class="label-wrapper">
+                                        <a style="{{#parseImage}}{{.}}{{/parseImage}}" data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                                            <i style="margin-right: 5px" class="fas fa-plus"></i>
+                                            {{.}}
+                                        </a>
+                                        {{#parseLink}}{{.}}{{/parseLink}}
+                                    </div>
                                 {{/value}}
                             </td>
                             {{/values}}
@@ -111,10 +127,13 @@
                             {{#values}}
                                 <td>
                                     {{#value}}
-                                        <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
-                                            <i style="margin-right: 5px" class="fas fa-plus"></i>
-                                            {{.}}
-                                        </a>
+                                        <div class="label-wrapper">
+                                            <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                                                <i style="margin-right: 5px" class="fas fa-plus"></i>
+                                                {{.}}
+                                            </a>
+                                            {{#parseLink}}{{.}}{{/parseLink}}
+                                        </div>
                                     {{/value}}
                                 </td>
                             {{/values}}
@@ -158,10 +177,13 @@
                             {{#values}}
                                 <td>
                                     {{#value}}
-                                        <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
-                                            <i style="margin-right: 5px" class="fas fa-plus"></i>
-                                            {{.}}
-                                        </a>
+                                        <div class="label-wrapper">
+                                            <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                                                <i style="margin-right: 5px" class="fas fa-plus"></i>
+                                                {{.}}
+                                            </a>
+                                            {{#parseLink}}{{.}}{{/parseLink}}
+                                        </div>
                                     {{/value}}
                                 </td>
                             {{/values}}
@@ -206,10 +228,13 @@
                     {{#values}}
                     <td>
                         {{#value}}
-                        <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
-                            <i style="margin-right: 5px" class="fas fa-plus"></i>
-                            {{.}}
-                        </a>
+                            <div class="label-wrapper">
+                                <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                                    <i style="margin-right: 5px" class="fas fa-plus"></i>
+                                    {{.}}
+                                </a>
+                                {{#parseLink}}{{.}}{{/parseLink}}
+                            </div>
                         {{/value}}
                     </td>
                     {{/values}}
