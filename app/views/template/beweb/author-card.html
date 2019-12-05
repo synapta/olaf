@@ -71,7 +71,7 @@
                 </div>
             {{/heading.length}}
 
-            {{#variant.length}}
+            {{#_variant.length}}
                 <div class="ui items">
                     <div class="ui accordion">
                         <div class="title">
@@ -80,16 +80,16 @@
                         </div>
                         <div class="content">
                             <ul class="ui bulleted list card-box">
-                                {{#variant}}
+                                {{#_variant}}
                                 <li>
                                     <div class="item">{{.}}</div>
                                 </li>
-                                {{/variant}}
+                                {{/_variant}}
                             </ul>
                         </div>
                     </div>
                 </div>
-            {{/variant.length}}
+            {{/_variant.length}}
 
             {{#sources.length}}
                 <div class="ui items">
