@@ -206,7 +206,7 @@
       "wikidata": "viafurl",
       "viaf": "viafid",
       "group": "Identificativi",
-      "limit": null,
+      "limit": 1,
       "label": "VIAF",
       "select": true
     },
