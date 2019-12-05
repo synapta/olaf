@@ -1,6 +1,7 @@
 {
   "limit" : 2,
   "selection": "left",
+  "matching": "import",
   "fields": {
     "uri": {
       "input": "Idrecord",
@@ -281,15 +282,6 @@
       "limit": 1,
       "label": "ISNI",
       "select": true
-    },
-    "suggested": {
-      "input": null,
-      "wikidata": null,
-      "viaf": null,
-      "group": null,
-      "limit": null,
-      "label": null,
-      "select": false
     }
   }
 }
