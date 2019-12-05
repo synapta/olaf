@@ -103,24 +103,6 @@ function renderAuthorMatchesContainer(author, token, selectedOptions, callback){
     });
 }
 
-function renderBewebAuthorMatches(selectionInput){
-
-    $.get('/views/template/beweb/selection-input.html', (template) => {
-        Object.keys(selectionInput).forEach((key) => {
-
-            // Clear list
-            $('#' + key).find('.selection_list').html('');
-
-            // Populate list
-            selectionInput[key].forEach((item) => {
-                $('#' + key).find('.selection_list').append(Mustache.render(template, {'value': item, 'key': key}));
-            });
-
-        })
-    });
-
-}
-
 function renderAuthorMatches(selectionInput){
 
     // Empty object

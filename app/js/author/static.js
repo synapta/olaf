@@ -91,7 +91,7 @@ function authorMatch(){
 
     // Render author matching container
     renderAuthorMatchesContainer(author, params.userToken, Object.values(selectedOptions), () => {
-        renderAuthorMatches(selectedFields);
+        renderAuthorMatches();
     });
 
 }
@@ -212,7 +212,7 @@ function matchField(label, value){
     // Handle button rendering
     fieldMatching(label, value);
     // Render author matches
-    renderAuthorMatches(selectedFields);
+    renderAuthorMatches();
 
 }
 
@@ -235,21 +235,22 @@ function addNewField(label){
             selectedFields[field] = selectedFields[field].slice(0, fieldsConfig[field].limit);
     });
 
-    renderAuthorMatches(selectedFields);
+    renderAuthorMatches();
 
 }
 
-function removeField(label, value) {
+function removeField(label, field){
 
-    // Remove the value from label collection
-    if(selectedFields[label]) {
-        if (selectedFields[label].map(item => item.toLowerCase()).includes(value.toLowerCase()))
-            selectedFields[label] = selectedFields[label].filter(item => item.toLowerCase() !== value.toLowerCase());
+    if(label) {
+        if (selectedFields[label].map(field => field.toLowerCase()).includes(field.toLowerCase())) {
+            selectedFields[label] = selectedFields[label].filter((item) => {
+                return item.toLowerCase() !== field.toLowerCase();
+            })
+        }
     }
 
-    renderAuthorMatches(selectedFields);
-
 }
+
 
 // Get author, render author card, options and author labels
 $(document).ready(() => {

@@ -18,26 +18,35 @@ function renderAuthorMatchesContainer(author, token, selectedOptions, callback) 
     });
 }
 
-function renderAuthorMatches(selectionInput){
-    $.get('/views/template/beweb/selection-input.html', (template) => {
-        Object.keys(selectionInput).forEach((key) => {
+function toggleAddButton(key) {
 
-            let parentKey = Object.keys(config.fields).filter(el => key.indexOf(el) === 0)[0];
+    let parentKey = Object.keys(config.fields).filter(el => key.indexOf(el) === 0)[0];
+
+    // Clear list
+    let fieldBox = $('#' + key);
+
+    // Render disabled button in case of reached limit
+    if (config.fields[parentKey].limit && config.fields[parentKey].limit <= selectedFields[key].length)
+        fieldBox.find('.add-new-field').addClass('disabled');
+    else
+        fieldBox.find('.add-new-field').removeClass('disabled');
+
+}
+
+function renderAuthorMatches(){
+    $.get('/views/template/beweb/selection-input.html', (template) => {
+        Object.keys(selectedFields).forEach((key) => {
 
             // Clear list
             let fieldBox = $('#' + key);
             fieldBox.find('.selection_list').html('');
 
             // Populate list
-            selectionInput[key].forEach((item) => {
+            selectedFields[key].forEach((item) => {
                 fieldBox.find('.selection_list').append(Mustache.render(template, {'value': item, 'key': key}));
             });
 
-            // Render disabled button in case of reached limit
-            if (config.fields[parentKey].limit && config.fields[parentKey].limit <= selectionInput[key].length)
-                fieldBox.find('.add-new-field').addClass('disabled');
-            else
-                fieldBox.find('.add-new-field').removeClass('disabled');
+            toggleAddButton(key);
 
         });
 
@@ -74,6 +83,22 @@ function fieldMatching(label, value){
     // Store selection
     let selection = $('.field_selection[data-label="' + label + '"][data-value="' + value + '" i]');
 
+    // Update ticks rendering
+    updateLabelTicks();
+
+}
+
+function deleteInput(el, label, value){
+
+    // Remove field
+    removeField(label, value);
+
+    // Delete parent of current item
+    $(el).parent().remove();
+
+    // Toggle add button
+    toggleAddButton(label);
+    // Update ticks rendering
     updateLabelTicks();
 
 }
