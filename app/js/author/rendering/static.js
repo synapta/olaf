@@ -167,15 +167,11 @@ function fieldMatching(label, value){
     // Store selection
     let selection = $('.field_selection[data-label="' + label + '"][data-value="' + value + '" i]');
 
-    if(!selection.hasClass('label')) {
-
-        // Change icon
-        if (selection.hasClass('green'))
-            selection.removeClass('green').html('<i class="fas fa-plus"></i>');
-        else
-            selection.addClass('green').html('<i class="fas fa-check"></i>');
-
-    }
+    // Change icon
+    if (selection.hasClass('green'))
+        selection.removeClass('green').html('<i class="fas fa-plus"></i>');
+    else
+        selection.addClass('green').html('<i class="fas fa-check"></i>');
 
 }
 
@@ -220,7 +216,7 @@ function _renderImage(render, text) {
         // Parse commons images
         renderedText = renderedText.replace('https://commons.wikimedia.org/wiki/File:', 'https://upload.wikimedia.org/wikipedia/commons/f/fa/');
         // Return styles to render image circle in second page
-        return `width: 60px; height: 60px; border-radius: 100%; background-image: url(${renderedText}); background-size: cover; overflow: hidden; color: transparent; margin: 0 auto;`;
+        return `width: 60px; height: 60px; border-radius: 100%; background-image: url(${renderedText}); background-size: cover; overflow: hidden; color: transparent !important; margin: 0 auto;`;
     }
 
     return ''

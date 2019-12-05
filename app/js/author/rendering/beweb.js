@@ -39,6 +39,41 @@ function renderAuthorMatches(selectionInput){
             else
                 fieldBox.find('.add-new-field').removeClass('disabled');
 
-        })
+        });
+
+        // Update ticks rendering
+        updateLabelTicks();
+
     });
+}
+
+function updateLabelTicks() {
+
+    $('.field_selection')
+        .find('i')
+        .removeClass('fa-check')
+        .addClass('fa-plus');
+
+    // Iterate over each input to toggle check
+    $('input').each((index, el) => {
+
+        let label = $(el).closest('td').attr('id');
+        let value = $(el).val();
+
+        $('.field_selection[data-label="' + label + '"][data-value="' + value + '" i]')
+            .find('i.fa-plus')
+            .removeClass('fa-plus')
+            .addClass('fa-check');
+
+    })
+
+}
+
+function fieldMatching(label, value){
+
+    // Store selection
+    let selection = $('.field_selection[data-label="' + label + '"][data-value="' + value + '" i]');
+
+    updateLabelTicks();
+
 }
