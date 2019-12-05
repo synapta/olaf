@@ -18,6 +18,7 @@ class Author {
 
         // Collect composite object
         let compositeObject = {};
+        let totalObject = [];
 
         // Collect array elements in a single array
         if(Array.isArray(value))
@@ -33,12 +34,27 @@ class Author {
             subKey = subKey.charAt(0).toUpperCase() + subKey.slice(1);
 
             // Store current subfield
-            if(Array.isArray(compositeObject[objKey]))
-                this[key + subKey] = compositeObject[objKey].map(el => el.trim());
-            else
-                this[key + subKey] = compositeObject[objKey].trim();
+            if(Array.isArray(compositeObject[objKey])) {
 
-        })
+                // Trim all strings in collection
+                let trimmedField = compositeObject[objKey].map(el => el.trim());
+
+                // Store trimmed field
+                this[key + subKey] = trimmedField;
+                totalObject = totalObject.concat(trimmedField)
+
+            }else {
+
+                // Store trimmed field
+                this[key + subKey] = compositeObject[objKey].trim();
+                totalObject.append(compositeObject[objKey].trim());
+
+            }
+
+        });
+
+        // Store total object
+        this[key] = totalObject;
 
     }
 
