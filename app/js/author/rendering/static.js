@@ -1,3 +1,10 @@
+// Render navbar
+function renderNavbar() {
+    $.get('/views/template/author/navbar.html', (template) => {
+        $('.navbar').html(template).promise().done(showUserToken(params.userToken));
+    })
+}
+
 // Render user token
 function showUserToken(userToken){
     $('#user-token').html(userToken);
@@ -12,7 +19,9 @@ function renderAuthorCard(author){
         // Change page title
         document.title = author.name + ' - OLAF';
         // Send output
-        $('#author-card').html(output);
+        $('#author-card').html(output).promise().done(() => {
+            $('.ui.accordion').accordion({exclusive:false});
+        });
 
     });
 }

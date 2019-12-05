@@ -1,0 +1,56 @@
+<div style="margin: 0;" class="ui divider"></div>
+
+<table id="table-prova" style="padding: 0 40px; margin-top: 0 !important;" class="ui very basic fixed table">
+    <tbody>
+    <tr>
+        <td></td>
+        <td></td>
+        {{#first}}
+            <td>
+                <div class="ui cards">
+                    <div style="width: calc(100% - 15px) !important" class="fluid card">
+                        <div class="content">
+                            <div class="right floated" style="width: 50px; height: 50px; border-radius: 100%; background-image: url({{image}}); background-size: cover; background-color: #E8E8E8"></div>
+                            <div class="header">
+                                {{name}}
+                            </div>
+                            <div class="description">
+                                {{description}}
+                            </div>
+                        </div>
+                        <div class="extra content">
+                            <div class="ui two buttons">
+                                {{#wikidata}}<a href="{{.}}" target="_blank" class="ui center aligned label basic">Fonte: Wikidata</a>{{/wikidata}}
+                                {{#viaf}}<a class="ui center aligned basic label" href="{{.}}" target="_blank">Fonte:  VIAF</a>{{/viaf}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        {{/first}}
+        {{#second}}
+            <td>
+                <div class="ui fluid cards">
+                    <div style="width: calc(100% - 15px) !important" class="fluid card">
+                        <div class="content">
+                            <div class="right floated" style="width: 50px; height: 50px; border-radius: 100%; background-image: url({{image}}); background-size: cover; background-color: #E8E8E8"></div>
+                            <div class="header">
+                                {{name}}
+                            </div>
+                            <div class="description">
+                                {{description}}
+                            </div>
+                        </div>
+                        <div class="extra content">
+                            <div class="ui two buttons">
+                                {{#wikidata}}<a href="{{.}}" target="_blank" class="ui center aligned label basic">Fonte: Wikidata</a>{{/wikidata}}
+                                {{#viaf}}<a class="ui center aligned basic label" href="{{.}}" target="_blank">Fonte:  VIAF</a>{{/viaf}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        {{/second}}
+    </tr>
+    </tbody>
+</table>

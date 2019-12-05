@@ -1,0 +1,28 @@
+<table style="width:100%; height: 65px; padding: 0 3%; display:table">
+    <tr>
+        <td style="width: 260px">
+            <div onclick="authorSkip('{{uri}}')" data-identifier="{{uri}}" class="fluid ui disabled button">Torna indietro</div>
+        </td>
+        <td>
+            <h3 class="ui header">
+                <i class="fas fa-book-reader" style="font-size: larger; margin-right: 10px;" aria-hidden="true"></i>
+                Open Linked Authority Files
+                <span style="color: #aaa;">on <span style="text-transform: uppercase" id="user-token"></span></span>
+            </h3>
+        </td>
+        <td style="width: 260px">
+            <div style="margin: 0 !important;" id="send-button">
+                <div class="fluid ui labeled button" tabindex="0">
+                    <button id="selected-options-send" onclick="authorMatch()" class="fluid ui button disabled">
+                        Associa autori selezionati
+                    </button>
+                    <a id="selected-options-counter" class="ui basic label">
+                        0
+                    </a>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="selection-header"></div>

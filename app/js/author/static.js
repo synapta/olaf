@@ -255,8 +255,8 @@ function removeField(label, field){
 // Get author, render author card, options and author labels
 $(document).ready(() => {
 
-    // Print current user in navbar field
-    showUserToken(params.userToken);
+    // Render navbar
+    renderNavbar();
 
     // Load configuration
     $.get(`/js/config/${params.userToken}.json`, (json) => {

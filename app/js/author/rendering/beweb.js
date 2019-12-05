@@ -1,3 +1,9 @@
+function renderNavbar() {
+    $.get('/views/template/beweb/navbar.html', (template) => {
+        $('.navbar').html(template).promise().done(showUserToken(params.userToken));
+    })
+}
+
 function renderAuthorCard(author){
     $.get('/views/template/beweb/author-card.html', (template) => {
 
@@ -6,12 +12,17 @@ function renderAuthorCard(author){
         // Change page title
         document.title = author.name + ' - OLAF';
         // Send output
-        $('#author-card').html(output);
+        $('#author-card').html(output).promise().done(() => {
+            $('.ui.accordion').accordion({exclusive:false});
+        });
 
     });
 }
 
 function renderAuthorMatchesContainer(author, token, selectedOptions, callback) {
+
+
+
     $.get('/views/template/beweb/matches.html', (template) => {
 
         let grouping = groupSelectionFields();
@@ -23,11 +34,27 @@ function renderAuthorMatchesContainer(author, token, selectedOptions, callback) 
         });
 
         $('.container').html(output).promise().done(() => {
-            $(`tr > th:nth-child(${Object.values(selectedOptions).length + 3})`).remove();
+            let n = Object.values(selectedOptions).length + 3;
+            $(`tr > td:nth-child(${n}), th:nth-child(${n})`).remove();
             $('.ui.accordion').accordion({exclusive:false});
         });
 
-        callback();
+        // Append navbar header
+        $.get('/views/template/beweb/author-card-preview.html', (template) => {
+
+            // Store candidates
+            let candidates = {
+                first: selectedOptions[0],
+                second: selectedOptions[1]
+            };
+
+            // Parse and render template
+            let output = Mustache.render(template, candidates);
+            $("#selection-header").html(output);
+
+            callback();
+
+        });
 
     });
 }

@@ -10,7 +10,8 @@
 
 .navbar
 {
-    height: 65px;
+    display: block !important;
+    min-height: 65px;
     text-align: center;
 }
 
