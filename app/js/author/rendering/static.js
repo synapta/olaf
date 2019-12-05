@@ -67,8 +67,6 @@ function renderBewebAuthorMatchesContainer(author, token, selectedOptions, callb
 
         let grouping = groupBewebAuthorFields(author, selectedOptions);
 
-        console.log(grouping);
-
         // Generate form container
         let output = Mustache.render(template, {
             'grouping': grouping,
@@ -185,8 +183,5 @@ function deleteInput(el, label, value){
 
     // Remove field
     removeField(label, value);
-
-    // Delete parent of current item
-    $(el).parent().remove();
 
 }

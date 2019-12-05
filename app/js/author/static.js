@@ -224,6 +224,18 @@ function addNewField(label){
 
 }
 
+function removeField(label, value) {
+
+    // Remove the value from label collection
+    if(selectedFields[label]) {
+        if (selectedFields[label].map(item => item.toLowerCase()).includes(value.toLowerCase()))
+            selectedFields[label] = selectedFields[label].filter(item => item.toLowerCase() !== value.toLowerCase());
+    }
+
+    renderAuthorMatches(selectedFields);
+
+}
+
 // Get author, render author card, options and author labels
 $(document).ready(() => {
 
