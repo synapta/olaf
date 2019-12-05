@@ -1,105 +1,155 @@
-{{#roles.length}}
-    <p class="card-box"><b>Ruoli</b></p>
-    {{#roles}}
-        <div class="add_match">
-            <div data-label="optionDescription" data-value="{{.}}" onclick="matchField('optionDescription', '{{.}}')" class="ui compact icon button field_selection">
-                <i class="fas fa-check"></i>
+<div class="column">
+    <div class="ui raised segment">
+        <div id="author-fields">
+
+            <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Entità AFXD</a>
+
+            <p class="author-name">
+                {{name}}
+            </p>
+
+            {{#type}}
+                <a class="ui blue ribbon label"> <i class="fas fa-book"></i> Categoria</a>
+                <p class="card-box">
+                    {{type}}{{#gender}}, {{.}}{{/gender}}
+                </p>
+            {{/type}}
+
+            {{#birthDate}}
+                <a class="ui blue ribbon label"> <i class="fas fa-star"></i> Nascita</a>
+                <p class="card-box">
+                    {{birthDate}}{{#birthPlace}}, {{.}}{{/birthPlace}}
+                </p>
+            {{/birthDate}}
+
+            {{#deathDate}}
+                <a class="ui blue ribbon label"> <i class="fas fa-cross"></i> Morte</a>
+                <p class="card-box">
+                    {{deathDate}}{{#deathPlace}}, {{.}}{{/deathPlace}}
+                </p>
+            {{/deathDate}}
+
+            {{#titles.length}}
+                <a href="{{uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesNumber}}) - Visualizza tutte</a>
+                <ul class="ui bulleted list card-box">
+                    {{#titles}}
+                    <li>
+                        <div class="item title">{{.}}</div>
+                    </li>
+                    {{/titles}}
+                </ul>
+            {{/titles.length}}
+
+            {{#roles.length}}
+                <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
+                <div class="ui bulleted list card-box">
+                    {{#roles}}
+                    <div class="item">{{.}}</div>
+                    {{/roles}}
+                </div>
+            {{/roles.length}}
+
+            <a class="ui blue ribbon label"> <i class="fas fa-info"></i> Altri campi</a>
+
+            {{#heading.length}}
+                <div class="ui items">
+                    <div class="ui accordion">
+                        <div class="title">
+                            <i class="dropdown icon"></i>
+                            Intestazioni
+                        </div>
+                        <div class="content">
+                            <ul class="ui bulleted list card-box">
+                                {{#heading}}
+                                <li>
+                                    <div class="item">{{.}}</div>
+                                </li>
+                                {{/heading}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {{/heading.length}}
+
+            {{#variant.length}}
+                <div class="ui items">
+                    <div class="ui accordion">
+                        <div class="title">
+                            <i class="dropdown icon"></i>
+                            Varianti
+                        </div>
+                        <div class="content">
+                            <ul class="ui bulleted list card-box">
+                                {{#variant}}
+                                <li>
+                                    <div class="item">{{.}}</div>
+                                </li>
+                                {{/variant}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {{/variant.length}}
+
+            {{#sources.length}}
+                <div class="ui items">
+                    <div class="ui accordion">
+                        <div class="title">
+                            <i class="dropdown icon"></i>
+                            Fonti archivistiche
+                        </div>
+                        <div class="content">
+                            <ul class="ui bulleted list card-box">
+                                {{#sources}}
+                                <li>
+                                    <div class="item">{{.}}</div>
+                                </li>
+                                {{/sources}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {{/sources.length}}
+
+            {{#links.length}}
+                <div class="ui items">
+                    <div class="ui accordion">
+                        <div class="title">
+                            <i class="dropdown icon"></i>
+                            Interlink esterni
+                        </div>
+                        <div class="content">
+                            <ul class="ui bulleted list card-box">
+                                {{#links}}
+                                <li>
+                                    <div class="item">
+                                        <a target="_blank" href="{{.}}">{{.}}</a>
+                                    </div>
+                                </li>
+                                {{/links}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {{/links.length}}
+
+        </div>
+
+        <div class="ui divider"></div>
+
+        <div class="card-box">
+            <div id="send-button">
+                <div class="fluid ui labeled button" tabindex="0">
+                    <button id="selected-options-send" onclick="authorMatch()" class="fluid ui button disabled">
+                        Associa autori selezionati
+                    </button>
+                    <a id="selected-options-counter" class="ui basic label">
+                        0
+                    </a>
+                </div>
             </div>
-            <span>{{.}}</span>
+            <div onclick="authorSkip('{{uri}}')" data-identifier="{{uri}}" class="fluid ui button">Salta autore</div>
         </div>
-    {{/roles}}
-{{/roles.length}}
 
-{{#name}}
-    <p class="card-box"><b>Nome</b></p>
-    <div class="add_match">
-        <div data-label="optionSbn" data-value="{{.}}" onclick="matchField('optionName', '{{.}}')" class="ui compact icon button field_selection">
-            <i class="fas fa-check"></i>
-        </div>
-        <span>{{.}}</span>
     </div>
-{{/name}}
-
-{{#type}}
-    <p class="card-box"><b>Tipo</b></p>
-    <div class="add_match">
-        <div data-label="optionType" data-value="{{type}}" onclick="matchField('optionType', '{{type}}')" class="ui compact icon button field_selection">
-            <i class="fas fa-check"></i>
-        </div>
-        <span>{{authorCategory.label}}</span>
-    </div>
-{{/type}}
-
-{{#gender}}
-    <p class="card-box"><b>Genere</b></p>
-    <div class="add_match">
-        <div data-label="optionGender" data-value="{{.}}" onclick="matchField('optionGender', '{{.}}')" class="ui compact icon button field_selection">
-            <i class="fas fa-check"></i>
-        </div>
-        <span>{{.}}</span>
-    </div>
-{{/gender}}
-
-{{#heading.length}}
-    <p class="card-box"><b>Intestazioni</b></p>
-    {{#heading}}
-        <div class="add_match">
-            <div data-label="optionHeading" data-value="{{.}}" onclick="matchField('optionHeading', '{{.}}')" class="ui compact icon button field_selection">
-                <i class="fas fa-check"></i>
-            </div>
-            <span>{{.}}</span>
-        </div>
-    {{/heading}}
-{{/heading.length}}
-
-{{#variant.length}}
-    <p class="card-box"><b>Varianti</b></p>
-    {{#variant}}
-    <div class="add_match">
-        <div data-label="optionVariant" data-value="{{.}}" onclick="matchField('optionVariant', '{{.}}')" class="ui compact icon button field_selection">
-            <i class="fas fa-check"></i>
-        </div>
-        <span>{{.}}</span>
-    </div>
-    {{/variant}}
-{{/variant.length}}
-
-{{#birthPlace}}
-    <p class="card-box"><b>Luogo di nascita</b></p>
-    <div class="add_match">
-        <div data-label="optionBirthPlace" data-value="{{.}}" onclick="matchField('optionBirthPlace', '{{.}}')" class="ui compact icon button field_selection">
-            <i class="fas fa-check"></i>
-        </div>
-        <span>{{.}}</span>
-    </div>
-{{/birthPlace}}
-
-{{#birthDate}}
-    <p class="card-box"><b>Data di nascita</b></p>
-    <div class="add_match">
-        <div data-label="optionBirthDate" data-value="{{.}}" onclick="matchField('optionBirthDate', '{{.}}')" class="ui compact icon button field_selection">
-            <i class="fas fa-check"></i>
-        </div>
-        <span>{{.}}</span>
-    </div>
-{{/birthDate}}
-
-{{#deathPlace}}
-    <p class="card-box"><b>Luogo di nascita</b></p>
-    <div class="add_match">
-        <div data-label="optionDeathPlace" data-value="{{.}}" onclick="matchField('optionDeathPlace', '{{.}}')" class="ui compact icon button field_selection">
-            <i class="fas fa-check"></i>
-        </div>
-        <span>{{.}}</span>
-    </div>
-{{/deathPlace}}
-
-{{#deathDate}}
-    <p class="card-box"><b>Data di nascita</b></p>
-    <div class="add_match">
-        <div data-label="optionDeathDate" data-value="{{.}}" onclick="matchField('optionDeathDate', '{{.}}')" class="ui compact icon button field_selection">
-            <i class="fas fa-check"></i>
-        </div>
-        <span>{{.}}</span>
-    </div>
-{{/deathDate}}
+</div>

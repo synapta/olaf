@@ -1,3 +1,16 @@
+function renderAuthorCard(author){
+    $.get('/views/template/beweb/author-card.html', (template) => {
+
+        // Generate output
+        let output = Mustache.render(template, author);
+        // Change page title
+        document.title = author.name + ' - OLAF';
+        // Send output
+        $('#author-card').html(output);
+
+    });
+}
+
 function renderAuthorMatchesContainer(author, token, selectedOptions, callback) {
     $.get('/views/template/beweb/matches.html', (template) => {
 
@@ -10,7 +23,8 @@ function renderAuthorMatchesContainer(author, token, selectedOptions, callback) 
         });
 
         $('.container').html(output).promise().done(() => {
-            $('.ui.accordion').accordion();
+            $(`tr > th:nth-child(${Object.values(selectedOptions).length + 3})`).remove();
+            $('.ui.accordion').accordion({exclusive:false});
         });
 
         callback();

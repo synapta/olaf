@@ -60,7 +60,7 @@ function authorMatch(){
         if(config.selection === 'left')
             targets = [author];
         else
-            targets = options;
+            targets = Object.values(selectedOptions);
 
         // Populate selection with selection fields
         targets.forEach(target => {
@@ -128,7 +128,7 @@ function groupSelectionFields(){
     let groupedFields = {};
 
     // Concat options
-    let choices = [author].concat(options);
+    let choices = [author].concat(Object.values(selectedOptions));
 
     // Initialize grouping
     Object.keys(groupedLabels).forEach((group) => {

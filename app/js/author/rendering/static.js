@@ -61,29 +61,6 @@ function renderSelectedOptions(el, selected, length){
 
 }
 
-// Render author matches
-function renderBewebAuthorMatchesContainer(author, token, selectedOptions, callback) {
-    $.get('/views/template/beweb/matches.html', (template) => {
-
-        let grouping = groupBewebAuthorFields(author, selectedOptions);
-
-        // Generate form container
-        let output = Mustache.render(template, {
-            'grouping': grouping,
-            'header': author.authorName.nameFull,
-            'firstImage': authorImages[1],
-            'secondImage': authorImages[0]
-        });
-
-        $('.container').html(output).promise().done(() => {
-            $('.ui.accordion').accordion();
-        });
-
-        callback();
-
-    });
-}
-
 function renderAuthorMatchesContainer(author, token, selectedOptions, callback){
     $.get('/views/template/author/matches.html', (template) => {
 
@@ -182,7 +159,7 @@ function _renderLinkIcon(render, text) {
     let renderedText = render(text);
 
     // Render link icon in case of link
-    if(renderedText.includes('http') && !renderedText.includes('jpg', 'png'))
+    if(renderedText.includes('http'))
         return `<a class="wrapper_link" target="_blank" href="${render(text)}"><i class="fas fa-external-link-alt"></i></a>`;
 
     return ''
