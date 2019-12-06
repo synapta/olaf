@@ -122,13 +122,13 @@
     },
     "variant": {
       "input": "Varianti",
-      "wikidata": null,
+      "wikidata": "altLabel",
       "viaf": null,
       "group": "Varianti",
       "limit": null,
       "label": "Varianti",
       "select": true,
-      "composite": ["und", "ita", "lat", "eng"]
+      "composite": ["und", "ita", "lat", "eng", "fra", "esp", "deu"]
     },
     "sources": {
       "input": "Fonti_archivistiche_e_bibliografiche",
@@ -204,7 +204,7 @@
     },
     "ch": {
       "input": "Catholic_Hierarchy",
-      "wikidata": "ch",
+      "wikidata": "Catholic_Hier",
       "viaf": null,
       "group": "Identificativi",
       "limit": 1,
