@@ -54,7 +54,7 @@ class Author {
         });
 
         // Store total object
-        this['_' + key] = totalObject;
+        this[key] = totalObject;
 
     }
 
