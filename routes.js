@@ -80,7 +80,7 @@ module.exports = function(app) {
             let author = parser.parseAuthor(JSON.parse(body));
 
             // Query options
-            let requests = queries.authorOptions(author.name, '');
+            let requests = queries.authorOptions(author.name.trim(), '');
             // Map requests to make Promise
             requests = requests.map(query => promiseRequest(query));
 

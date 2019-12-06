@@ -17,6 +17,8 @@ class Option {
         else if (type === 'viaf')
             this._parseViafBody();
 
+        console.log(rawBody);
+
     };
 
     async _parseWikidataBody() {
@@ -40,6 +42,10 @@ class Option {
                 else if(key === 'birthDate' || key === 'deathDate')
                     // Handle dates
                     this[key] = this[key].substr(0, 10);
+
+                else if(key.includes('variant'))
+                    // Handle variants
+                    this[key] = this[key].split(',').map(el => el.trim());
 
             }
         });
