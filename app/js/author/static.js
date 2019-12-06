@@ -216,17 +216,19 @@ function matchField(label, value){
 
 }
 
-function addNewField(label){
+function addNewField(field){
 
     // Store fields configuration
     let fieldsConfig = config.fields;
 
     // Add new input to selection list
-    if(!selectedFields[label])
-        selectedFields[label] = [];
+    if(!selectedFields[field])
+        selectedFields[field] = [];
 
+    // Store current collection in field selection
+    selectedFields[field] = getSelectionValues(field);
     // Append empty selection
-    selectedFields[label].unshift("");
+    selectedFields[field].unshift("");
 
     // Slice current collection
     // Evaluate array limit

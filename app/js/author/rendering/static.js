@@ -143,6 +143,20 @@ function fieldMatching(label, value){
 
 }
 
+function getSelectionValues(field){
+
+    // Values collection
+    let values = [];
+
+    // Extract values from all inputs in the given field
+    $('#' + field).find('input').each((index, el) => {
+        values.push($(el).val());
+    });
+
+    return values;
+
+}
+
 function deleteInput(el, label, value){
 
     // Remove field
