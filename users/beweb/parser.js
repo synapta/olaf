@@ -13,7 +13,7 @@ let config           = null;
  * Initialize module with user configuration
  * **/
 function configInit(configObj) {
-    config = new Config(configObj);
+    config = configObj;
 }
 
 /**
@@ -119,3 +119,5 @@ exports.parseAuthorOptions = (author, bodies, callback) => {
 exports.configInit = (configObj) => {
     configInit(configObj);
 };
+
+exports.config = config;

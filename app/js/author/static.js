@@ -12,6 +12,10 @@ let params = parseUrl(window.location.href, {'userToken': 4, 'authorId': 6});
 let selectedOptions = {};
 let selectedFields = {};
 
+function _getAllSelectableFields() {
+    return Object.keys(config.fields).filter(el => config.fields[el].select && !config.fields[el].composite);
+}
+
 function authorSelect(el, optionString){
 
     // Parse item
@@ -53,7 +57,7 @@ function authorMatch(){
 
         // Get selection fields from config
         let fieldsConfig = config.fields;
-        let selectionFields = Object.keys(config.fields).filter(el => config.fields[el].select);
+        let selectionFields = _getAllSelectableFields();
         let targets = null;
 
         // Select targets from which import the data
@@ -65,25 +69,23 @@ function authorMatch(){
         // Populate selection with selection fields
         targets.forEach(target => {
             selectionFields.forEach(field => {
-                Object.keys(author).filter(el => el.indexOf(field) === 0).forEach((subField) => {
 
-                    // Check if field is empty and initialize it
-                    if (!selectedFields[subField])
-                        selectedFields[subField] = [];
+                // Check if field is empty and initialize it
+                if (!selectedFields[field])
+                    selectedFields[field] = [];
 
-                    // Append current field to selected fields collection
-                    if (target[subField] && !selectedFields[subField].includes(target[subField])) {
-                        if(Array.isArray(target[subField]))
-                            selectedFields[subField] = selectedFields[subField].concat(target[subField]);
-                        else
-                            selectedFields[subField].push(target[subField]);
-                    }
+                // Append current field to selected fields collection
+                if (target[field] && !selectedFields[field].includes(target[field])) {
+                    if(Array.isArray(target[field]))
+                        selectedFields[field] = selectedFields[field].concat(target[field]);
+                    else
+                        selectedFields[field].push(target[field]);
+                }
 
-                    // Slice limited fields
-                    if(fieldsConfig[field].limit)
-                        selectedFields[subField] = selectedFields[subField].slice(0, fieldsConfig[field].limit);
+                // Slice limited fields
+                if(fieldsConfig[field].limit)
+                    selectedFields[field] = selectedFields[field].slice(0, fieldsConfig[field].limit);
 
-                });
             })
         })
 
@@ -101,7 +103,7 @@ function groupSelectionLabels(){
     // Initialize grouping object
     let groupedFields = {};
 
-    Object.keys(config.fields).forEach((key) => {
+    _getAllSelectableFields().forEach((key) => {
 
         // Store group for each field
         let field = key;
@@ -137,41 +139,39 @@ function groupSelectionFields(){
         groupedFields[group] = [];
         // Iterate over grouped fields
         groupedLabels[group].forEach((field) => {
-            Object.keys(author).filter(el => el.indexOf(field) === 0).forEach((subfield) => {
 
-                // Check if field is composite
-                let isFieldComposite = config.fields[field].composite;
-                let dictionaryLabel = config.fields[field].label;
+            // Check if field is composite
+            let isFieldComposite = config.fields[field].composite;
+            let dictionaryLabel = config.fields[field].label;
 
-                // Generate new dictionary label for composite fields
-                if(isFieldComposite)
-                    dictionaryLabel = config.fields[field].label + ' ' + subfield.replace(field, '').toUpperCase();
+            // Generate new dictionary label for composite fields
+            /*if(isFieldComposite)
+                dictionaryLabel = config.fields[field].label + ' ' + field.replace(field, '').toUpperCase();*/
 
-                // Generate field object
-                let fieldObject = {'label': subfield, 'dictionary': dictionaryLabel, 'values': []};
+            // Generate field object
+            let fieldObject = {'label': field, 'dictionary': dictionaryLabel, 'values': []};
 
-                // Iterate over options
-                choices.forEach((choice) => {
-                    fieldObject.values.push({
-                        'field': subfield,
-                        'value': choice[subfield],
-                        'parseLink': () => {
-                            return (text, render) => {
-                                return _renderLinkIcon(render, text);
-                            }
-                        },
-                        'parseImage': () => {
-                            return (text, render) => {
-                                return _renderImage(render, text)
-                            }
+            // Iterate over options
+            choices.forEach((choice) => {
+                fieldObject.values.push({
+                    'field': field,
+                    'value': choice[field],
+                    'parseLink': () => {
+                        return (text, render) => {
+                            return _renderLinkIcon(render, text);
                         }
-                    });
+                    },
+                    'parseImage': () => {
+                        return (text, render) => {
+                            return _renderImage(render, text)
+                        }
+                    }
                 });
-
-                // Append field object
-                groupedFields[group].push(fieldObject);
-
             });
+
+            // Append field object
+            groupedFields[group].push(fieldObject);
+
         });
 
     });
@@ -259,7 +259,7 @@ $(document).ready(() => {
     renderNavbar();
 
     // Load configuration
-    $.get(`/js/config/${params.userToken}.json`, (json) => {
+    $.get(`/api/v1/${params.userToken}/config/`, (json) => {
 
         // Store config
         config = json;

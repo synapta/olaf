@@ -43,7 +43,7 @@ class Author {
                 this[key + subKey] = trimmedField;
                 totalObject = totalObject.concat(trimmedField)
 
-            }else {
+            } else {
 
                 // Store trimmed field
                 this[key + subKey] = compositeObject[objKey].trim();
@@ -70,14 +70,14 @@ class Author {
                 // Handle composite fields
                 if(this.config.isFieldComposite(key))
                     this._flatAndStoreCompositeField(key, this.rawBody[map[key]]);
-                else{
+                else {
                     if(Array.isArray(this.rawBody[map[key]]))
                         this[key] = this.rawBody[map[key]].map(el => el.trim());
                     else
                         this[key] = this.rawBody[map[key]].trim()
                 }
 
-            } else
+            } else if(!this[key])
                 this[key] = null;
         });
 
