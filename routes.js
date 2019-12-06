@@ -9,6 +9,7 @@ const fs             = require('fs');
 let queries          = null;
 let parser           = null;
 let config           = null;
+let Config           = require('./users/beweb/config').Config;
 
 // Token validation
 function validateToken(token) {
@@ -41,7 +42,7 @@ module.exports = function(app) {
 
             // Load user config
             if(!config)
-                config = JSON.parse(fs.readFileSync(`./app/js/config/${token}.json`));
+                config = new Config(JSON.parse(fs.readFileSync(`./app/js/config/${token}.json`)));
 
             // Load modules
             queries = require('./users/' + token + '/queries');
@@ -93,6 +94,13 @@ module.exports = function(app) {
             });
 
         });
+
+    });
+
+    app.get('/api/v1/:token/config/', (request, response) => {
+
+        // Send configuration object
+        response.json(config.getConfig())
 
     });
 
