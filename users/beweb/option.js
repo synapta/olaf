@@ -117,6 +117,9 @@ class Option {
                 if (response.occupation && response.occupation.data) {
 
                     // Collect titles
+                    if(!Array.isArray(response.occupation.data))
+                        response.occupation.data = [response.occupation.data];
+
                     this.roles = response.occupation.data.map(el => el.text);
 
                     // If titles is not an array, convert titles as array
