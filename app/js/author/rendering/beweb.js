@@ -1,6 +1,11 @@
-function renderNavbar() {
+function renderNavbar(selection=true, callback) {
     $.get('/views/template/beweb/navbar.html', (template) => {
-        $('.navbar').html(template).promise().done(showUserToken(params.userToken));
+        $('.navbar').html(Mustache.render(template, {'selection': selection}))
+                    .promise()
+                    .done(() => {
+                        showUserToken(params.userToken);
+                        callback();
+                    });
     })
 }
 
@@ -20,9 +25,6 @@ function renderAuthorCard(author){
 }
 
 function renderAuthorMatchesContainer(author, token, selectedOptions, callback) {
-
-
-
     $.get('/views/template/beweb/matches.html', (template) => {
 
         let grouping = groupSelectionFields();
@@ -50,9 +52,14 @@ function renderAuthorMatchesContainer(author, token, selectedOptions, callback) 
 
             // Parse and render template
             let output = Mustache.render(template, candidates);
-            $("#selection-header").html(output);
 
-            callback();
+            // Render second page navbar
+            renderNavbar(false, () => {
+                // Render navbar header
+                $("#selection-header").html(output);
+                // Return to callee
+                callback();
+            });
 
         });
 
