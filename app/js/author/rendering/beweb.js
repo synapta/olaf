@@ -150,3 +150,11 @@ function deleteInput(el, label, value){
     updateLabelTicks();
 
 }
+
+function submitForm() {
+
+    // Render confirmation box and then submit the form
+    if(confirm("Confermi di voler inviare i dati?"))
+        $('#matches-form').submit();
+
+}
