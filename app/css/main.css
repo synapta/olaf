@@ -63,6 +63,11 @@ ul.card-box > li
     margin-right: 5px;
 }
 
+.author-option .label
+{
+    margin: 2.5px 0 !important;
+}
+
 #send-button
 {
     margin-bottom: 10px;

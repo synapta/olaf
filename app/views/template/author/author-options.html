@@ -59,12 +59,19 @@
                 {{#wikidata}}<a href="{{.}}" target="_blank" class="ui center aligned label basic">Fonte: Wikidata</a>{{/wikidata}}
                 {{#viaf}}<a class="ui center aligned basic label" href="{{.}}" target="_blank">Fonte:  VIAF</a>{{/viaf}}
                 {{#wikipedia}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia IT</a>{{/wikipedia}}
+                {{#wikimediaCommons}}<a class="ui center aligned blue label" href="https://commons.wikimedia.org/wiki/Category:{{.}}" target="_blank">Wikimedia Commons</a>{{/wikimediaCommons}}
                 {{#isni}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">ISNI</a>{{/isni}}
                 {{#wikipediaIt}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia</a>{{/wikipediaIt}}
                 {{#treccani}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Treccani</a>{{/treccani}}
                 {{#sbn}}<a class="ui center aligned blue label" href="https://opac.sbn.it/opacsbn/opac/iccu/scheda_authority.jsp?bid={.}}" target="_blank">SBN</a>{{/sbn}}
                 {{#ch}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Catholic Hierarchy</a>{{/ch}}
-                {{#wikimediaCommons}}<a class="ui center aligned blue label" href="https://commons.wikimedia.org/wiki/Category:{{.}}" target="_blank">Wikimedia Commons</a>{{/wikimediaCommons}}
+                {{#dbpedia}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Dbpedia</a>{{/dbpedia}}
+                {{#lcnaf}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">LCNAF</a>{{/lcnaf}}
+                {{#gnd}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">GND</a>{{/gnd}}
+                {{#bnf}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">BNF</a>{{/bnf}}
+                {{#ulan}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">ULAN</a>{{/ulan}}
+                {{#bav}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">BAV</a>{{/bav}}
+                {{#cerl}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">CERL</a>{{/cerl}}
             </div>
             <div class="ui divider"></div>
             <button onclick="authorSelect(this, this.parentElement.getAttribute('data-item'))" class="ui fluid green button author-selection">Seleziona candidato</button>

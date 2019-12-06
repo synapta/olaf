@@ -17,8 +17,6 @@ class Option {
         else if (type === 'viaf')
             this._parseViafBody();
 
-        console.log(rawBody);
-
     };
 
     async _parseWikidataBody() {
