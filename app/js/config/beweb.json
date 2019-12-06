@@ -128,7 +128,7 @@
       "limit": null,
       "label": "Varianti",
       "select": true,
-      "composite": true
+      "composite": ["und", "ita", "lat", "eng"]
     },
     "sources": {
       "input": "Fonti_archivistiche_e_bibliografiche",
