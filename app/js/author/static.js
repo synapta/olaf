@@ -286,7 +286,7 @@ $(document).ready(() => {
 
                 // Check empty response
                 if(options.length === 0) {
-                    alert('Non sono presenti match per questo autore. Verrà saltato automaticamente');
+                    alert('Non sono presenti match per questo autore.');
                     authorSkip(author.uri);
                 }
 
