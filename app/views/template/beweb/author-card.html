@@ -2,7 +2,7 @@
     <div class="ui raised segment">
         <div id="author-fields">
 
-            <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Entità AFXD</a>
+            <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Entità AFCEI</a>
 
             <p class="author-name">
                 {{name}}
@@ -96,7 +96,7 @@
                     <div class="ui accordion">
                         <div class="title">
                             <i class="dropdown icon"></i>
-                            Fonti archivistiche
+                            Fonti archivistiche e bibliografiche
                         </div>
                         <div class="content">
                             <ul class="ui bulleted list card-box">
@@ -132,6 +132,28 @@
                     </div>
                 </div>
             {{/links.length}}
+
+            {{#sbn.length}}
+                <div class="ui items">
+                    <div class="ui accordion">
+                        <div class="title">
+                            <i class="dropdown icon"></i>
+                            SBN
+                        </div>
+                        <div class="content">
+                            <ul class="ui bulleted list card-box">
+                                {{#sbn}}
+                                <li>
+                                    <div class="item">
+                                        <a target="_blank" href="{{.}}">{{.}}</a>
+                                    </div>
+                                </li>
+                                {{/sbn}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {{/sbn.length}}
 
         </div>
 

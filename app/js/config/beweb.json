@@ -184,6 +184,15 @@
       "label": "Wikidata",
       "select": true
     },
+    "dbpedia": {
+      "input": "Dbpedia",
+      "wikidata": "dbpedia",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "Dbpedia",
+      "select": true
+    },
     "treccani": {
       "input": "Enciclopedia_Treccani",
       "wikidata": "treccani",
@@ -203,7 +212,7 @@
       "select": true
     },
     "viaf": {
-      "input": null,
+      "input": "VIAF",
       "wikidata": "viafurl",
       "viaf": "viafid",
       "group": "Identificativi",
@@ -212,7 +221,7 @@
       "select": true
     },
     "sbn": {
-      "input": null,
+      "input": "SBN",
       "wikidata": "sbn",
       "viaf": "iccu",
       "group": "Identificativi",
@@ -281,6 +290,15 @@
       "group": "Identificativi",
       "limit": 1,
       "label": "ISNI",
+      "select": true
+    },
+    "link": {
+      "input": "Link",
+      "wikidata": null,
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": null,
+      "label": "Interlink esterni",
       "select": true
     }
   }
