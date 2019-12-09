@@ -28,6 +28,8 @@ module.exports = function(app) {
 
     // Setting up express
     app.use('/', express.static('./app'));
+    app.use('/get/beweb/static', express.static('./app'));
+
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(bodyParser.json());
 
