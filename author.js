@@ -9,6 +9,8 @@ class Author {
         this.rawBody = rawBody;
         this.config = config;
 
+        console.log(rawBody);
+
         // Parse author fields
         this._parseBody();
 

@@ -74,11 +74,11 @@ function renderAuthorMatchesContainer(author, token, selectedOptions, callback){
     $.get('/views/template/author/matches.html', (template) => {
 
         // Generate container
-        let output = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/', 'authorUri': author.authorUri});
+        let output = Mustache.render(template, {'action': '/api/v1/' + token + '/enrich-author/', 'authorUri': author.uri});
         $('#author-container').html(output);
 
         // Populate matches options
-        $.get('/views/template/author/matches-options.html', (template) => {
+        $.get('/views/template/author/matches-option.html', (template) => {
             output = Mustache.render(template, {'options': selectedOptions});
             $('#matches-options').html(output);
         });
@@ -89,25 +89,23 @@ function renderAuthorMatchesContainer(author, token, selectedOptions, callback){
     });
 }
 
-function renderAuthorMatches(selectionInput){
+function renderAuthorMatches(){
 
     // Empty object
-    let emptyInput = true;
-    Object.values(selectionInput).map(input => {
-        if(input.length > 0)
-           emptyInput = false;
-    });
+    let emptyInput = Object.values(selectedFields).every(el => !el.length);
 
     // Set new button
     $('#send-button').html('<button onclick="authorSend()" id="send-author-matches" class="ui fluid primary button">Conferma assegnazione</button>');
     // Populate matches container
     if(emptyInput) {
         $.get('/views/template/author/matches-selection-empty.html', (template) => {
+
             // Set button behavior
             $('#send-author-matches').removeClass('primary').addClass('disabled');
             // Set empty template
             let output = Mustache.render(template);
             $('#matches-selection').html(output);
+
         });
     } else {
         $.get('/views/template/author/matches-selection.html', (template) => {
@@ -117,8 +115,8 @@ function renderAuthorMatches(selectionInput){
 
             // Generate selection map
             let selectionMap = {'selectedFields': []};
-            Object.keys(selectionInput).map(key => {
-                selectionMap['selectedFields'].push({'label': key, 'values': selectionInput[key]});
+            Object.keys(selectedFields).map(key => {
+                selectionMap['selectedFields'].push({'label': config.fields[key].label, 'field': key, 'values': selectedFields[key]});
             });
 
             // Set matches template
@@ -130,16 +128,37 @@ function renderAuthorMatches(selectionInput){
 
 }
 
+function updateLabelTicks() {
+
+    $('.field_selection')
+        .removeClass('green')
+        .find('i')
+        .removeClass('fa-check')
+        .addClass('fa-plus');
+
+    // Iterate over each input to toggle check
+    $('input').each((index, el) => {
+
+        let label = $(el).closest('td').attr('id');
+        let value = $(el).val();
+
+        console.log(label);
+        console.log(value);
+
+        $('.field_selection[data-label="' + label + '"][data-value="' + value + '" i]')
+            .addClass('green')
+            .find('i')
+            .removeClass('fa-plus')
+            .addClass('fa-check');
+
+    })
+
+}
+
 function fieldMatching(label, value){
 
-    // Store selection
-    let selection = $('.field_selection[data-label="' + label + '"][data-value="' + value + '" i]');
-
-    // Change icon
-    if (selection.hasClass('green'))
-        selection.removeClass('green').html('<i class="fas fa-plus"></i>');
-    else
-        selection.addClass('green').html('<i class="fas fa-check"></i>');
+    // Upate label ticks
+    updateLabelTicks()
 
 }
 

@@ -12,17 +12,30 @@ let params = parseUrl(window.location.href, {'userToken': 4, 'authorId': 6});
 let selectedOptions = {};
 let selectedFields = {};
 
-function _loadAlternativeScripts() {
+function _fileExists(url) {
+
+    let http = new XMLHttpRequest();
+
+    http.open('HEAD', url, false);
+    http.send();
+
+    return http.status !== 404;
+
+}
+
+function _loadAlternativeScripts(callback) {
 
     // Generate new <script> and populate it with user alternative scripts
     let s = document.createElement("script");
-    let fileUrl = `/get/beweb/static/js/author/rendering/${params.userToken}.js`;
+    let fileUrl = `/js/author/rendering/${params.userToken}.js`;
 
-    $.get(fileUrl).done(function() {
+    if(_fileExists(fileUrl)){
         s.type = "text/javascript";
         s.src = fileUrl;
         $("head").append(s);
-    });
+    }
+
+    callback();
 
 }
 
@@ -47,7 +60,7 @@ function authorSelect(el, optionString){
     } else {
 
         // Check selection limit
-        if(Object.keys(selectedOptions).length >= config.limit) {
+        if(config.limit && Object.keys(selectedOptions).length >= config.limit) {
             alert('Sono stati selezionati troppi autori.');
             return;
         }
@@ -270,44 +283,45 @@ function removeField(label, field){
 
 // Get author, render author card, options and author labels
 $(document).ready(() => {
+    // Load alternative scripts
+    _loadAlternativeScripts(() => {
 
-    //
+        // Render navbar
+        renderNavbar();
 
-    // Render navbar
-    renderNavbar();
+        // Load configuration
+        $.get(`/api/v1/${params.userToken}/config/`, (json) => {
 
-    // Load configuration
-    $.get(`/api/v1/${params.userToken}/config/`, (json) => {
+            // Store config
+            config = json;
 
-        // Store config
-        config = json;
+            // Get current author and its options
+            $.ajax({
 
-        // Get current author and its options
-        $.ajax({
+                url: '/api/v1/' + params.userToken + '/author/' + (params.authorId ? params.authorId : ''),
+                method: 'GET',
+                dataType: 'json',
 
-            url: '/api/v1/' + params.userToken + '/author/' + (params.authorId ? params.authorId : ''),
-            method: 'GET',
-            dataType: 'json',
+                success: response => {
 
-            success: response => {
+                    // Store author response
+                    author = response.author;
+                    options = response.options;
 
-                // Store author response
-                author = response.author;
-                options = response.options;
+                    // Render author card
+                    renderAuthorCard(author);
+                    // Render author options
+                    renderAuthorOptions({'options': options});
 
-                // Render author card
-                renderAuthorCard(author);
-                // Render author options
-                renderAuthorOptions({'options': options});
+                    // Check empty response
+                    if(options.length === 0) {
+                        alert('Non sono presenti match per questo autore.');
+                        authorSkip(author.uri);
+                    }
 
-                // Check empty response
-                if(options.length === 0) {
-                    alert('Non sono presenti match per questo autore.');
-                    authorSkip(author.uri);
                 }
-
-            }
+            });
         });
-    });
 
+    });
 });

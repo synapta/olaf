@@ -36,6 +36,9 @@ class Option {
                     // Replace https
                     this[key] = this[key].replace('https', 'http');
 
+                if(key === 'wikimediaCommons')
+                    this[key] = 'https://commons.wikimedia.org/wiki/Category:' + this[key].replace(' ', '_');
+
                 // Parse dates
                 else if(key === 'birthDate' || key === 'deathDate')
                     // Handle dates

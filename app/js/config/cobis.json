@@ -1,7 +1,7 @@
 {
   "limit" : null,
   "selection": "right",
-  "matching": "enrich",
+  "matching": "toggle",
   "fields": {
     "uri": {
       "input": "personURI",
@@ -98,7 +98,7 @@
       "wikidata": "wikidata",
       "viaf": null,
       "group": "Identificativi",
-      "limit": 1,
+      "limit": null,
       "label": "Wikidata",
       "select": true
     },
@@ -116,7 +116,7 @@
       "wikidata": "viafurl",
       "viaf": "viafid",
       "group": "Identificativi",
-      "limit": 1,
+      "limit": null,
       "label": "VIAF",
       "select": true
     },

@@ -32,7 +32,7 @@
             {{/deathDate}}
 
             {{#titles.length}}
-                <a href="{{uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesNumber}}) - Visualizza tutte</a>
+                <a href="{{uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titles.length}}) - Visualizza tutte</a>
                 <ul class="ui bulleted list card-box">
                     {{#titles}}
                     <li>
@@ -50,90 +50,6 @@
                     {{/roles}}
                 </div>
             {{/roles.length}}
-
-            <a class="ui blue ribbon label"> <i class="fas fa-info"></i> Altri campi</a>
-
-            {{#heading.length}}
-                <div class="ui items">
-                    <div class="ui accordion">
-                        <div class="title">
-                            <i class="dropdown icon"></i>
-                            Intestazioni
-                        </div>
-                        <div class="content">
-                            <ul class="ui bulleted list card-box">
-                                {{#heading}}
-                                <li>
-                                    <div class="item">{{.}}</div>
-                                </li>
-                                {{/heading}}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            {{/heading.length}}
-
-            {{#variant.length}}
-                <div class="ui items">
-                    <div class="ui accordion">
-                        <div class="title">
-                            <i class="dropdown icon"></i>
-                            Varianti
-                        </div>
-                        <div class="content">
-                            <ul class="ui bulleted list card-box">
-                                {{#variant}}
-                                <li>
-                                    <div class="item">{{.}}</div>
-                                </li>
-                                {{/variant}}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            {{/variant.length}}
-
-            {{#sources.length}}
-                <div class="ui items">
-                    <div class="ui accordion">
-                        <div class="title">
-                            <i class="dropdown icon"></i>
-                            Fonti archivistiche
-                        </div>
-                        <div class="content">
-                            <ul class="ui bulleted list card-box">
-                                {{#sources}}
-                                <li>
-                                    <div class="item">{{.}}</div>
-                                </li>
-                                {{/sources}}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            {{/sources.length}}
-
-            {{#links.length}}
-                <div class="ui items">
-                    <div class="ui accordion">
-                        <div class="title">
-                            <i class="dropdown icon"></i>
-                            Interlink esterni
-                        </div>
-                        <div class="content">
-                            <ul class="ui bulleted list card-box">
-                                {{#links}}
-                                <li>
-                                    <div class="item">
-                                        <a target="_blank" href="{{.}}">{{.}}</a>
-                                    </div>
-                                </li>
-                                {{/links}}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            {{/links.length}}
 
         </div>
 

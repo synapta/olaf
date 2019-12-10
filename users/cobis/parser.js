@@ -32,8 +32,10 @@ function parseAuthor(body){
     });
 
     // Normalize name
-    parsedBody['personName'] = parsedBody['personName'].replace(/\s*\<.*\>|\_/gmi, ' ');
-    parsedBody['personName'] = parsedBody['personName'].split(',').map(el => el.trim()).reverse().join(' ');
+    if('personName' in parsedBody) {
+        parsedBody['personName'] = parsedBody['personName'].replace(/\s*\<.*\>|\_/gmi, ' ');
+        parsedBody['personName'] = parsedBody['personName'].split(',').map(el => el.trim()).reverse().join(' ');
+    }
 
     return new Author(parsedBody, config);
 }

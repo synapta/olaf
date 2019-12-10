@@ -65,7 +65,7 @@ module.exports = function(app) {
     });
 
     // Frontend
-    app.get(['/get/:token/author/', '/get/:token/author/:authorId'], (request, response) => {
+    app.get(['/get/:token/author/', '/get/:token/authorityfile/', '/get/:token/author/:authorId', '/get/:token/authorityfile/:authorId'], (request, response) => {
         response.sendFile('author.html', {root: __dirname + '/app/views'});
     });
 
@@ -128,7 +128,7 @@ module.exports = function(app) {
 
     });
 
-    app.post('/api/v1/:token/author-matches/', (request, response) => {
+    app.post('/api/v1/:token/enrich-author/', (request, response) => {
 
         // Get requests
         let requests = queries.authorLink(request.body);
