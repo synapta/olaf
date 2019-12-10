@@ -27,7 +27,7 @@ function _loadAlternativeScripts(callback) {
 
     // Generate new <script> and populate it with user alternative scripts
     let s = document.createElement("script");
-    let fileUrl = `/js/author/rendering/${params.userToken}.js`;
+    let fileUrl = `/get/beweb/static/js/author/rendering/${params.userToken}.js`;
 
     if(_fileExists(fileUrl)){
         s.type = "text/javascript";
