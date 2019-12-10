@@ -1,6 +1,6 @@
 // Render navbar
 function renderNavbar() {
-    $.get('/get/beweb/static/views/template/author/navbar.html', (template) => {
+    $.get('/views/template/author/navbar.html', (template) => {
         $('.navbar').html(template).promise().done(showUserToken(params.userToken));
     })
 }
@@ -12,7 +12,7 @@ function showUserToken(userToken){
 
 // Render author card
 function renderAuthorCard(author){
-    $.get('/get/beweb/static/views/template/author/author-card.html', (template) => {
+    $.get('/views/template/author/author-card.html', (template) => {
 
         // Generate output
         let output = Mustache.render(template, author);
@@ -28,7 +28,7 @@ function renderAuthorCard(author){
 
 // Render author options
 function renderAuthorOptions(options){
-    $.get('/get/beweb/static/views/template/author/author-options.html', (template) => {
+    $.get('/views/template/author/author-options.html', (template) => {
         // Render output
         let output = Mustache.render(template, options);
         // Show output
@@ -71,14 +71,14 @@ function renderSelectedOptions(el, selected, length){
 }
 
 function renderAuthorMatchesContainer(author, token, selectedOptions, callback){
-    $.get('/get/beweb/static/views/template/author/matches.html', (template) => {
+    $.get('/views/template/author/matches.html', (template) => {
 
         // Generate container
         let output = Mustache.render(template, {'action': '/api/v1/' + token + '/author-matches/', 'authorUri': author.authorUri});
         $('#author-container').html(output);
 
         // Populate matches options
-        $.get('/get/beweb/static/views/template/author/matches-options.html', (template) => {
+        $.get('/views/template/author/matches-options.html', (template) => {
             output = Mustache.render(template, {'options': selectedOptions});
             $('#matches-options').html(output);
         });
@@ -102,7 +102,7 @@ function renderAuthorMatches(selectionInput){
     $('#send-button').html('<button onclick="authorSend()" id="send-author-matches" class="ui fluid primary button">Conferma assegnazione</button>');
     // Populate matches container
     if(emptyInput) {
-        $.get('/get/beweb/static/views/template/author/matches-selection-empty.html', (template) => {
+        $.get('/views/template/author/matches-selection-empty.html', (template) => {
             // Set button behavior
             $('#send-author-matches').removeClass('primary').addClass('disabled');
             // Set empty template
@@ -110,7 +110,7 @@ function renderAuthorMatches(selectionInput){
             $('#matches-selection').html(output);
         });
     } else {
-        $.get('/get/beweb/static/views/template/author/matches-selection.html', (template) => {
+        $.get('/views/template/author/matches-selection.html', (template) => {
 
             // Set button behavior
             $('#send-author-matches').addClass('primary').removeClass('disabled');

@@ -9,7 +9,7 @@ const fs             = require('fs');
 let queries          = null;
 let parser           = null;
 let config           = null;
-let Config           = require('./users/beweb/config').Config;
+let Config           = require('./config').Config;
 
 // Token validation
 function validateToken(token) {
