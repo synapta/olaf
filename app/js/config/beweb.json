@@ -221,7 +221,7 @@
       "select": true
     },
     "sbn": {
-      "input": "SBN",
+      "input": "Codice_SBN",
       "wikidata": "sbn",
       "viaf": "iccu",
       "group": "Identificativi",
