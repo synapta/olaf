@@ -112,6 +112,8 @@ class Option {
                 if (response.titles && response.titles.work) {
 
                     // Collect titles
+                    if (!Array.isArray(response.titles.work))
+                        response.titles.work = [response.titles.work]
                     this.titles = response.titles.work.map(el => el.title);
 
                     // If titles is not an array, convert titles as array
