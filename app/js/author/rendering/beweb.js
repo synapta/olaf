@@ -1,5 +1,5 @@
 function renderNavbar(selection=true, callback) {
-    $.get(/get/beweb/static'/views/template/beweb/navbar.html', (template) => {
+    $.get('/get/beweb/static/views/template/beweb/navbar.html', (template) => {
         $('.navbar').html(Mustache.render(template, {'selection': selection}))
                     .promise()
                     .done(() => {
