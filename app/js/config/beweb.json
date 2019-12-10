@@ -166,15 +166,6 @@
       "label": "Id Wikipedia",
       "select": false
     },
-    "wikimediaCommons": {
-      "input": "Commons",
-      "wikidata": "wikimediaCommons",
-      "viaf": null,
-      "group": "Identificativi",
-      "limit": 1,
-      "label": "Commons",
-      "select": true
-    },
     "wikidata": {
       "input": "Wikidata",
       "wikidata": "wikidata",
