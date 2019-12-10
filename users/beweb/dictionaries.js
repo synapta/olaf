@@ -185,7 +185,7 @@ prova = {
         "wikidata"  : 'viafurl',
         "viaf"      : 'viafid',
         "group"     : 'Identificativi',
-        "limit"     : null,
+        "limit"     : 1,
         "label"     : 'VIAF'
     },
     "sbn"               : {
@@ -193,7 +193,7 @@ prova = {
         "wikidata"  : 'sbn',
         "viaf"      : 'iccu',
         "group"     : 'Identificativi',
-        "limit"     : null,
+        "limit"     : 1,
         "label"     : 'SBN'
     },
     "suggested"         : {
