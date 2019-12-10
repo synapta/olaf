@@ -12,6 +12,20 @@ let params = parseUrl(window.location.href, {'userToken': 4, 'authorId': 6});
 let selectedOptions = {};
 let selectedFields = {};
 
+function _loadAlternativeScripts() {
+
+    // Generate new <script> and populate it with user alternative scripts
+    let s = document.createElement("script");
+    let fileUrl = `/get/beweb/static/js/author/rendering/${params.userToken}.js`;
+
+    $.get(fileUrl).done(function() {
+        s.type = "text/javascript";
+        s.src = fileUrl;
+        $("head").append(s);
+    });
+
+}
+
 function _getAllSelectableFields() {
     return Object.keys(config.fields).filter(el => config.fields[el].select && !config.fields[el].composite);
 }
@@ -256,6 +270,8 @@ function removeField(label, field){
 
 // Get author, render author card, options and author labels
 $(document).ready(() => {
+
+    //
 
     // Render navbar
     renderNavbar();
