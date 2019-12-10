@@ -288,7 +288,7 @@ function composeQueryVIAF(name, surname){
         method: 'GET',
         url: 'https://www.viaf.org/viaf/AutoSuggest',
         qs: {
-            query: name + " " + surname
+            query: (name + " " + surname).trim()
         },
         headers: {
             'cache-control': 'no-cache',

@@ -114,7 +114,7 @@ function updateLabelTicks() {
     // Iterate over each input to toggle check
     $('input').each((index, el) => {
 
-        let label = $(el).attr('data-field');
+        let label = $(el).closest('td').attr('id');
         let value = $(el).val();
 
         $('.field_selection[data-label="' + label + '"][data-value="' + value + '" i]')
