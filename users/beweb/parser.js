@@ -1,10 +1,7 @@
 // Requirements
-const nodeRequest    = require('request');
 const fuzz           = require('fuzzball');
-const dictionaries   = require('./dictionaries');
-const Option         = require('./option').Option;
-const Author         = require('./author').Author;
-const Config         = require('./config').Config;
+const Option         = require('../../option').Option;
+const Author         = require('../../author').Author;
 
 // Configuration
 let config           = null;
