@@ -1,5 +1,5 @@
 function renderNavbar(selection=true, callback) {
-    $.get('/views/template/beweb/navbar.html', (template) => {
+    $.get(/get/beweb/static'/views/template/beweb/navbar.html', (template) => {
         $('.navbar').html(Mustache.render(template, {'selection': selection}))
                     .promise()
                     .done(() => {
@@ -10,7 +10,7 @@ function renderNavbar(selection=true, callback) {
 }
 
 function renderAuthorCard(author){
-    $.get('/views/template/beweb/author-card.html', (template) => {
+    $.get('/get/beweb/static/views/template/beweb/author-card.html', (template) => {
 
         // Generate output
         let output = Mustache.render(template, author);
@@ -25,7 +25,7 @@ function renderAuthorCard(author){
 }
 
 function renderAuthorMatchesContainer(author, token, selectedOptions, callback) {
-    $.get('/views/template/beweb/matches.html', (template) => {
+    $.get('/get/beweb/static/views/template/beweb/matches.html', (template) => {
 
         let grouping = groupSelectionFields();
 
@@ -42,7 +42,7 @@ function renderAuthorMatchesContainer(author, token, selectedOptions, callback) 
         });
 
         // Append navbar header
-        $.get('/views/template/beweb/author-card-preview.html', (template) => {
+        $.get('/get/beweb/static/views/template/beweb/author-card-preview.html', (template) => {
 
             // Store candidates
             let candidates = {
@@ -82,7 +82,7 @@ function toggleAddButton(key) {
 }
 
 function renderAuthorMatches(){
-    $.get('/views/template/beweb/selection-input.html', (template) => {
+    $.get('/get/beweb/static/views/template/beweb/selection-input.html', (template) => {
         Object.keys(selectedFields).forEach((key) => {
 
             // Clear list
