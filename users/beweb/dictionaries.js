@@ -164,14 +164,14 @@ prova = {
         "limit"     : 1,
         "label"     : 'Id Wikipedia'
     },
-    "wikimediaCommons"  : {
-        "input"     : 'Commons',
-        "wikidata"  : 'wikimediaCommons',
-        "viaf"      : null,
-        "group"     : 'Identificativi',
-        "limit"     : 1,
-        "label"     : 'Commons'
-    },
+    // "wikimediaCommons"  : {
+    //     "input"     : 'Commons',
+    //     "wikidata"  : 'wikimediaCommons',
+    //     "viaf"      : null,
+    //     "group"     : 'Identificativi',
+    //     "limit"     : 1,
+    //     "label"     : 'Commons'
+    // },
     "treccani"          : {
         "input"     : null,
         "wikidata"  : 'treccani',
