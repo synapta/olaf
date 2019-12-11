@@ -99,7 +99,7 @@
       "viaf": null,
       "group": "Identificativi",
       "limit": null,
-      "label": "Wikidata",
+      "label": "URI Wikidata",
       "select": true
     },
     "treccani": {
@@ -117,7 +117,7 @@
       "viaf": "viafid",
       "group": "Identificativi",
       "limit": null,
-      "label": "VIAF",
+      "label": "Codice VIAF",
       "select": true
     },
     "sbn": {
@@ -126,7 +126,7 @@
       "viaf": "iccu",
       "group": "Identificativi",
       "limit": null,
-      "label": "SBN",
+      "label": "Codice SBN",
       "select": true
     }
   }

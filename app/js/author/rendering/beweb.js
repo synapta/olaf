@@ -83,6 +83,7 @@ function toggleAddButton(key) {
 
 function renderAuthorMatches(){
     $.get('/get/beweb/static/views/template/beweb/selection-input.html', (template) => {
+
         Object.keys(selectedFields).forEach((key) => {
 
             // Clear list
@@ -94,6 +95,7 @@ function renderAuthorMatches(){
                 fieldBox.find('.selection_list').append(Mustache.render(template, {'value': item, 'key': key}));
             });
 
+            // Activate or deactivate the add button
             toggleAddButton(key);
 
         });
@@ -123,13 +125,6 @@ function updateLabelTicks() {
             .addClass('fa-check');
 
     })
-
-}
-
-function fieldMatching(label, value){
-
-    // Update ticks rendering
-    updateLabelTicks();
 
 }
 

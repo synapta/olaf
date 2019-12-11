@@ -168,12 +168,7 @@ function groupSelectionFields(){
         groupedLabels[group].forEach((field) => {
 
             // Check if field is composite
-            let isFieldComposite = config.fields[field].composite;
             let dictionaryLabel = config.fields[field].label;
-
-            // Generate new dictionary label for composite fields
-            /*if(isFieldComposite)
-                dictionaryLabel = config.fields[field].label + ' ' + field.replace(field, '').toUpperCase();*/
 
             // Generate field object
             let fieldObject = {'label': field, 'dictionary': dictionaryLabel, 'values': []};
@@ -236,8 +231,6 @@ function matchField(label, value){
 
     });
 
-    // Handle button rendering
-    fieldMatching(label, value);
     // Render author matches
     renderAuthorMatches();
 

@@ -104,7 +104,7 @@ function renderAuthorMatches(){
             $('#send-author-matches').removeClass('primary').addClass('disabled');
             // Set empty template
             let output = Mustache.render(template);
-            $('#matches-selection').html(output);
+            $('#matches-selection').html(output).promise().done(updateLabelTicks());
 
         });
     } else {
@@ -121,7 +121,7 @@ function renderAuthorMatches(){
 
             // Set matches template
             let output = Mustache.render(template, selectionMap);
-            $('#matches-selection').html(output);
+            $('#matches-selection').html(output).promise().done(updateLabelTicks());
 
         })
     }
@@ -137,25 +137,15 @@ function updateLabelTicks() {
         .addClass('fa-plus');
 
     // Iterate over each input to toggle check
-    $('input').each((index, el) => {
-
-        let label = $(el).attr('data-field');
-        let value = $(el).val();
-
-        $('.field_selection[data-label="' + label + '"][data-value="' + value + '" i]')
-            .addClass('green')
-            .find('i')
-            .removeClass('fa-plus')
-            .addClass('fa-check');
-
-    })
-
-}
-
-function fieldMatching(label, value){
-
-    // Upate label ticks
-    updateLabelTicks()
+    Object.keys(selectedFields).forEach((field) => {
+        selectedFields[field].map((value) => {
+            $('.field_selection[data-field="' + field + '"][data-value="' + value + '" i]')
+                .addClass('green')
+                .find('i')
+                .removeClass('fa-plus')
+                .addClass('fa-check');
+        })
+    });
 
 }
 
