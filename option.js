@@ -99,10 +99,10 @@ class Option {
                 response = JSON.parse(response);
 
                 // Store birth and death dates
-                if (!this.birthDate)
+                if (!this.birthDate && response.birthDate && response.birthDate !== '0')
                     this.birthDate = response.birthDate;
 
-                if (!this.deathDate)
+                if (!this.deathDate && response.deathDate && response.deathDate !== '0')
                     this.deathDate = response.deathDate;
 
                 if (this.type === 'personal')
@@ -113,12 +113,16 @@ class Option {
 
                     // Collect titles
                     if (!Array.isArray(response.titles.work))
-                        response.titles.work = [response.titles.work]
-                    this.titles = response.titles.work.map(el => el.title);
+                        response.titles.work = [response.titles.work];
 
-                    // If titles is not an array, convert titles as array
-                    if (!Array.isArray(this.titles))
-                        this.titles = [this.titles];
+                    // Get titles from VIAF
+                    let titles = response.titles.work.map(el => el.title);
+
+                    // Check and handle previous titles existence
+                    if(Array.isArray(this.titles))
+                        titles = this.titles.concat(titles);
+
+                    this.titles = titles;
 
                 }
 
