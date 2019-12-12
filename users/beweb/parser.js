@@ -68,42 +68,6 @@ function parseViafOptions(body, viafUris) {
 
 }
 
-/*function getAuthorSimilarOptions(author, options, callback){
-
-    // Parse all options
-    options.forEach((option) => {
-        if(author.authorTitles) {
-
-            // Match author by titles
-            let optionTitles = [];
-            if (option.optionTitles) {
-                option.optionTitles.forEach((titles) => {
-                    optionTitles = optionTitles.concat(titles.titlesItem);
-                })
-            }
-
-            // Match with author titles
-            author.authorTitles.titlesItem.forEach((title) => {
-                if (optionTitles.length > 0) {
-                    // Threshold 0.8 match result
-                    let results = fuzz.extract(title, optionTitles, {scorer: fuzz.token_set_ratio, cutoff: 80});
-                    // Check similarity
-                    results.forEach((result) => {
-                        if (result.length > 0)
-                            // Set option as suggested
-                            option.optionSuggested = true;
-                    });
-                }
-            });
-        }
-    });
-
-    // Callback suggested options
-    callback(options);
-
-
-}*/
-
 // Exports
 exports.parseAuthor = (body) => {
     return parseAuthor(body);
