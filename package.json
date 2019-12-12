@@ -29,6 +29,7 @@
     "underscore": "^1.9.1",
     "http": "latest",
     "fuzzball": "latest",
-    "fs": "latest"
+    "fs": "latest",
+    "crypto-js": "latest"
   }
 }

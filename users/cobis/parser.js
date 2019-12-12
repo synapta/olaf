@@ -57,8 +57,14 @@ function parseAuthorOptions(author, bodies, callback) {
 
     // Enrich all options with VIAF and return them
     Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
-        options.map(el => el.getString());
+
+        // Parse titles in order to find suggested options
+        options.map(option => suggestOption(author, option));
+        // Set up option string identifier
+        options.map(option => option.getString());
+
         callback(options);
+
     });
 
 }
@@ -88,41 +94,23 @@ function parseViafOptions(body, viafUris) {
 
 }
 
-/*function getAuthorSimilarOptions(author, options, callback){
+function suggestOption(author, option){
 
     // Parse all options
-    options.forEach((option) => {
-        if(author.authorTitles) {
+    if(author.titles && option.titles) {
 
-            // Match author by titles
-            let optionTitles = [];
-            if (option.optionTitles) {
-                option.optionTitles.forEach((titles) => {
-                    optionTitles = optionTitles.concat(titles.titlesItem);
-                })
-            }
+        // Threshold 0.8 match result
+        let isSuggested = author.titles
+            .map(title => fuzz.extract(title, option.titles, {scorer: fuzz.token_set_ratio, cutoff: 80}))
+            .some(result => !!result.length);
 
-            // Match with author titles
-            author.authorTitles.titlesItem.forEach((title) => {
-                if (optionTitles.length > 0) {
-                    // Threshold 0.8 match result
-                    let results = fuzz.extract(title, optionTitles, {scorer: fuzz.token_set_ratio, cutoff: 80});
-                    // Check similarity
-                    results.forEach((result) => {
-                        if (result.length > 0)
-                            // Set option as suggested
-                            option.optionSuggested = true;
-                    });
-                }
-            });
-        }
-    });
+        if(isSuggested)
+            // Set option as suggested
+            option.setOptionsAsSuggested()
 
-    // Callback suggested options
-    callback(options);
+    }
 
-
-}*/
+}
 
 // Exports
 exports.parseAuthor = (body) => {

@@ -1,4 +1,4 @@
-const requests     = require('request-promise');
+const requests  = require('request-promise');
 
 /**
  * A class to model author options
@@ -36,6 +36,7 @@ class Option {
                     // Replace https
                     this[key] = this[key].replace('https', 'http');
 
+                // Parse Wikimedia commons identifier
                 if(key === 'wikimediaCommons')
                     this[key] = 'https://commons.wikimedia.org/wiki/Category:' + this[key].replace(' ', '_');
 
@@ -169,6 +170,10 @@ class Option {
 
     getString() {
         this.string = JSON.stringify(this);
+    }
+
+    setOptionsAsSuggested() {
+        this.suggested = true;
     }
 
 }
