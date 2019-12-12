@@ -58,6 +58,21 @@ class Author {
 
     }
 
+    _parseName() {
+
+        // Store raw name
+        this.rawName = this.name;
+
+        // Parse name
+        this.name = this.name
+            .replace(/\s*\<.*\>|\_/gmi, ' ')
+            .split(',')
+            .map(el => el.trim())
+            .reverse()
+            .join(' ');
+
+    }
+
     _parseBody() {
 
         // Author map
@@ -76,6 +91,9 @@ class Author {
                     else
                         this[key] = this.rawBody[map[key]].trim()
                 }
+
+                if(key === 'name')
+                    this._parseName()
 
             } else if(!this[key])
                 this[key] = null;

@@ -31,12 +31,6 @@ function parseAuthor(body){
 
     });
 
-    // Normalize name
-    if('personName' in parsedBody) {
-        parsedBody['personName'] = parsedBody['personName'].replace(/\s*\<.*\>|\_/gmi, ' ');
-        parsedBody['personName'] = parsedBody['personName'].split(',').map(el => el.trim()).reverse().join(' ');
-    }
-
     return new Author(parsedBody, config);
 }
 
