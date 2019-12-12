@@ -4,12 +4,14 @@ const bodyParser     = require('body-parser');
 const nodeRequest    = require('request');
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
+const Config         = require('./config').Config;
 
 // Modules
 let queries          = null;
 let parser           = null;
 let config           = null;
-let Config           = require('./config').Config;
+let configToken      = null;
+
 
 // Token validation
 function validateToken(token) {
@@ -43,8 +45,10 @@ module.exports = function(app) {
         if (validateToken(token)) {
 
             // Load user config
-            if(!config)
+            if(!config || token !== configToken) {
                 config = new Config(JSON.parse(fs.readFileSync(`./app/js/config/${token}.json`)));
+                configToken = token;
+            }
 
             // Load modules
             queries = require('./users/' + token + '/queries');

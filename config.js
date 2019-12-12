@@ -46,9 +46,6 @@ class Config {
 
                 });
 
-                // Remove composite field after folding
-                //delete this.config.fields[key];
-
             }
         })
 
@@ -61,10 +58,9 @@ class Config {
     getInputDictionary() {
 
         let inputDictionary = {};
-        let configFields = this.config.fields;
 
         // Map config fields to get dictionary
-        Object.keys(configFields).map(el => inputDictionary[el] = configFields[el].input);
+        Object.keys(this.config.fields).map(el => inputDictionary[el] = this.config.fields[el].input);
 
         return inputDictionary;
 
@@ -73,10 +69,9 @@ class Config {
     getWikidataDictionary() {
 
         let wikidataDictionary = {};
-        let configFields = this.config.fields;
 
         // Map config fields to get dictionary
-        Object.keys(configFields).map(el => wikidataDictionary[el] = configFields[el].wikidata);
+        Object.keys(this.config.fields).map(el => wikidataDictionary[el] = this.config.fields[el].wikidata);
 
         return wikidataDictionary;
 
@@ -85,13 +80,16 @@ class Config {
     getViafDictionary() {
 
         let viafDictionary = {};
-        let configFields = this.config.fields;
 
         // Map config fields to get dictionary
-        Object.keys(configFields).map(el => viafDictionary[el] = configFields[el].viaf);
+        Object.keys(this.config.fields).map(el => viafDictionary[el] = this.config.fields[el].viaf);
 
         return viafDictionary;
 
+    }
+
+    getToFormatFields() {
+        return Object.keys(this.config.fields).filter(el => this.config.fields[el].format)
     }
 
     isFieldComposite(field) {

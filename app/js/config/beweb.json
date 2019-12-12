@@ -64,7 +64,11 @@
       "group": "Bio",
       "limit": 1,
       "label": "Data di nascita/Data istituzione",
-      "select": true
+      "select": true,
+      "format": {
+        "in": "(\\d{4})-(\\d{2})-(\\d{2})",
+        "out": "$3/$2/$1"
+      }
     },
     "deathDate": {
       "input": "Data_di_morte_Data_soppressione",
@@ -73,7 +77,11 @@
       "group": "Bio",
       "limit": 1,
       "label": "Data di morte/Luogo soppressione",
-      "select": true
+      "select": true,
+      "format": {
+        "in": "(\\d{4})-(\\d{2})-(\\d{2})",
+        "out": "$3/$2/$1"
+      }
     },
     "birthPlace": {
       "input": "Luogo_di_nascita_Luogo_istituzione",

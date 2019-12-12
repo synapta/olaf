@@ -17,6 +17,9 @@ class Option {
         else if (type === 'viaf')
             this._parseViafBody();
 
+        // Format input data
+        this._formatFields();
+
     };
 
     async _parseWikidataBody() {
@@ -83,6 +86,22 @@ class Option {
 
     }
 
+    _formatFields() {
+
+        this.config.getToFormatFields().forEach((field) => {
+
+            // Get format from config
+            let inRe = RegExp(this.config.getConfig().fields[field].format.in, "gi");
+            let outRe = this.config.getConfig().fields[field].format.out;
+
+            // Replace current field with the formatted one
+            if(inRe.test(this[field]))
+                this[field] = this[field].replace(inRe, outRe);
+
+        })
+
+    }
+
     async enrichObjectWithViaf() {
 
         // Set up VIAF dictionary
@@ -145,6 +164,8 @@ class Option {
                 // Store option gender
                 if (!this.gender && response.fixed)
                     this.gender = viafDictionary[response.fixed];
+
+                this._formatFields();
 
             }).catch((err) => {
                 throw err;
