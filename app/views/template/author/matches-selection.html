@@ -1,10 +1,10 @@
 {{#selectedFields}}
     {{#values.length}}
-        <div class="ui raised segment">
+        <div class="ui raised segment selection-segment">
             <div class="ui bottom left attached label">{{label}}</div>
             <div>
                 {{#values}}
-                <div style="margin-bottom: 10px;" class="ui fluid input">
+                <div class="ui fluid input">
                     <input type="text" name="{{field}}" placeholder="{{label}}" value="{{.}}" />
                 </div>
                 {{/values}}

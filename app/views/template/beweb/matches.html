@@ -1,39 +1,3 @@
-<style>
-    .column {
-        border-bottom: 1px dashed #cdcdcd;
-    }
-    .label {
-        margin: 2.5px !important;
-        cursor: pointer;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        max-width: 100%;
-    }
-    h2 {
-        display: inline;
-    }
-    .label-wrapper{
-        display: inline;
-    }
-    .field_selection{
-        max-width: calc(100% - 30px);
-    }
-    .wrapper_link {
-        position: relative;
-        top: -10px;
-    }
-    tr {
-        transition: background-color 500ms;
-    }
-    tr .fa-check {
-        color: #21BA45;
-    }
-    #matches-form {
-        margin-top: 175px;
-    }
-</style>
-
 <form id="matches-form" action="{{action}}" type="" method="post">
 
     <div class="ui accordion">
@@ -57,7 +21,7 @@
 
                 <tbody>
                     {{#grouping.Nome}}
-                        <tr>
+                        <tr class="selection-row">
                             <td valign="top" id="{{label}}">
 
                                 <div style="margin-bottom: 10px;">
@@ -108,7 +72,7 @@
 
                 <tbody>
                     {{#grouping.Bio}}
-                        <tr>
+                        <tr class="selection-row">
                             <td valign="top" id="{{label}}">
 
                                 <div style="margin-bottom: 10px;">
@@ -159,7 +123,7 @@
 
                 <tbody>
                     {{#grouping.Identificativi}}
-                        <tr>
+                        <tr class="selection-row">
                             <td valign="top" id="{{label}}">
 
                                 <div style="margin-bottom: 10px;">
@@ -209,7 +173,7 @@
 
                 <tbody>
                 {{#grouping.Varianti}}
-                <tr>
+                <tr class="selection-row">
                     <td valign="top" id="{{label}}">
 
                         <div style="margin-bottom: 10px;">
