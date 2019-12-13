@@ -254,12 +254,10 @@ function authorOptions(name, surname){
 
 function authorLink(body) {
 
-    // Generate requests
-    let requests = [];
     // Parse query
     let hash = crypto.createHash('md5').update(SECRET_KEY + body.id + 'updEntita').digest("hex");
-    requests.push(composeQuery("id=" + body.id + "&mode=updEntita&check=" + hash + "&dati=" + encodeURIComponent(json.stringify(body))));
-    return requests;
+
+    return composeQuery("id=" + body.id + "&mode=updEntita&check=" + hash + "&dati=" + encodeURIComponent(JSON.stringify(body)));
 
 }
 

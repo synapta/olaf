@@ -147,6 +147,25 @@ module.exports = function(app) {
 
     });
 
+    app.post('/api/v1/:token/enrich-beweb-author', (request, response) => {
+
+        let data = request.body;
+
+        nodeRequest.post({
+            url: queries.authorLink(data),
+            body: data,
+            json: true
+        }, (err, res, body) => {
+
+            // Handle error
+            if(err) throw err;
+            // Send back Beweb response
+            response.json(body);
+
+        });
+
+    });
+
     app.post('/api/v1/:token/author-skip/', (request, response) => {
 
         // Compose query

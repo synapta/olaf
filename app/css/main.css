@@ -235,6 +235,13 @@ ul.card-box > li
     display: inline;
 }
 
+/* Messages */
+
+.message .fas {
+    font-size: 35px;
+    margin-right: 15px;
+}
+
 /* Footer */
 
 /* FOOTER */

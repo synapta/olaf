@@ -143,10 +143,35 @@ function deleteInput(el, label, value){
 
 }
 
+function showResultMessage(data, success=true) {
+    $.get('/get/beweb/static/views/template/beweb/result-message.html', (template) => {
+
+        // Parse output
+        let output = Mustache.render(template, {'success': success, 'data': data});
+
+        // Remove header and show result message
+        $('.navbar-fixed-column').find('.button').addClass('disabled');
+        $('#selection-header').remove();
+        $('.container').html(output);
+
+    });
+}
+
 function submitForm() {
 
     // Render confirmation box and then submit the form
-    if(confirm("Confermi di voler inviare i dati?"))
-        $('#matches-form').submit();
+    if(confirm("Confermi di voler inviare i dati?")){
+        $.ajax({
+            type: 'POST',
+            url: '/api/v1/' + params.userToken + '/enrich-beweb-author',
+            data: $('#matches-form').serialize(),
+            success: (data) => {
+                showResultMessage(data);
+            },
+            error: (data) => {
+                showResultMessage(data);
+            }
+        })
+    }
 
 }
