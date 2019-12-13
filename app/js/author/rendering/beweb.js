@@ -169,22 +169,3 @@ function showResultMessage(data, success=true) {
 
     });
 }
-
-function submitForm() {
-
-    // Render confirmation box and then submit the form
-    if(confirm("Confermi di voler inviare i dati?")){
-        $.ajax({
-            type: 'POST',
-            url: '/api/v1/' + params.userToken + '/enrich-beweb-author',
-            data: $('#matches-form').serialize(),
-            success: (data) => {
-                showResultMessage(data);
-            },
-            error: (data) => {
-                showResultMessage(data);
-            }
-        })
-    }
-
-}

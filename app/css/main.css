@@ -152,6 +152,11 @@ ul.card-box > li
     margin-bottom: 10px;
 }
 
+.add_match span {
+    position: relative;
+    top: -14px;
+}
+
 /* Matches selection */
 
 .fa-arrow-left, .fa-arrow-right, .fa-spinner
@@ -168,6 +173,10 @@ ul.card-box > li
 
 .selection-segment {
     margin-bottom: 10px;
+}
+
+.selection-segment input {
+    margin: 5px 0 !important;
 }
 
 /* Beweb selection */
@@ -225,10 +234,6 @@ ul.card-box > li
 
 .selection-row .fa-check {
     color: #21BA45;
-}
-
-#matches-form {
-    margin-top: 175px;
 }
 
 .title h2 {

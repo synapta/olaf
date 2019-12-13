@@ -25,15 +25,19 @@ function _fileExists(url) {
 
 function _loadAlternativeScripts(callback) {
 
-    // Generate new <script> and populate it with user alternative scripts
-    let s = document.createElement("script");
-    let fileUrl = `/get/beweb/static/js/author/rendering/${params.userToken}.js`;
+    [`/get/beweb/static/js/author/rendering/${params.userToken}.js`,
+        `/get/beweb/static/js/author/${params.userToken}.js`].forEach(url => {
 
-    if(_fileExists(fileUrl)){
-        s.type = "text/javascript";
-        s.src = fileUrl;
-        $("head").append(s);
-    }
+        // Generate new <script> and populate it with user alternative scripts
+        let s = document.createElement("script");
+
+        if(_fileExists(url)){
+            s.type = "text/javascript";
+            s.src = url;
+            $("head").append(s);
+        }
+
+    });
 
     callback();
 
@@ -275,6 +279,35 @@ function removeField(label, field){
 
 }
 
+function authorSkip(authorUri) {
+
+    // API call
+    $.ajax({
+        url: '/api/v1/' + params.userToken + '/author-skip/',
+        method: 'POST',
+        data: {'authorId': authorUri},
+        dataType: 'json',
+        success: response => {
+            if(response.status === 'success') {
+                // Store last action in session
+                sessionStorage.setItem("action", "skip");
+                // Reload page
+                location.href = '/get/' + params.userToken + '/author';
+            } else
+                alert("Errore");
+        }
+    });
+
+}
+
+function authorSend(){
+
+    // Store last action in session
+    sessionStorage.setItem("action", "match");
+    // Send form
+    document.getElementById('matches-form').submit();
+
+}
 
 // Get author, render author card, options and author labels
 $(document).ready(() => {

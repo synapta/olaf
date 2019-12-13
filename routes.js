@@ -136,6 +136,7 @@ module.exports = function(app) {
 
         // Get requests
         let requests = queries.authorLink(request.body);
+
         // Map requests to make Promise
         requests = requests.map(req => promiseRequest(req));
 
@@ -159,8 +160,10 @@ module.exports = function(app) {
 
             // Handle error
             if(err) throw err;
+
             // Send back Beweb response
-            response.json(body);
+            data.result = body;
+            response.json(data);
 
         });
 
@@ -172,12 +175,10 @@ module.exports = function(app) {
         let requests = queries.authorSkip(request.body);
 
         // Send requests
-        /*nodeRequest(requests, (err, res, body) => {
+        nodeRequest(requests, (err, res, body) => {
             // Send response
             response.json({'status': 'success'});
-        });*/
-
-        response.json({'skipped': true});
+        });
 
     });
 
