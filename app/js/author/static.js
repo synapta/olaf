@@ -212,6 +212,8 @@ function matchField(label, value){
         if (selectedFields[label].map(item => item.toLowerCase()).includes(value.toLowerCase())) {
             if(config.matching === 'toggle')
                 selectedFields[label] = selectedFields[label].filter(item => item.toLowerCase() !== value.toLowerCase());
+            else
+                sendFeedback(label, value);
         }else
             selectedFields[label].unshift(value);
     } else {

@@ -106,6 +106,19 @@ function renderAuthorMatches(){
     });
 }
 
+function sendFeedback(label, value) {
+
+    // Send green flash
+    $('.field_selection[data-label="' + label + '"][data-value="' + value + '" i]')
+        .closest('tr')
+        .toggleClass('positive').delay(500).promise().done(() => {
+        $('.field_selection[data-label="' + label + '"][data-value="' + value + '" i]')
+            .closest('tr')
+            .toggleClass('positive')
+    })
+
+}
+
 function updateLabelTicks() {
 
     $('.field_selection')
