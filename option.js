@@ -90,13 +90,26 @@ class Option {
 
         this.config.getToFormatFields().forEach((field) => {
 
-            // Get format from config
-            let inRe = RegExp(this.config.getConfig().fields[field].format.in, "gi");
+            let inRe = this.config.getConfig().fields[field].format.in;
             let outRe = this.config.getConfig().fields[field].format.out;
 
-            // Replace current field with the formatted one
-            if(inRe.test(this[field]))
-                this[field] = this[field].replace(inRe, outRe);
+            if(inRe && outRe) {
+
+                // Get format from config
+                inRe = RegExp(inRe, "gi");
+
+                // Replace current field with the formatted one
+                if (inRe.test(this[field]))
+                    this[field] = this[field].replace(inRe, outRe);
+
+            }
+
+            // Remove checking
+            if(this[field] && this.config.getConfig().fields[field].format.check) {
+                let checks = this.config.getConfig().fields[field].format.check;
+                if(!checks.some(check => RegExp(check, "gi").test(this[field])))
+                    delete this[field];
+            }
 
         })
 

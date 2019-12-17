@@ -66,8 +66,9 @@
       "label": "Data di nascita/Data istituzione",
       "select": true,
       "format": {
-        "in": "(\\d{4})-(\\d{2})-(\\d{2})",
-        "out": "$3/$2/$1"
+        "in": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        "out": "$3/$2/$1",
+        "check": ["^\\d{2}/\\d{2}/\\d{4}$", "^\\d{4}$"]
       }
     },
     "deathDate": {
@@ -79,8 +80,9 @@
       "label": "Data di morte/Luogo soppressione",
       "select": true,
       "format": {
-        "in": "(\\d{4})-(\\d{2})-(\\d{2})",
-        "out": "$3/$2/$1"
+        "in": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        "out": "$3/$2/$1",
+        "check": ["^\\d{2}/\\d{2}/\\d{4}$", "^\\d{4}$"]
       }
     },
     "birthPlace": {
@@ -90,7 +92,10 @@
       "group": "Bio",
       "limit": 1,
       "label": "Luogo di nascita/Luogo istituzione",
-      "select": true
+      "select": true,
+      "format": {
+        "check": ["^((?!t\\d+).)*$"]
+      }
     },
     "deathPlace": {
       "input": "Luogo_di_morte_Luogo_soppressione",
@@ -99,7 +104,10 @@
       "group": "Bio",
       "limit": 1,
       "label": "Luogo di morte/Data soppressione",
-      "select": true
+      "select": true,
+      "format": {
+        "check": ["^((?!t\\d+).)*$"]
+      }
     },
     "image": {
       "input": "Immagine",
