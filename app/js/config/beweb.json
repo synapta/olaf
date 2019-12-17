@@ -32,7 +32,7 @@
     },
     "roles": {
       "input": "Qualifica",
-      "wikidata": "positionHeld",
+      "wikidata": null,
       "viaf": null,
       "group": "Bio",
       "limit": null,
