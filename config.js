@@ -66,6 +66,17 @@ class Config {
 
     }
 
+    getOutputDectionary() {
+
+        let outputDictionary = {};
+
+        // Map config fields to get dictionary
+        Object.keys(this.config.fields).map(el => outputDictionary[this.config.fields[el].input] = el);
+
+        return outputDictionary;
+
+    }
+
     getWikidataDictionary() {
 
         let wikidataDictionary = {};

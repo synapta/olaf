@@ -2,8 +2,8 @@
     <i class="fas fa-{{#success}}check{{/success}}{{^success}}times{{/success}}"></i>
     <div class="content">
         <div class="header">
-            I dati dell'autore "{{data.name}}" {{^success}}non{{/success}} sono stati inviati {{#success}}correttamente{{/success}}
+            {{data.msg}}
         </div>
-        <p>Questa pagina si chiuderà automaticamente.</p>
+        <p>Codice di risposta: {{data.code}}</p>
     </div>
 </div>

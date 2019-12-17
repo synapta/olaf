@@ -8,7 +8,7 @@ function authorSend(){
     if(confirm("Confermi di voler inviare i dati?")){
         $.ajax({
             type: 'POST',
-            url: '/api/v1/' + params.userToken + '/enrich-beweb-author',
+            url: '/api/v1/' + params.userToken + '/enrich-beweb-author/' + author.uri,
             data: $('#matches-form').serialize(),
             success: (data) => {
                 showResultMessage(data);

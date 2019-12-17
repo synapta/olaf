@@ -10,7 +10,7 @@
       "group": null,
       "limit": 1,
       "label": "Id record",
-      "select": true
+      "select": false
     },
     "name": {
       "input": "Visualizzazione_su_BEWEB",
@@ -34,10 +34,10 @@
       "input": "Qualifica",
       "wikidata": "positionHeld",
       "viaf": null,
-      "group": null,
+      "group": "Bio",
       "limit": null,
       "label": "Qualifica",
-      "select": false
+      "select": true
     },
     "type": {
       "input": "Categoria",
@@ -136,7 +136,7 @@
       "limit": null,
       "label": "Varianti",
       "select": true,
-      "composite": ["und", "ita", "lat", "eng", "fra", "esp", "deu"]
+      "composite": ["un", "it", "la", "en", "fr", "es", "de"]
     },
     "sources": {
       "input": "Fonti_archivistiche_e_bibliografiche",
@@ -298,7 +298,7 @@
       "group": "Identificativi",
       "limit": null,
       "label": "Interlink esterni",
-      "select": true
+      "select": false
     }
   }
 }

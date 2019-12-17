@@ -14,7 +14,7 @@ let authorSelect = (authorId) => {
 
 let wikidataQuery = (name, surname) => {
 
-    return `PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    return encodeURIComponent(`PREFIX wdt: <http://www.wikidata.org/prop/direct/>
             PREFIX wd: <http://www.wikidata.org/entity/>
             
             SELECT (?i as ?wikidata) 
@@ -22,14 +22,14 @@ let wikidataQuery = (name, surname) => {
             (SAMPLE(?tipologia) as ?tipologia) 
             (SAMPLE(?num) as ?num) 
             (SAMPLE(?descrizione) as ?descrizione) 
-            (SAMPLE(?altLabelIT) as ?altLabelIta)
-            (SAMPLE(?altLabelEN) as ?altLabelEng)
-            (SAMPLE(?altLabelFR) as ?altLabelFra)
-            (SAMPLE(?altLabelES) as ?altLabelEsp)
-            (SAMPLE(?altLabelDE) as ?altLabelDeu)
-            (SAMPLE(?altLabelLA) as ?altLabelLat)
+            (SAMPLE(?altLabelIT) as ?altLabelIt)
+            (SAMPLE(?altLabelEN) as ?altLabelEn)
+            (SAMPLE(?altLabelFR) as ?altLabelFr)
+            (SAMPLE(?altLabelES) as ?altLabelEs)
+            (SAMPLE(?altLabelDE) as ?altLabelDe)
+            (SAMPLE(?altLabelLA) as ?altLabelLa)
             (SAMPLE(?bookLabel) as ?titles)
-            (SAMPLE(?positionHeld) as ?positionHeld)
+            (SAMPLE(DISTINCT ?positionHeld) as ?positionHeld)
             (SAMPLE(?gender) as ?gender)
             (SAMPLE(?birthDate) as ?birthDate) 
             (SAMPLE(?birthPlace) as ?birthPlace) 
@@ -56,7 +56,6 @@ let wikidataQuery = (name, surname) => {
               SERVICE wikibase:label {
                 bd:serviceParam wikibase:language "it,en,fr,es,ge" .
                 ?i rdfs:label ?nome .
-                ?positionHeldID rdfs:label ?positionHeld .
                 ?birthPlaceID rdfs:label ?birthPlace .
                 ?deathPlaceID rdfs:label ?deathPlace .
                 ?i skos:altLabel ?altLabel .
@@ -120,6 +119,10 @@ let wikidataQuery = (name, surname) => {
             
               OPTIONAL {
                 ?i wdt:P39 ?positionHeldID
+                SERVICE wikibase:label {
+                    bd:serviceParam wikibase:language "it" .
+                    ?positionHeldID rdfs:label ?positionHeld .
+                }
               }
             
               OPTIONAL {
@@ -194,7 +197,6 @@ let wikidataQuery = (name, surname) => {
               OPTIONAL {
                 ?i wdt:P1017 ?BAVraw
                 BIND(concat('https://viaf.org/viaf/sourceID/BAV|', STR(?BAVraw)) as ?BAV)
-                
               }
               
               OPTIONAL {
@@ -241,7 +243,7 @@ let wikidataQuery = (name, surname) => {
             
             }
             GROUP BY ?i
-            ORDER BY ASC(?num) LIMIT 20`.replace(/\s+|\r+|\t+/g, ' ');
+            ORDER BY ASC(?num) LIMIT 20`);
 };
 
 // Functions
@@ -255,9 +257,9 @@ function authorOptions(name, surname){
 function authorLink(body) {
 
     // Parse query
-    let hash = crypto.createHash('md5').update(SECRET_KEY + body.id + 'updEntita').digest("hex");
+    let hash = crypto.createHash('md5').update(SECRET_KEY + body.Idrecord + 'updEntita').digest("hex");
 
-    return composeQuery("id=" + body.id + "&mode=updEntita&check=" + hash + "&dati=" + encodeURIComponent(JSON.stringify(body)));
+    return composeQuery("id=" + body.Idrecord + "&mode=updEntita&check=" + hash + "&dati=" + encodeURIComponent(JSON.stringify(body)));
 
 }
 
@@ -284,17 +286,23 @@ function composeQueryWikidata(name, surname){
 
     // Compose query
     return {
-        method: 'GET',
+        method: 'POST',
         url: 'https://query.wikidata.org/sparql',
-        qs: {
-            query: wikidataQuery(name, surname)
-        },
+        body: 'query=' + wikidataQuery(name, surname),
         headers: {
-            'cache-control': 'no-cache',
-            Host: 'query.wikidata.org',
-            'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
-            Accept: 'application/sparql-results+json',
-            'user-agent': 'pippo',
+            'accept-language': 'it-IT,it;q=0.9',
+            'accept-encoding': 'deflate, br',
+            referer: 'https://query.wikidata.org/',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'user-agent': 'Pippo',
+            'x-requested-with': 'XMLHttpRequest',
+            origin: 'https://query.wikidata.org',
+            accept: 'application/sparql-results+json',
+            'Cache-Control': 'no-cache',
+            pragma: 'no-cache',
+            authority: 'query.wikidata.org'
         }
     }
 

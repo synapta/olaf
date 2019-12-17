@@ -148,22 +148,21 @@ module.exports = function(app) {
 
     });
 
-    app.post('/api/v1/:token/enrich-beweb-author', (request, response) => {
+    app.post('/api/v1/:token/enrich-beweb-author/:uri', (request, response) => {
 
-        let data = request.body;
+        let output = parser.parseOutput(request.body);
+        output['Idrecord'] = request.params.uri;
 
         nodeRequest.post({
-            url: queries.authorLink(data),
-            body: data,
-            json: true
+            url: queries.authorLink(output)
         }, (err, res, body) => {
 
             // Handle error
             if(err) throw err;
 
             // Send back Beweb response
-            data.result = body;
-            response.json(data);
+            //output.result = body;
+            response.json(JSON.parse(body));
 
         });
 
