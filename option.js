@@ -153,11 +153,11 @@ class Option {
                     if(!Array.isArray(response.occupation.data))
                         response.occupation.data = [response.occupation.data];
 
-                    this.roles = response.occupation.data.map(el => el.text);
+                    let roles = response.occupation.data.map(el => el.text);
 
                     // If titles is not an array, convert titles as array
-                    if (!Array.isArray(this.roles))
-                        this.titles = [this.roles];
+                    /*if (!Array.isArray(this.roles))
+                        this.roles = this.roles.concat(roles);*/
 
                 }
 
