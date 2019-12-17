@@ -159,6 +159,9 @@ function deleteInput(el, label, value){
 function showResultMessage(data, success=true) {
     $.get('/get/beweb/static/views/template/beweb/result-message.html', (template) => {
 
+        if(!success || data.code !== 0)
+            success = false;
+
         // Parse output
         let output = Mustache.render(template, {'success': success, 'data': data});
 
