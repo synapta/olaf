@@ -159,10 +159,10 @@
       "input": "Link",
       "wikidata": null,
       "viaf": null,
-      "group": null,
+      "group": "Identificativi",
       "limit": null,
       "label": "Link",
-      "select": false
+      "select": true
     },
     "wikipediaIt": {
       "input": "Wikipedia",

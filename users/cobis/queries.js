@@ -199,9 +199,9 @@ function authorLink(body) {
 
     // Get body params
     let authorUri = body.authorUri;
-    let optionWikidata = body.optionWikidata;
-    let optionViaf = body.optionViaf;
-    let optionSbn = body.optionSbn;
+    let optionWikidata = body.wikidata;
+    let optionViaf = body.viaf;
+    let optionSbn = body.sbn;
 
     // Single variables as arrays
     if(optionWikidata && !Array.isArray(optionWikidata))

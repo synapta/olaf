@@ -161,7 +161,6 @@ module.exports = function(app) {
             if(err) throw err;
 
             // Send back Beweb response
-            //output.result = body;
             response.json(JSON.parse(body));
 
         });

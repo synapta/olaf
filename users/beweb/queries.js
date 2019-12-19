@@ -14,7 +14,7 @@ let authorSelect = (authorId) => {
 
 let wikidataQuery = (name, surname) => {
 
-    return encodeURIComponent(`PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    return `PREFIX wdt: <http://www.wikidata.org/prop/direct/>
             PREFIX wd: <http://www.wikidata.org/entity/>
             
             SELECT (?i as ?wikidata) 
@@ -70,6 +70,7 @@ let wikidataQuery = (name, surname) => {
                 ?i wikibase:apiOutputItem mwapi:item .
                 ?num wikibase:apiOrdinal true .
               }
+              
               OPTIONAL {
                 SERVICE wikibase:label {
                 bd:serviceParam wikibase:language "it" .
@@ -90,6 +91,7 @@ let wikidataQuery = (name, surname) => {
                 ?i skos:altLabel ?altLabelFR.
                 }
               }
+              
               OPTIONAL {
                 SERVICE wikibase:label {
                 bd:serviceParam wikibase:language "es" .
@@ -165,12 +167,12 @@ let wikidataQuery = (name, surname) => {
             
               OPTIONAL {
                 ?i wdt:P214 ?viaf
-                      BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
+                BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
               }
             
               OPTIONAL {
                 ?i wdt:P396 ?sbnr
-                      BIND(REPLACE(REPLACE(STR(?sbnr), "\\\\\\\\", ""), "ITICCU", "") as ?sbn)
+                BIND(REPLACE(REPLACE(STR(?sbnr), "\\\\\\\\", ""), "ITICCU", "") as ?sbn)
               }
               
               OPTIONAL {
@@ -208,10 +210,12 @@ let wikidataQuery = (name, surname) => {
                 ?i wdt:P1047 ?Catholic_Hierraw
                 BIND(concat('http://www.catholic-hierarchy.org/bishop/b', STR(?Catholic_Hierraw), ".html") as ?Catholic_Hier)
               }
+              
               OPTIONAL {
                 ?i wdt:P213 ?isniraw
                 BIND(concat('http://www.isni.org/', STR(?isniraw)) as ?ISNI)
               }
+              
               MINUS{
                 ?i wdt:P31 wd:Q15632617
               }
@@ -225,11 +229,13 @@ let wikidataQuery = (name, surname) => {
                 ?class wdt:P279* wd:Q234460
                 VALUES ?class {wd:Q838948 wd:Q14204246 wd:Q4502142}
               }
+              
               MINUS{
                 ?i wdt:P31 ?class2.
                 ?class2 wdt:P279* ?uberC
                 VALUES ?uberC {wd:Q4502142 wd:Q3914}
               }
+              
               MINUS{
                 ?i wdt:P31 ?class3.
                 VALUES ?class3 {wd:Q17633526}
@@ -239,11 +245,12 @@ let wikidataQuery = (name, surname) => {
               OPTIONAL{
                 VALUES (?ty ?ti) {(wd:Q5 'Persona') (wd:Q8436 'Famiglia')}
               }
+              
               BIND(IF(!BOUND(?ti), 'Ente', ?ti) AS ?tipologia)
             
             }
             GROUP BY ?i
-            ORDER BY ASC(?num) LIMIT 20`);
+            ORDER BY ASC(?num) LIMIT 20`;
 };
 
 // Functions
@@ -288,7 +295,7 @@ function composeQueryWikidata(name, surname){
     return {
         method: 'POST',
         url: 'https://query.wikidata.org/sparql',
-        body: 'query=' + wikidataQuery(name, surname),
+        body: 'query=' + encodeURIComponent(wikidataQuery(name, surname)),
         headers: {
             'accept-language': 'it-IT,it;q=0.9',
             'accept-encoding': 'deflate, br',
