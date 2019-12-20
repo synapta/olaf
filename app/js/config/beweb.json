@@ -232,7 +232,7 @@
       "wikidata": "sbn",
       "viaf": "iccu",
       "group": "Identificativi",
-      "limit": null,
+      "limit": 1,
       "label": "SBN",
       "select": true
     },
