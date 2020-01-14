@@ -2,6 +2,7 @@
 const express        = require('express');
 const bodyParser     = require('body-parser');
 const nodeRequest    = require('request');
+const pgp = require('pg-promise')({});
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
 const Config         = require('./config').Config;
@@ -12,6 +13,16 @@ let parser           = null;
 let config           = null;
 let configToken      = null;
 
+
+const cn = {
+    host: 'localhost',
+    port: 5432,
+    database: 'beweb_olaf',
+    user: 'beweb_user',
+    password: 'eV8iekebeing0Zo'
+};
+
+const db = pgp(cn)
 
 // Token validation
 function validateToken(token) {
@@ -81,7 +92,7 @@ module.exports = function(app) {
 
         // Make request
         nodeRequest(queryAuthor, (err, res, body) => {
-
+            console.log(body)
             // Handle and send author
             let author = parser.parseAuthor(JSON.parse(body));
 
@@ -92,6 +103,7 @@ module.exports = function(app) {
 
             // Make options queries
             Promise.all(requests).then((bodies) => {
+                console.log(JSON.stringify(bodies,null,2));
                 // Parse result
                 parser.parseAuthorOptions(author, bodies.map(body => JSON.parse(body)), (options) => {
                     // Send back options and author response
@@ -153,7 +165,11 @@ module.exports = function(app) {
         let output = parser.parseOutput(request.body);
         output['Idrecord'] = request.params.uri;
 
-        nodeRequest.post({
+        // if wikidata is linked to a AFXD resource we save the query response in the database.
+        if (output['Wikidata'])
+            queries.storeWikidataInfo(db, output);
+
+        /*nodeRequest.post({
             url: queries.authorLink(output)
         }, (err, res, body) => {
 
@@ -161,10 +177,10 @@ module.exports = function(app) {
             if(err) throw err;
 
             // Send back Beweb response
-            response.json(JSON.parse(body));
+            //response.json(JSON.parse(body));
 
         });
-
+*/
     });
 
     app.post('/api/v1/:token/author-skip/', (request, response) => {

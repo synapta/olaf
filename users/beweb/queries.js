@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const nodeRequest    = require('request');
 
 const SECRET_KEY = 'edQ5ZtumF6iKAY3UvAXO';
 
@@ -12,8 +13,7 @@ let authorSelect = (authorId) => {
     return 'mode=getSource&id=' + authorId + '&check=' + hash;
 };
 
-let wikidataQuery = (name, surname) => {
-
+let wikidataQuery = (name, surname, wikidata) => {
     return `PREFIX wdt: <http://www.wikidata.org/prop/direct/>
             PREFIX wd: <http://www.wikidata.org/entity/>
             
@@ -61,16 +61,18 @@ let wikidataQuery = (name, surname) => {
                 ?i skos:altLabel ?altLabel .
                 ?i schema:description ?descrizione
               }
-            
-              SERVICE wikibase:mwapi {
+              
+              ${
+              (wikidata !== undefined ? `VALUES ?i {wd:${wikidata.split('/').pop()}}` :
+              `SERVICE wikibase:mwapi {
                 bd:serviceParam wikibase:api "EntitySearch" .
                 bd:serviceParam wikibase:endpoint "www.wikidata.org" .
                 bd:serviceParam mwapi:search "${name} ${surname}" .
                 bd:serviceParam mwapi:language "it" .
                 ?i wikibase:apiOutputItem mwapi:item .
                 ?num wikibase:apiOrdinal true .
+              }`)
               }
-              
               OPTIONAL {
                 SERVICE wikibase:label {
                 bd:serviceParam wikibase:language "it" .
@@ -289,13 +291,12 @@ function composeQuery(query) {
 
 }
 
-function composeQueryWikidata(name, surname){
-
+function composeQueryWikidata(name, surname, wikidata){
     // Compose query
     return {
         method: 'POST',
         url: 'https://query.wikidata.org/sparql',
-        body: 'query=' + encodeURIComponent(wikidataQuery(name, surname)),
+        body: 'query=' + encodeURIComponent(wikidataQuery(name, surname, wikidata)),
         headers: {
             'accept-language': 'it-IT,it;q=0.9',
             'accept-encoding': 'deflate, br',
@@ -333,6 +334,59 @@ function composeQueryVIAF(name, surname){
 
 }
 
+function pgStoreQuery(id_beweb, data) {
+    let argListParams = [];
+    let params = [];
+    let argListCols = [];
+    let columns = []
+    let i = 2;
+
+    Object.keys(data).forEach(key => {
+        argListCols.push('$' + i + "~");
+        columns.push(key.toLowerCase());
+        i++;
+    });
+
+    Object.keys(data).forEach(key => {
+        argListParams.push('$' + i);
+        params.push(data[key]);
+        i++;
+    });
+
+    return [`with del as (
+        delete
+        from
+            history h
+        where
+            id_beweb = $1)
+        insert
+            into
+            history (id_beweb, ${argListCols.join(',')} , data_inserimento)
+        values ($1, ${argListParams.join(',')} , now() )`, [id_beweb].concat(columns).concat(params) ]
+}
+
+function storeWikidataInfo(db, data) {
+    // Query a wikidata
+    nodeRequest( composeQueryWikidata(null,null, data.Wikidata), function (err, res, body) {
+
+        let results = JSON.parse(body).results.bindings;
+
+        let cleanObj = {};
+
+        Object.keys(results[0]).forEach(key => {
+            cleanObj[key] = results[0][key].value;
+        });
+        //salvo risposta su db. 
+        query = pgStoreQuery(data.Idrecord, cleanObj)
+        db.none(query[0], query[1]).then(()=> {
+            console.log("data inserted");
+        }).catch((err)=>{
+            console.log(err)
+        })
+    })
+}
+
+
 // Exports
 exports.authorSelect = (params) => {
     return composeQuery(authorSelect(params));
@@ -348,4 +402,8 @@ exports.authorSkip = (body) => {
 
 exports.authorLink = (body) => {
     return authorLink(body)
+};
+
+exports.storeWikidataInfo = (db, data) => {
+    return storeWikidataInfo(db, data)
 };
