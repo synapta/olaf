@@ -13,6 +13,14 @@ let authorSelect = (authorId) => {
     return 'mode=getSource&id=' + authorId + '&check=' + hash;
 };
 
+function flattenSparqlResponse(res) {
+    let cleanObj = {};
+    Object.keys(res).forEach(key => {
+        cleanObj[key] = res[key].value;
+    });
+    return cleanObj;
+}
+
 let wikidataQuery = (name, surname, wikidata) => {
     return `PREFIX wdt: <http://www.wikidata.org/prop/direct/>
             PREFIX wd: <http://www.wikidata.org/entity/>
@@ -353,16 +361,114 @@ function pgStoreQuery(id_beweb, data) {
         i++;
     });
 
-    return [`with del as (
-        delete
-        from
-            history h
-        where
-            id_beweb = $1)
-        insert
-            into
-            history (id_beweb, ${argListCols.join(',')} , data_inserimento)
-        values ($1, ${argListParams.join(',')} , now() )`, [id_beweb].concat(columns).concat(params) ]
+    return {
+      pgQuery: `with del as (
+          delete
+          from
+              history h
+          where
+              id_beweb = $1)
+          insert
+              into
+              history (id_beweb, ${argListCols.join(',')} , data_inserimento)
+          values ($1, ${argListParams.join(',')} , now() )`, 
+      params: [id_beweb].concat(columns).concat(params)
+    }
+}
+
+function pgGetRecordQuery () {
+    return `select * 
+      from 
+        history h
+      where id_beweb = $1
+    `;
+}
+
+function updateRecordInfoQuery () {
+    return `update history 
+      set
+        ha_modifiche = true,
+        numero_campi_modificati = $2,
+        data_primo_cambiamento = $3
+      where id_beweb = $1
+    `;
+}
+
+function listIDbewebRecordQuery () {
+    return `select 
+      id_beweb
+    from
+      history
+    `;
+}
+
+function getChangedRecordsQuery () {
+    return `select 
+      id_beweb,
+      wikidata,
+      data_inserimento,
+      numero_campi_modificati,
+      data_primo_cambiamento
+    from
+      history
+    where
+      ha_modifiche = true
+    `;
+}
+
+function getChangedRecords(db, cb) {
+    db.result(getChangedRecordsQuery()).then((data)=> {
+        console.log(data.rows);
+        cb(data.rows);
+    }).catch(err => {
+        console.error(err);
+    });
+}
+
+function getAllIdBeweb(db, cb) {
+    db.result(listIDbewebRecordQuery()).then((data)=> {
+        console.log(data.rows[0]);
+        cb(data.rows);
+    }).catch(err => {
+        console.error(err);
+    });
+}
+
+function checkWikidataModification (db, id_beweb, cb) {
+    // Query wikidata
+    db.one(pgGetRecordQuery(), [id_beweb]).then((data)=> {
+        
+        console.log(data);
+
+        nodeRequest( composeQueryWikidata(null,null, data.wikidata), function (err, res, body) {
+
+            let results = JSON.parse(body).results.bindings;
+    
+            let cleanObj = flattenSparqlResponse(results[0]);
+            console.log(cleanObj);
+            let diff = 0
+            Object.keys(cleanObj).forEach(key => {
+                if (cleanObj[key] !== data[key.toLowerCase()]) {
+                    console.log(cleanObj[key], data[key.toLowerCase()]);
+                    diff++;
+
+                }
+            });
+            if (diff > 0) {
+                db.none(updateRecordInfoQuery(), [id_beweb, diff,  data.data_primo_cambiamento !== null ? data.data_primo_cambiamento : (new Date ()) ]).then(()=> {
+                    cb();
+                    console.log("aggiornato campo " + id_beweb);
+                }).catch(err => {
+                    console.error(err);
+                });
+            } else {
+                console.log("nessuna modifica per " + id_beweb);
+                cb();
+            };
+        });
+    }).catch((err)=>{
+        console.error(err)
+    });
 }
 
 function storeWikidataInfo(db, data) {
@@ -371,18 +477,15 @@ function storeWikidataInfo(db, data) {
 
         let results = JSON.parse(body).results.bindings;
 
-        let cleanObj = {};
+        let cleanObj = flattenSparqlResponse(results[0]);
 
-        Object.keys(results[0]).forEach(key => {
-            cleanObj[key] = results[0][key].value;
-        });
         //salvo risposta su db. 
-        query = pgStoreQuery(data.Idrecord, cleanObj)
-        db.none(query[0], query[1]).then(()=> {
+        let { pgQuery, params } = pgStoreQuery(data.Idrecord, cleanObj)
+        db.none(pgQuery, params).then(()=> {
             console.log("data inserted");
         }).catch((err)=>{
             console.log(err)
-        })
+        });
     })
 }
 
@@ -406,4 +509,16 @@ exports.authorLink = (body) => {
 
 exports.storeWikidataInfo = (db, data) => {
     return storeWikidataInfo(db, data)
+};
+
+exports.checkWikidataModification = (db, id_beweb, cb) => {
+    return checkWikidataModification(db, id_beweb, cb)
+};
+
+exports.getAllIdBeweb = (db, cb) => {
+    return getAllIdBeweb(db, cb)
+};
+
+exports.getChangedRecords = (db, cb) => {
+    return getChangedRecords(db, cb)
 };

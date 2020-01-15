@@ -6,6 +6,8 @@ const pgp = require('pg-promise')({});
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
 const Config         = require('./config').Config;
+var schedule = require('node-schedule');
+
 
 // Modules
 let queries          = null;
@@ -23,6 +25,25 @@ const cn = {
 };
 
 const db = pgp(cn)
+
+XXqueries = require('./users/beweb/queries');
+
+schedule.scheduleJob('*/20 * * * *', function(firedate) {
+    console.log(firedate, "checking modification")
+    XXqueries.getAllIdBeweb(db, function(data) {
+        let parseAnother = function() {
+            if (data.length === 0 ) {
+                return;
+            }
+            let record = data.pop();
+            XXqueries.checkWikidataModification(db, record.id_beweb, function(data) {
+                setTimeout(function(){ parseAnother(); }, 10000); 
+            });
+        };
+        parseAnother();
+    })
+});
+
 
 // Token validation
 function validateToken(token) {
@@ -83,6 +104,13 @@ module.exports = function(app) {
     app.get(['/get/:token/author/', '/get/:token/authorityfile/', '/get/:token/author/:authorId', '/get/:token/authorityfile/:authorId'], (request, response) => {
         response.sendFile('author.html', {root: __dirname + '/app/views'});
     });
+
+    app.get(['/get/:token/author-list/'], (request, response) => {
+        if (request.params.token === 'beweb') {
+            response.sendFile('author-list.html', {root: __dirname + '/app/views'});
+        }
+    });
+
 
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
@@ -169,7 +197,7 @@ module.exports = function(app) {
         if (output['Wikidata'])
             queries.storeWikidataInfo(db, output);
 
-        /*nodeRequest.post({
+        nodeRequest.post({
             url: queries.authorLink(output)
         }, (err, res, body) => {
 
@@ -180,7 +208,7 @@ module.exports = function(app) {
             //response.json(JSON.parse(body));
 
         });
-*/
+
     });
 
     app.post('/api/v1/:token/author-skip/', (request, response) => {
@@ -196,4 +224,12 @@ module.exports = function(app) {
 
     });
 
+
+    app.get('/api/v1/:token/author-list/', (request, response) => {
+        // Send requests
+        queries.getChangedRecords(db, (data) => {
+            // Send response
+            response.json(data);
+        });
+    });
 };
