@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const nodeRequest    = require('request');
 
 const SECRET_KEY = 'edQ5ZtumF6iKAY3UvAXO';
 
@@ -12,8 +13,15 @@ let authorSelect = (authorId) => {
     return 'mode=getSource&id=' + authorId + '&check=' + hash;
 };
 
-let wikidataQuery = (name, surname) => {
+function flattenSparqlResponse(res) {
+    let cleanObj = {};
+    Object.keys(res).forEach(key => {
+        cleanObj[key] = res[key].value;
+    });
+    return cleanObj;
+}
 
+let wikidataQuery = (name, surname, wikidata) => {
     return `PREFIX wdt: <http://www.wikidata.org/prop/direct/>
             PREFIX wd: <http://www.wikidata.org/entity/>
             
@@ -61,16 +69,18 @@ let wikidataQuery = (name, surname) => {
                 ?i skos:altLabel ?altLabel .
                 ?i schema:description ?descrizione
               }
-            
-              SERVICE wikibase:mwapi {
+              
+              ${
+              (wikidata !== undefined ? `VALUES ?i {wd:${wikidata.split('/').pop()}}` :
+              `SERVICE wikibase:mwapi {
                 bd:serviceParam wikibase:api "EntitySearch" .
                 bd:serviceParam wikibase:endpoint "www.wikidata.org" .
                 bd:serviceParam mwapi:search "${name} ${surname}" .
                 bd:serviceParam mwapi:language "it" .
                 ?i wikibase:apiOutputItem mwapi:item .
                 ?num wikibase:apiOrdinal true .
+              }`)
               }
-              
               OPTIONAL {
                 SERVICE wikibase:label {
                 bd:serviceParam wikibase:language "it" .
@@ -133,12 +143,20 @@ let wikidataQuery = (name, surname) => {
               }
             
               OPTIONAL {
-                ?i wdt:P569 ?birthDate .
+                ?i p:P569 ?birthDateStatement .
+                ?birthDateStatement psv:P569/wikibase:timeValue ?birthDateValue .
+                ?birthDateStatement psv:P569/wikibase:timePrecision ?birthDatePrecision .
+                BIND(IF(?birthDatePrecision < 11, STRBEFORE(STR(?birthDateValue), "-") , ?birthDateValue ) as ?birthDate)
+                
                 ?i wdt:P19 ?birthPlaceID .
               }
             
               OPTIONAL {
-                ?i wdt:P570 ?deathDate .
+                ?i p:P570 ?deathDateStatement .
+                ?deathDateStatement psv:P570/wikibase:timeValue ?deathDateValue .
+                ?deathDateStatement psv:P570/wikibase:timePrecision ?deathDatePrecision .
+                BIND(IF(?deathDatePrecision < 11, STRBEFORE(STR(?deathDateValue), "-") , ?deathDateValue ) as ?deathDate)
+
                 ?i wdt:P20 ?deathPlaceID .
               }
             
@@ -289,13 +307,12 @@ function composeQuery(query) {
 
 }
 
-function composeQueryWikidata(name, surname){
-
+function composeQueryWikidata(name, surname, wikidata){
     // Compose query
     return {
         method: 'POST',
         url: 'https://query.wikidata.org/sparql',
-        body: 'query=' + encodeURIComponent(wikidataQuery(name, surname)),
+        body: 'query=' + encodeURIComponent(wikidataQuery(name, surname, wikidata)),
         headers: {
             'accept-language': 'it-IT,it;q=0.9',
             'accept-encoding': 'deflate, br',
@@ -333,6 +350,154 @@ function composeQueryVIAF(name, surname){
 
 }
 
+function pgStoreQuery(id_beweb, data) {
+    let argListParams = [];
+    let params = [];
+    let argListCols = [];
+    let columns = []
+    let i = 2;
+
+    Object.keys(data).forEach(key => {
+        argListCols.push('$' + i + "~");
+        columns.push(key.toLowerCase());
+        i++;
+    });
+
+    Object.keys(data).forEach(key => {
+        argListParams.push('$' + i);
+        params.push(data[key]);
+        i++;
+    });
+
+    return {
+      pgQuery: `with del as (
+          delete
+          from
+              history h
+          where
+              id_beweb = $1)
+          insert
+              into
+              history (id_beweb, ${argListCols.join(',')} , data_inserimento)
+          values ($1, ${argListParams.join(',')} , now() )`, 
+      params: [id_beweb].concat(columns).concat(params)
+    }
+}
+
+function pgGetRecordQuery () {
+    return `select * 
+      from 
+        history h
+      where id_beweb = $1
+    `;
+}
+
+function updateRecordInfoQuery () {
+    return `update history 
+      set
+        ha_modifiche = true,
+        numero_campi_modificati = $2,
+        data_primo_cambiamento = $3
+      where id_beweb = $1
+    `;
+}
+
+function listIDbewebRecordQuery () {
+    return `select 
+      id_beweb
+    from
+      history
+    `;
+}
+
+function getChangedRecordsQuery () {
+    return `select 
+      id_beweb,
+      wikidata,
+      data_inserimento,
+      numero_campi_modificati,
+      data_primo_cambiamento
+    from
+      history
+    where
+      ha_modifiche = true
+    `;
+}
+
+function getChangedRecords(db, cb) {
+    db.result(getChangedRecordsQuery()).then((data)=> {
+        console.log(data.rows);
+        cb(data.rows);
+    }).catch(err => {
+        console.error(err);
+    });
+}
+
+function getAllIdBeweb(db, cb) {
+    db.result(listIDbewebRecordQuery()).then((data)=> {
+        console.log(data.rows[0]);
+        cb(data.rows);
+    }).catch(err => {
+        console.error(err);
+    });
+}
+
+function checkWikidataModification (db, id_beweb, cb) {
+    // Query wikidata
+    db.one(pgGetRecordQuery(), [id_beweb]).then((data)=> {
+        
+        console.log(data);
+
+        nodeRequest( composeQueryWikidata(null,null, data.wikidata), function (err, res, body) {
+
+            let results = JSON.parse(body).results.bindings;
+    
+            let cleanObj = flattenSparqlResponse(results[0]);
+            console.log(cleanObj);
+            let diff = 0
+            Object.keys(cleanObj).forEach(key => {
+                if (cleanObj[key] !== data[key.toLowerCase()]) {
+                    console.log(cleanObj[key], data[key.toLowerCase()]);
+                    diff++;
+
+                }
+            });
+            if (diff > 0) {
+                db.none(updateRecordInfoQuery(), [id_beweb, diff,  data.data_primo_cambiamento !== null ? data.data_primo_cambiamento : (new Date ()) ]).then(()=> {
+                    cb();
+                    console.log("aggiornato campo " + id_beweb);
+                }).catch(err => {
+                    console.error(err);
+                });
+            } else {
+                console.log("nessuna modifica per " + id_beweb);
+                cb();
+            };
+        });
+    }).catch((err)=>{
+        console.error(err)
+    });
+}
+
+function storeWikidataInfo(db, data) {
+    // Query a wikidata
+    nodeRequest( composeQueryWikidata(null,null, data.Wikidata), function (err, res, body) {
+
+        let results = JSON.parse(body).results.bindings;
+
+        let cleanObj = flattenSparqlResponse(results[0]);
+
+        //salvo risposta su db. 
+        let { pgQuery, params } = pgStoreQuery(data.Idrecord, cleanObj)
+        db.none(pgQuery, params).then(()=> {
+            console.log("data inserted");
+        }).catch((err)=>{
+            console.log(err)
+        });
+    })
+}
+
+
 // Exports
 exports.authorSelect = (params) => {
     return composeQuery(authorSelect(params));
@@ -348,4 +513,20 @@ exports.authorSkip = (body) => {
 
 exports.authorLink = (body) => {
     return authorLink(body)
+};
+
+exports.storeWikidataInfo = (db, data) => {
+    return storeWikidataInfo(db, data)
+};
+
+exports.checkWikidataModification = (db, id_beweb, cb) => {
+    return checkWikidataModification(db, id_beweb, cb)
+};
+
+exports.getAllIdBeweb = (db, cb) => {
+    return getAllIdBeweb(db, cb)
+};
+
+exports.getChangedRecords = (db, cb) => {
+    return getChangedRecords(db, cb)
 };

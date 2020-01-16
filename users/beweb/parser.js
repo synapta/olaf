@@ -1,5 +1,4 @@
 // Requirements
-const fuzz           = require('fuzzball');
 const Option         = require('../../option').Option;
 const Author         = require('../../author').Author;
 

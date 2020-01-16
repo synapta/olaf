@@ -18,18 +18,20 @@
   },
   "homepage": "https://github.com/synapta/olaf2#readme",
   "dependencies": {
+    "crypto-js": "latest",
     "express": "^4.16.4",
+    "fs": "latest",
+    "fuzzball": "latest",
+    "http": "latest",
     "jquery": "^3.4.1",
     "morgan": "^1.9.1",
+    "node-schedule": "^1.3.2",
+    "pg-promise": "^10.3.5",
     "request": "^2.88.0",
     "request-promise": "latest",
     "require": "^2.4.20",
     "semantic-ui-grid": "^2.4.1",
     "sugar": "latest",
-    "underscore": "^1.9.1",
-    "http": "latest",
-    "fuzzball": "latest",
-    "fs": "latest",
-    "crypto-js": "latest"
+    "underscore": "^1.9.1"
   }
 }
