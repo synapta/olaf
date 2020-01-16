@@ -146,8 +146,10 @@ let wikidataQuery = (name, surname, wikidata) => {
                 ?i p:P569 ?birthDateStatement .
                 ?birthDateStatement psv:P569/wikibase:timeValue ?birthDateValue .
                 ?birthDateStatement psv:P569/wikibase:timePrecision ?birthDatePrecision .
-                BIND(IF(?birthDatePrecision < 11, STRBEFORE(STR(?birthDateValue), "-") , ?birthDateValue ) as ?birthDate)
-                
+                OPTIONAL {?birthDateStatement pq:P1480 ?birthCirc.}
+                BIND(IF(?birthDatePrecision < 11 || BOUND(?birthCirc), STRBEFORE(STR(?birthDateValue), "-"), ?birthDateValue ) as ?birthDate)
+
+
                 ?i wdt:P19 ?birthPlaceID .
               }
             
@@ -155,7 +157,8 @@ let wikidataQuery = (name, surname, wikidata) => {
                 ?i p:P570 ?deathDateStatement .
                 ?deathDateStatement psv:P570/wikibase:timeValue ?deathDateValue .
                 ?deathDateStatement psv:P570/wikibase:timePrecision ?deathDatePrecision .
-                BIND(IF(?deathDatePrecision < 11, STRBEFORE(STR(?deathDateValue), "-") , ?deathDateValue ) as ?deathDate)
+                OPTIONAL {?deathDateStatement pq:P1480 ?deathCirc.}
+                BIND(IF(?deathDatePrecision < 11  || BOUND(?deatchCirc), STRBEFORE(STR(?deathDateValue), "-") , ?deathDateValue ) as ?deathDate)
 
                 ?i wdt:P20 ?deathPlaceID .
               }

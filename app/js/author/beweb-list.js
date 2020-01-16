@@ -3,8 +3,8 @@ let params = parseUrl(window.location.href, {'userToken': 4, 'authorId': 6});
 
 template = `
 <tr>
-    <td><a href="/get/beweb/author/{{id_beweb}}">{{id_beweb}}</td>
-    <td>{{wikidata}}</td>
+    <td><a target="_blank" href="/get/beweb/author/{{id_beweb}}">{{id_beweb}}</a></td>
+    <td><a target="_blank" href="{{{wikidata}}}">{{wikidata}}</a></td>
     <td>{{data_inserimento}}</td>
     <td>{{numero_campi_modificati}}</td>
     <td>{{data_primo_cambiamento}}</td>
