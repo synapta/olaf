@@ -143,12 +143,20 @@ let wikidataQuery = (name, surname, wikidata) => {
               }
             
               OPTIONAL {
-                ?i wdt:P569 ?birthDate .
+                ?i p:P569 ?birthDateStatement .
+                ?birthDateStatement psv:P569/wikibase:timeValue ?birthDateValue .
+                ?birthDateStatement psv:P569/wikibase:timePrecision ?birthDatePrecision .
+                BIND(IF(?birthDatePrecision < 11, STRBEFORE(STR(?birthDateValue), "-") , ?birthDateValue ) as ?birthDate)
+                
                 ?i wdt:P19 ?birthPlaceID .
               }
             
               OPTIONAL {
-                ?i wdt:P570 ?deathDate .
+                ?i p:P570 ?deathDateStatement .
+                ?deathDateStatement psv:P570/wikibase:timeValue ?deathDateValue .
+                ?deathDateStatement psv:P570/wikibase:timePrecision ?deathDatePrecision .
+                BIND(IF(?deathDatePrecision < 11, STRBEFORE(STR(?deathDateValue), "-") , ?deathDateValue ) as ?deathDate)
+
                 ?i wdt:P20 ?deathPlaceID .
               }
             
