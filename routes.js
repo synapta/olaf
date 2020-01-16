@@ -120,7 +120,6 @@ module.exports = function(app) {
 
         // Make request
         nodeRequest(queryAuthor, (err, res, body) => {
-            console.log(body)
             // Handle and send author
             let author = parser.parseAuthor(JSON.parse(body));
 
@@ -131,7 +130,6 @@ module.exports = function(app) {
 
             // Make options queries
             Promise.all(requests).then((bodies) => {
-                console.log(JSON.stringify(bodies,null,2));
                 // Parse result
                 parser.parseAuthorOptions(author, bodies.map(body => JSON.parse(body)), (options) => {
                     // Send back options and author response
@@ -205,7 +203,7 @@ module.exports = function(app) {
             if(err) throw err;
 
             // Send back Beweb response
-            //response.json(JSON.parse(body));
+            response.json(JSON.parse(body));
 
         });
 
