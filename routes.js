@@ -26,17 +26,17 @@ const cn = {
 
 const db = pgp(cn)
 
-XXqueries = require('./users/beweb/queries');
+bewebQueries = require('./users/beweb/queries');
 
-schedule.scheduleJob('*/20 * * * *', function(firedate) {
-    console.log(firedate, "checking modification")
-    XXqueries.getAllIdBeweb(db, function(data) {
+schedule.scheduleJob('21 */4 * * *', function(firedate) {
+    console.log(firedate, "checking modifications")
+    bewebQueries.getAllIdBeweb(db, function(data) {
         let parseAnother = function() {
             if (data.length === 0 ) {
                 return;
             }
             let record = data.pop();
-            XXqueries.checkWikidataModification(db, record.id_beweb, function(data) {
+            bewebQueries.checkWikidataModification(db, record.id_beweb, function(data) {
                 setTimeout(function(){ parseAnother(); }, 10000); 
             });
         };
@@ -192,8 +192,9 @@ module.exports = function(app) {
         output['Idrecord'] = request.params.uri;
 
         // if wikidata is linked to a AFXD resource we save the query response in the database.
-        if (output['Wikidata'])
+        if (output['Wikidata']) {
             queries.storeWikidataInfo(db, output);
+        }
 
         nodeRequest.post({
             url: queries.authorLink(output)

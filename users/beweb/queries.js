@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const nodeRequest    = require('request');
+const bewebConfig    = require('../../app/js/config/beweb.json');
 
 const SECRET_KEY = 'edQ5ZtumF6iKAY3UvAXO';
 
@@ -335,6 +336,16 @@ function composeQueryWikidata(name, surname, wikidata){
 
 }
 
+function wikidata2bewebLabel (label) {
+    let prettyLabel;
+    Object.keys(bewebConfig.fields).forEach(key => {
+        if (bewebConfig.fields[key].wikidata === label) {
+            prettyLabel = bewebConfig.fields[key].label;
+        }
+    });
+    return prettyLabel;
+}
+
 function composeQueryVIAF(name, surname){
 
     // Compose query
@@ -353,12 +364,12 @@ function composeQueryVIAF(name, surname){
 
 }
 
-function pgStoreQuery(id_beweb, data) {
+function pgStoreQuery(id_beweb, nome, data) {
     let argListParams = [];
     let params = [];
     let argListCols = [];
     let columns = []
-    let i = 2;
+    let i = 3;
 
     Object.keys(data).forEach(key => {
         argListCols.push('$' + i + "~");
@@ -373,18 +384,21 @@ function pgStoreQuery(id_beweb, data) {
     });
 
     return {
-      pgQuery: `with del as (
-          delete
-          from
-              history h
-          where
-              id_beweb = $1)
+      pgQuery: `
           insert
               into
-              history (id_beweb, ${argListCols.join(',')} , data_inserimento)
-          values ($1, ${argListParams.join(',')} , now() )`, 
-      params: [id_beweb].concat(columns).concat(params)
+              history (id_beweb, nome_visualizzazione, ${argListCols.join(',')} , data_inserimento)
+          values ($1, $2, ${argListParams.join(',')} , now() )`, 
+      params: [id_beweb, nome].concat(columns).concat(params)
     }
+}
+
+function deleteRecordQuery () {
+    return `delete
+      from
+          history h
+      where
+          id_beweb = $1;`;
 }
 
 function pgGetRecordQuery () {
@@ -400,7 +414,8 @@ function updateRecordInfoQuery () {
       set
         ha_modifiche = true,
         numero_campi_modificati = $2,
-        data_primo_cambiamento = $3
+        data_primo_cambiamento = $3,
+        differenze = $4
       where id_beweb = $1
     `;
 }
@@ -414,12 +429,14 @@ function listIDbewebRecordQuery () {
 }
 
 function getChangedRecordsQuery () {
-    return `select 
+    return `select
       id_beweb,
+      nome_visualizzazione,
       wikidata,
       data_inserimento,
       numero_campi_modificati,
-      data_primo_cambiamento
+      data_primo_cambiamento,
+      differenze
     from
       history
     where
@@ -429,7 +446,6 @@ function getChangedRecordsQuery () {
 
 function getChangedRecords(db, cb) {
     db.result(getChangedRecordsQuery()).then((data)=> {
-        console.log(data.rows);
         cb(data.rows);
     }).catch(err => {
         console.error(err);
@@ -438,7 +454,6 @@ function getChangedRecords(db, cb) {
 
 function getAllIdBeweb(db, cb) {
     db.result(listIDbewebRecordQuery()).then((data)=> {
-        console.log(data.rows[0]);
         cb(data.rows);
     }).catch(err => {
         console.error(err);
@@ -449,24 +464,32 @@ function checkWikidataModification (db, id_beweb, cb) {
     // Query wikidata
     db.one(pgGetRecordQuery(), [id_beweb]).then((data)=> {
         
-        console.log(data);
-
         nodeRequest( composeQueryWikidata(null,null, data.wikidata), function (err, res, body) {
 
             let results = JSON.parse(body).results.bindings;
     
             let cleanObj = flattenSparqlResponse(results[0]);
-            console.log(cleanObj);
+            delete cleanObj.descrizione;
             let diff = 0
+            let differenzeObj = [];
+
             Object.keys(cleanObj).forEach(key => {
                 if (cleanObj[key] !== data[key.toLowerCase()]) {
-                    console.log(cleanObj[key], data[key.toLowerCase()]);
                     diff++;
-
+                    differenzeObj.push({ 
+                        nome: wikidata2bewebLabel(key),
+                        originale: data[key.toLowerCase()],
+                        modificato: cleanObj[key]
+                    });
                 }
             });
             if (diff > 0) {
-                db.none(updateRecordInfoQuery(), [id_beweb, diff,  data.data_primo_cambiamento !== null ? data.data_primo_cambiamento : (new Date ()) ]).then(()=> {
+                db.none(updateRecordInfoQuery(), [
+                  id_beweb,
+                  diff,
+                  data.data_primo_cambiamento !== null ? data.data_primo_cambiamento : (new Date ()),
+                  JSON.stringify(differenzeObj)
+                ]).then(()=> {
                     cb();
                     console.log("aggiornato campo " + id_beweb);
                 }).catch(err => {
@@ -489,13 +512,16 @@ function storeWikidataInfo(db, data) {
         let results = JSON.parse(body).results.bindings;
 
         let cleanObj = flattenSparqlResponse(results[0]);
+        delete cleanObj.descrizione;
 
         //salvo risposta su db. 
-        let { pgQuery, params } = pgStoreQuery(data.Idrecord, cleanObj)
-        db.none(pgQuery, params).then(()=> {
-            console.log("data inserted");
-        }).catch((err)=>{
-            console.log(err)
+        let { pgQuery, params } = pgStoreQuery(data.Idrecord, data.Visualizzazione_su_BEWEB, cleanObj)
+        db.none(deleteRecordQuery(), [data.Idrecord]).then(()=> {
+            db.none(pgQuery, params).then(()=> {
+                console.log("data inserted");
+            }).catch((err)=>{
+                console.error(err)
+            });
         });
     })
 }
