@@ -218,7 +218,6 @@ module.exports = function(app) {
     app.post('/api/v1/:token/add-author-again', (request, response) => {
         // Send requests
         let data = request.body;
-        console.log (data)
         queries.storeWikidataInfo(db, data, () => {
             // Send response
             response.status(200).json({"done":true});

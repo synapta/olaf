@@ -312,7 +312,6 @@ function composeQuery(query) {
 }
 
 function composeQueryWikidata(name, surname, wikidata){
-    console.log(name, surname, wikidata)
     // Compose query
     return {
         method: 'POST',
@@ -464,11 +463,9 @@ function getAllIdBeweb(db, cb) {
 function checkWikidataModification (db, id_beweb, cb) {
     // Query wikidata
     db.one(pgGetRecordQuery(), [id_beweb]).then((data)=> {
-        console.log(data.wikidata)
         nodeRequest( composeQueryWikidata(null,null, data.wikidata), function (err, res, body) {
 
             let results = JSON.parse(body).results.bindings;
-            console.log(results)
             let cleanObj = flattenSparqlResponse(results[0]);
             delete cleanObj.descrizione;
             let diff = 0
@@ -519,12 +516,11 @@ function storeWikidataInfo(db, data, cb) {
         let { pgQuery, params } = pgStoreQuery(data.Idrecord, data.Visualizzazione_su_BEWEB, cleanObj)
         db.none(deleteRecordQuery(), [data.Idrecord]).then(()=> {
             db.none(pgQuery, params).then(()=> {
-                console.log(typeof cb)
                 if (typeof cb === 'function') {
                   cb();
                 }
-                console.log("data inserted");
-            }).catch((err)=>{
+
+              }).catch((err)=>{
                 console.error(err)
             });
         });
