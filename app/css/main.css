@@ -335,6 +335,10 @@ ul.card-box > li
     margin: 0 10px;
 }
 
+.scarta-icon-button {
+    width: 10em;
+}
+
 /* VERY SMALL SCREENS AND LARGE TABLETS */
 @media screen and (max-width: 991px) {
     .footer-section-1 {

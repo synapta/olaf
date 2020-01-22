@@ -312,6 +312,7 @@ function composeQuery(query) {
 }
 
 function composeQueryWikidata(name, surname, wikidata){
+    console.log(name, surname, wikidata)
     // Compose query
     return {
         method: 'POST',
@@ -463,11 +464,11 @@ function getAllIdBeweb(db, cb) {
 function checkWikidataModification (db, id_beweb, cb) {
     // Query wikidata
     db.one(pgGetRecordQuery(), [id_beweb]).then((data)=> {
-        
+        console.log(data.wikidata)
         nodeRequest( composeQueryWikidata(null,null, data.wikidata), function (err, res, body) {
 
             let results = JSON.parse(body).results.bindings;
-    
+            console.log(results)
             let cleanObj = flattenSparqlResponse(results[0]);
             delete cleanObj.descrizione;
             let diff = 0
@@ -505,7 +506,7 @@ function checkWikidataModification (db, id_beweb, cb) {
     });
 }
 
-function storeWikidataInfo(db, data) {
+function storeWikidataInfo(db, data, cb) {
     // Query a wikidata
     nodeRequest( composeQueryWikidata(null,null, data.Wikidata), function (err, res, body) {
 
@@ -518,6 +519,10 @@ function storeWikidataInfo(db, data) {
         let { pgQuery, params } = pgStoreQuery(data.Idrecord, data.Visualizzazione_su_BEWEB, cleanObj)
         db.none(deleteRecordQuery(), [data.Idrecord]).then(()=> {
             db.none(pgQuery, params).then(()=> {
+                console.log(typeof cb)
+                if (typeof cb === 'function') {
+                  cb();
+                }
                 console.log("data inserted");
             }).catch((err)=>{
                 console.error(err)
@@ -544,8 +549,8 @@ exports.authorLink = (body) => {
     return authorLink(body)
 };
 
-exports.storeWikidataInfo = (db, data) => {
-    return storeWikidataInfo(db, data)
+exports.storeWikidataInfo = (db, data, cb) => {
+    return storeWikidataInfo(db, data, cb)
 };
 
 exports.checkWikidataModification = (db, id_beweb, cb) => {

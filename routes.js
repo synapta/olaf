@@ -26,7 +26,7 @@ const cn = {
 
 const db = pgp(cn)
 
-bewebQueries = require('./users/beweb/queries');
+const bewebQueries = require('./users/beweb/queries');
 
 schedule.scheduleJob('21 */4 * * *', function(firedate) {
     console.log(firedate, "checking modifications")
@@ -223,6 +223,15 @@ module.exports = function(app) {
 
     });
 
+    app.post('/api/v1/:token/add-author-again', (request, response) => {
+        // Send requests
+        let data = request.body;
+        console.log (data)
+        queries.storeWikidataInfo(db, data, () => {
+            // Send response
+            response.status(200).json({"done":true});
+        });
+    });
 
     app.get('/api/v1/:token/author-list/', (request, response) => {
         // Send requests
@@ -231,4 +240,5 @@ module.exports = function(app) {
             response.json(data);
         });
     });
+
 };
