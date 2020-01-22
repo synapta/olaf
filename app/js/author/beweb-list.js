@@ -18,15 +18,23 @@ template = `
     <td>{{data_inserimento}}</td>
     <td>{{numero_campi_modificati}}</td>
     <td>{{data_primo_cambiamento}}</td>
-    <td>
-        <ul>
-        {{#differenze}}
-            <li>
-            <b>{{nome}}</b>
-            <p>{{originale}} -> {{modificato}}<p>
-            </li>
-        {{/differenze}}
-        </ul>
+    <td class="differenze-column">
+        <div class="ui accordion">
+            <div class="title">
+                <i class="icon dropdown"></i>
+                Visualizza Modifiche
+            </div>
+            <div class="content">
+                <ul>
+                {{#differenze}}
+                    <li>
+                    <b>{{nome}}</b>
+                    <p>{{originale}} -> {{modificato}}<p>
+                    </li>
+                {{/differenze}}
+                </ul>
+            </div>
+        </div>
     </td>
 </tr>`;
 
@@ -49,6 +57,11 @@ $(document).ready(() => {
             output += Mustache.render(template, element);
         });
         $( "tbody" ).html(output);
+
+        $('.ui.accordion').each(function(i){
+            console.log(i)
+            $(this).accordion({ exclusive: false});
+        });
 
         $(".scarta-icon-button").each(function() {
             var $this = $(this);
@@ -81,4 +94,3 @@ $(document).ready(() => {
         });
     });
 });
-

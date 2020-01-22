@@ -339,6 +339,10 @@ ul.card-box > li
     width: 10em;
 }
 
+.differenze-column {
+    width: 40em;
+}
+
 /* VERY SMALL SCREENS AND LARGE TABLETS */
 @media screen and (max-width: 991px) {
     .footer-section-1 {
