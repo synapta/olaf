@@ -6,6 +6,7 @@ const pgp = require('pg-promise')({});
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
 const Config         = require('./config').Config;
+const pgConnection         = require('./pgConfig').pgConnection;
 var schedule = require('node-schedule');
 
 
@@ -15,16 +16,7 @@ let parser           = null;
 let config           = null;
 let configToken      = null;
 
-
-const cn = {
-    host: 'localhost',
-    port: 5432,
-    database: 'beweb_olaf',
-    user: 'beweb_user',
-    password: 'eV8iekebeing0Zo'
-};
-
-const db = pgp(cn)
+const db = pgp(pgConnection)
 
 const bewebQueries = require('./users/beweb/queries');
 
