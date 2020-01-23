@@ -54,6 +54,12 @@ let authorSelect = (authorId) => {
               ${authorId ? `LIMIT 1` : ``}`;
 };
 
+let cobisInsertTimestamp = (authorUri) => {
+    return `INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+                <${authorUri}> dcterms:modified "${(new Date()).toISOString()}"^^xsd:dateTime
+            }`;
+};
+
 let cobisInsertWikidata = (authorUri, optionWikidata) => {
     return `INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
                 <${authorUri}> owl:sameAs <${optionWikidata}>
@@ -220,6 +226,9 @@ function authorLink(body) {
 
         // Parse query
         if(links[key] !== undefined) {
+            optionWikidata.forEach((option) => {
+                requests.push(composeQuery(cobisInsertTimestamp(authorUri)));
+            });
             if (key === 'wikidata') {
                 optionWikidata.forEach((option) => {
                     requests.push(composeQuery(cobisInsertWikidata(authorUri, option)));
