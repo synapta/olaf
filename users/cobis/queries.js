@@ -1,4 +1,5 @@
-// Queries
+const nodeRequest    = require('request');
+
 let authorSelect = (authorId) => {
     return `PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
             PREFIX schema: <http://schema.org/>
@@ -90,7 +91,7 @@ let cobisInsertSkip = (authorUri) => {
             }`;
 };
 
-let wikidataQuery = (name, surname) => {
+let wikidataQuery = (options) => {
 
     return `
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -120,14 +121,7 @@ let wikidataQuery = (name, surname) => {
                 ?item schema:description ?descrizione
             }
 
-            SERVICE wikibase:mwapi {
-                bd:serviceParam wikibase:api "EntitySearch" .
-                bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-                bd:serviceParam mwapi:search "${name + ' ' + surname}" .
-                bd:serviceParam mwapi:language "it" .
-                ?item wikibase:apiOutputItem mwapi:item .
-                ?num wikibase:apiOrdinal true .
-            }
+            VALUES ?item { ${options.join(' ')} }
             
             OPTIONAL {
                 ?book wdt:P31 wd:Q571 .
@@ -197,7 +191,7 @@ let wikidataQuery = (name, surname) => {
 function authorOptions(name, surname){
 
     // Compose queries
-    return [composeQueryWikidata(name, surname), composeQueryVIAF(name, surname)];
+    return [makeWikidataQuery(name, surname), makeViafQuery(name, surname)];
 
 }
 
@@ -225,10 +219,9 @@ function authorLink(body) {
     Object.keys(links).forEach((key) => {
 
         // Parse query
-        if(links[key] !== undefined) {
-            optionWikidata.forEach((option) => {
-                requests.push(composeQuery(cobisInsertTimestamp(authorUri)));
-            });
+        if(links[key] !== undefined) {  
+            requests.push(composeQuery(cobisInsertTimestamp(authorUri)));
+
             if (key === 'wikidata') {
                 optionWikidata.forEach((option) => {
                     requests.push(composeQuery(cobisInsertWikidata(authorUri, option)));
@@ -270,14 +263,32 @@ function composeQuery(query) {
 
 }
 
-function composeQueryWikidata(name, surname){
+function composeQueryEntityListWikidata(name, surname){
 
     // Compose query
     return {
         method: 'GET',
-        url: 'https://query.wikidata.org/sparql',
+        uri: 'https://www.wikidata.org/w/api.php',
         qs: {
-            query: wikidataQuery(name, surname)
+            action: "wbsearchentities",
+            search: name + " " + surname,
+            language: "en",
+            limit: 20, 
+            format: "json"
+        },
+        json: true
+    }
+}
+
+function composeQueryWikidata(list){
+    
+
+    // Compose query
+    return {
+        method: 'GET',
+        uri: 'https://query.wikidata.org/sparql',
+        qs: {
+            query: wikidataQuery(list)
         },
         headers: {
             'cache-control': 'no-cache',
@@ -290,12 +301,33 @@ function composeQueryWikidata(name, surname){
 
 }
 
-function composeQueryVIAF(name, surname){
+function makeWikidataQuery (name, surname) {
+    return new Promise ( function(resolve, reject) {
+        nodeRequest(composeQueryEntityListWikidata(name, surname), function (error, response, body) {
+            if (error) {
+                console.error(error)
+                reject();
+            }
+            let qList = [];
+            body.search.forEach( elem => {
+                qList.push("wd:" + elem.id);
+            });
+            nodeRequest(composeQueryWikidata(qList), function (error, response, body) {
+                if (error) {
+                    console.error(error);
+                    reject();
+                }
+                resolve(body);
+            });
+        })
+    });
+}
 
+function composeQueryVIAF(name, surname){
     // Compose query
     return {
         method: 'GET',
-        url: 'https://www.viaf.org/viaf/AutoSuggest',
+        uri: 'https://www.viaf.org/viaf/AutoSuggest',
         qs: {
             query: name + " " + surname
         },
@@ -307,6 +339,20 @@ function composeQueryVIAF(name, surname){
     }
 
 }
+
+function makeViafQuery(name, surname) {
+    return new Promise ( function(resolve, reject) {
+        nodeRequest(composeQueryVIAF(name, surname), function (error, response, body) {
+            if (error) {
+                console.error(error);
+                reject();
+            }
+            resolve(body);
+        });
+    });
+}
+
+
 
 // Exports
 exports.authorSelect = (params) => {

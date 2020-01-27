@@ -70,9 +70,7 @@ module.exports = function (app) {
             let author = parser.parseAuthor(JSON.parse(body));
             // Query options
             let requests = queries.authorOptions(author.authorName.nameFirst, author.authorName.nameLast);
-            // Map requests to make Promise
-            requests = requests.map(query => promiseRequest(query));
-
+ 
             // Make options queries
             Promise.all(requests).then((bodies) => {
                 // Parse result
@@ -93,10 +91,8 @@ module.exports = function (app) {
         let firstName = request.query.firstName;
         let lastName = request.query.lastName;
 
-        // Get requests
+        // Get requests promise
         let requests = queries.authorOptions(firstName, lastName);
-        // Map requests to make Promise
-        requests = requests.map(query => promiseRequest(query));
 
         // Make options queries
         Promise.all(requests).then((bodies) => {
