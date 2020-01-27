@@ -148,8 +148,10 @@ function parseAuthorOptions(author, bodies, callback) {
                                 });
 
                         });
-                    } else
+                    } else {
                         parseCounter++;
+                        callback({'options': options, 'fields': authorFields})
+                    }
                 });
             } else
             // Callback
@@ -242,7 +244,7 @@ function parseViafOptions(viafBody, knownViaf, callback) {
 
     // Parse results
     let results = viafBody.result;
-    if(results) {
+    if(results && results !== null ) {
         results.forEach((result) => {
             // Generate new option
             let viafOption = {};
