@@ -117,8 +117,6 @@ module.exports = function(app) {
 
             // Query options
             let requests = queries.authorOptions((author.name || '').trim(), '');
-            // Map requests to make Promise
-            requests = requests.map(query => promiseRequest(query));
 
             // Make options queries
             Promise.all(requests).then((bodies) => {
