@@ -22,7 +22,7 @@ function flattenSparqlResponse(res) {
     return cleanObj;
 }
 
-let wikidataQuery = (name, surname, wikidata) => {
+let wikidataQuery = (options) => {
     return `PREFIX wdt: <http://www.wikidata.org/prop/direct/>
             PREFIX wd: <http://www.wikidata.org/entity/>
             
@@ -70,18 +70,9 @@ let wikidataQuery = (name, surname, wikidata) => {
                 ?i skos:altLabel ?altLabel .
                 ?i schema:description ?descrizione
               }
-              
-              ${
-              (wikidata !== undefined ? `VALUES ?i {wd:${wikidata.split('/').pop()}}` :
-              `SERVICE wikibase:mwapi {
-                bd:serviceParam wikibase:api "EntitySearch" .
-                bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-                bd:serviceParam mwapi:search "${name} ${surname}" .
-                bd:serviceParam mwapi:language "it" .
-                ?i wikibase:apiOutputItem mwapi:item .
-                ?num wikibase:apiOrdinal true .
-              }`)
-              }
+
+              VALUES ?i { ${options.join(' ')} }
+
               OPTIONAL {
                 SERVICE wikibase:label {
                 bd:serviceParam wikibase:language "it" .
@@ -271,15 +262,14 @@ let wikidataQuery = (name, surname, wikidata) => {
               BIND(IF(!BOUND(?ti), 'Ente', ?ti) AS ?tipologia)
             
             }
-            GROUP BY ?i
-            ORDER BY ASC(?num) LIMIT 20`;
+            GROUP BY ?i LIMIT 20`;
 };
 
 // Functions
 function authorOptions(name, surname){
 
     // Compose queries
-    return [composeQueryWikidata(name, surname), composeQueryVIAF(name, surname)];
+    return [makeWikidataQuery(name, surname), makeViafQuery(name, surname)];
 
 }
 
@@ -289,15 +279,6 @@ function authorLink(body) {
     let hash = crypto.createHash('md5').update(SECRET_KEY + body.Idrecord + 'updEntita').digest("hex");
 
     return composeQuery("id=" + body.Idrecord + "&mode=updEntita&check=" + hash + "&dati=" + encodeURIComponent(JSON.stringify(body)));
-
-}
-
-function authorSkip(body) {
-
-    // Get body params
-    let authorUri = body.authorId;
-    // Return query
-    return composeQuery(cobisInsertSkip(authorUri));
 
 }
 
@@ -311,12 +292,12 @@ function composeQuery(query) {
 
 }
 
-function composeQueryWikidata(name, surname, wikidata){
+function composeQueryWikidata(options){
     // Compose query
     return {
         method: 'POST',
         url: 'https://query.wikidata.org/sparql',
-        body: 'query=' + encodeURIComponent(wikidataQuery(name, surname, wikidata)),
+        body: 'query=' + encodeURIComponent(wikidataQuery(options)),
         headers: {
             'accept-language': 'it-IT,it;q=0.9',
             'accept-encoding': 'deflate, br',
@@ -334,6 +315,45 @@ function composeQueryWikidata(name, surname, wikidata){
         }
     }
 
+}
+function composeQueryEntityListWikidata(name, surname){
+
+  // Compose query
+  return {
+      method: 'GET',
+      uri: 'https://www.wikidata.org/w/api.php',
+      qs: {
+          action: "wbsearchentities",
+          search: name + " " + surname,
+          language: "en",
+          limit: 20, 
+          format: "json"
+      },
+      json: true
+  }
+}
+
+function makeWikidataQuery (name, surname) {
+  return new Promise ( function(resolve, reject) {
+      nodeRequest(composeQueryEntityListWikidata(name, surname), function (error, response, body) {
+          if (error) {
+              console.error(error)
+              reject();
+          }
+          let qList = [];
+          body.search.forEach( elem => {
+              qList.push("wd:" + elem.id);
+          });
+          nodeRequest(composeQueryWikidata(qList), function (error, response, body) {
+              console.log(body)
+              if (error) {
+                  console.error(error);
+                  reject();
+              }
+              resolve(body);
+          });
+      })
+  });
 }
 
 function wikidata2bewebLabel (label) {
@@ -362,6 +382,18 @@ function composeQueryVIAF(name, surname){
         }
     }
 
+}
+
+function makeViafQuery(name, surname) {
+  return new Promise ( function(resolve, reject) {
+      nodeRequest(composeQueryVIAF(name, surname), function (error, response, body) {
+          if (error) {
+              console.error(error);
+              reject();
+          }
+          resolve(body);
+      });
+  });
 }
 
 function pgStoreQuery(id_beweb, nome, data) {
@@ -463,7 +495,7 @@ function getAllIdBeweb(db, cb) {
 function checkWikidataModification (db, id_beweb, cb) {
     // Query wikidata
     db.one(pgGetRecordQuery(), [id_beweb]).then((data)=> {
-        nodeRequest( composeQueryWikidata(null,null, data.wikidata), function (err, res, body) {
+        nodeRequest( composeQueryWikidata([data.wikidata.replace("http://www.wikidata.org/entity/", "wd:")]), function (err, res, body) {
 
             let results = JSON.parse(body).results.bindings;
             let cleanObj = flattenSparqlResponse(results[0]);
@@ -505,7 +537,7 @@ function checkWikidataModification (db, id_beweb, cb) {
 
 function storeWikidataInfo(db, data, cb) {
     // Query a wikidata
-    nodeRequest( composeQueryWikidata(null,null, data.Wikidata), function (err, res, body) {
+    nodeRequest( composeQueryWikidata([data.Wikidata.replace("http://www.wikidata.org/entity/", "wd:")]), function (err, res, body) {
 
         let results = JSON.parse(body).results.bindings;
 
