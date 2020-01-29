@@ -1,3 +1,5 @@
+const nodeRequest    = require('request');
+
 // Queries
 let authorSelect = (authorId) => {
     return `PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
@@ -16,28 +18,28 @@ let authorSelect = (authorId) => {
                    (GROUP_CONCAT(distinct(?title); separator="###") as ?title) WHERE {
 
                 {
+                    ${authorId ? '': `
+                    MINUS {?personURI owl:sameAs ?wd}
+                    MINUS {?personURI cobis:hasViafURL ?vf}
+                    MINUS {?personURI olaf:skipped ?skipped}
+                    `}
                 
                     GRAPH<http://dati.cobis.to.it/CMUS/>{
                         SELECT ?personURI (COUNT(DISTINCT ?contribution) AS ?titlesCount) WHERE {
-    
                             ?contribution bf2:agent ?personURI .
                             ?instance bf2:instanceOf ?work .
                             ?work bf2:contribution ?contribution .
                             ?contribution bf2:agent ?personURI .
                             
+
                             ${authorId ? `
                                 FILTER (?personURI = <http://dati.cobis.to.it/agent/${authorId}>)
-                            ` : `
-                                MINUS {?personURI owl:sameAs ?wd}
-                                MINUS {?personURI cobis:hasViafURL ?vf}
-                                MINUS {?personURI olaf:skipped ?skipped}
-                            `}
+                            ` : ''}
     
                         } GROUP BY ?personURI
                           ${authorId ? `` : `
-                              ORDER BY DESC(?titlesCount)
-                              LIMIT 1                      
-                              OFFSET ${Math.floor(Math.random() * 49)}
+                              ORDER BY DESC(?titlesCount)                     
+                              
                           `}
                     }
                     
@@ -55,7 +57,14 @@ let authorSelect = (authorId) => {
                 OPTIONAL {?contribution bf2:role/rdfs:label ?personRole . }
 
             } GROUP BY ?personURI ?personName
-              ${authorId ? `LIMIT 1` : ``}`;
+              LIMIT 1
+              ${authorId ? '': `OFFSET ${Math.floor(Math.random() * 49)}`}`
+};
+
+let cobisInsertTimestamp = (authorUri) => {
+    return `INSERT INTO GRAPH<http://dati.cobis.to.it/OLAF/>{
+                <${authorUri}> dcterms:modified "${(new Date()).toISOString()}"^^xsd:dateTime
+            }`;
 };
 
 let cobisInsertWikidata = (authorUri, optionWikidata) => {
@@ -88,7 +97,7 @@ let cobisInsertSkip = (authorUri) => {
             }`;
 };
 
-let wikidataQuery = (name, surname) => {
+let wikidataQuery = (options) => {
 
     return `
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -96,11 +105,11 @@ let wikidataQuery = (name, surname) => {
         
         SELECT (?item as ?wikidata) 
                (SAMPLE (?nome) as ?nome) 
-               (GROUP_CONCAT(DISTINCT ?tipologia) as ?tipologia) 
+               (sample( ?tipologia) as ?tipologia) 
                (SAMPLE (?num) as ?num) 
                (SAMPLE (?descrizione) as ?descrizione) 
                (SAMPLE (?altLabel) as ?altLabel)
-               (GROUP_CONCAT(DISTINCT ?bookLabel;separator='###') as ?titles)
+               (sample( ?bookLabel) as ?titles)
                (SAMPLE (?birthDate) as ?birthDate) 
                (SAMPLE (?deathDate) as ?deathDate) 
                (SAMPLE (?immagine) as ?immagine) 
@@ -111,21 +120,14 @@ let wikidataQuery = (name, surname) => {
         WHERE {
 
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "it,en,fr,es,ge".
+                bd:serviceParam wikibase:language "it, en".
                 ?item rdfs:label ?nome .
                 ?type rdfs:label ?tipologia.
                 ?item skos:altLabel ?altLabel .
                 ?item schema:description ?descrizione
             }
 
-            SERVICE wikibase:mwapi {
-                bd:serviceParam wikibase:api "EntitySearch" .
-                bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-                bd:serviceParam mwapi:search "${name + ' ' + surname}" .
-                bd:serviceParam mwapi:language "it" .
-                ?item wikibase:apiOutputItem mwapi:item .
-                ?num wikibase:apiOrdinal true .
-            }
+            VALUES ?item { ${options.join(' ')} }
             
             OPTIONAL {
                 ?book wdt:P31 wd:Q571 .
@@ -195,7 +197,7 @@ let wikidataQuery = (name, surname) => {
 function authorOptions(name, surname){
 
     // Compose queries
-    return [composeQueryWikidata(name, surname), composeQueryVIAF(name, surname)];
+    return [makeWikidataQuery(name, surname), makeViafQuery(name, surname)];
 
 }
 
@@ -223,7 +225,9 @@ function authorLink(body) {
     Object.keys(links).forEach((key) => {
 
         // Parse query
-        if(links[key] !== undefined) {
+        if(links[key] !== undefined) {  
+            requests.push(composeQuery(cobisInsertTimestamp(authorUri)));
+
             if (key === 'wikidata') {
                 optionWikidata.forEach((option) => {
                     requests.push(composeQuery(cobisInsertWikidata(authorUri, option)));
@@ -265,14 +269,32 @@ function composeQuery(query) {
 
 }
 
-function composeQueryWikidata(name, surname){
+function composeQueryEntityListWikidata(name, surname){
 
     // Compose query
     return {
         method: 'GET',
-        url: 'https://query.wikidata.org/sparql',
+        uri: 'https://www.wikidata.org/w/api.php',
         qs: {
-            query: wikidataQuery(name, surname)
+            action: "wbsearchentities",
+            search: name + " " + surname,
+            language: "en",
+            limit: 20, 
+            format: "json"
+        },
+        json: true
+    }
+}
+
+function composeQueryWikidata(list){
+    
+
+    // Compose query
+    return {
+        method: 'GET',
+        uri: 'https://query.wikidata.org/sparql',
+        qs: {
+            query: wikidataQuery(list)
         },
         headers: {
             'cache-control': 'no-cache',
@@ -285,12 +307,33 @@ function composeQueryWikidata(name, surname){
 
 }
 
-function composeQueryVIAF(name, surname){
+function makeWikidataQuery (name, surname) {
+    return new Promise ( function(resolve, reject) {
+        nodeRequest(composeQueryEntityListWikidata(name, surname), function (error, response, body) {
+            if (error) {
+                console.error(error)
+                reject();
+            }
+            let qList = [];
+            body.search.forEach( elem => {
+                qList.push("wd:" + elem.id);
+            });
+            nodeRequest(composeQueryWikidata(qList), function (error, response, body) {
+                if (error) {
+                    console.error(error);
+                    reject();
+                }
+                resolve(body);
+            });
+        })
+    });
+}
 
+function composeQueryVIAF(name, surname){
     // Compose query
     return {
         method: 'GET',
-        url: 'https://www.viaf.org/viaf/AutoSuggest',
+        uri: 'https://www.viaf.org/viaf/AutoSuggest',
         qs: {
             query: name + " " + surname
         },
@@ -302,6 +345,20 @@ function composeQueryVIAF(name, surname){
     }
 
 }
+
+function makeViafQuery(name, surname) {
+    return new Promise ( function(resolve, reject) {
+        nodeRequest(composeQueryVIAF(name, surname), function (error, response, body) {
+            if (error) {
+                console.error(error);
+                reject();
+            }
+            resolve(body);
+        });
+    });
+}
+
+
 
 // Exports
 exports.authorSelect = (params) => {

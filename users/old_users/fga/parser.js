@@ -103,60 +103,70 @@ function parseAuthorOptions(author, bodies, callback) {
             // Compose options object
             let options = wikidataOptions.concat(viafOptions);
             // Get viaf details
-            if(options.length > 0) {
-                options.forEach((option) => {
-                    // Parse option
-                    if (option.optionViaf) {
-                        let viafUriParameters = option.optionViaf.split('/');
-                        getViafDetails(viafUriParameters[viafUriParameters.length - 1], (result) => {
 
-                            // Store titles
-                            if(result.optionTitles) {
-                                // Generate object
-                                let optionTitlesObject = {'titlesSource': 'VIAF', 'titlesItem': result.optionTitles};
-                                // Handle Wikidata titles
-                                if(!option.optionTitles)
-                                    option.optionTitles = [optionTitlesObject];
-                                else
-                                    option.optionTitles.push(optionTitlesObject);
-                            }
-
-                            // Store occupations
-                            if(result.optionOccupations) {
-                                // Merge occupations into description
-                                if(option.optionDescription)
-                                    result.optionOccupations.unshift(option.optionDescription);
-                                option.optionDescription = result.optionOccupations.join(', ');
-                            }
-
-                            // Store birthDate
-                            if (!option.optionBirthDate && result.optionBirthDate !== '0')
-                                option.optionBirthDate = result.optionBirthDate;
-
-                            // Store deathDate
-                            if (!option.optionDeathDate && result.optionDeathDate !== '0')
-                                option.optionDeathDate = result.optionDeathDate;
-
-                            // Callback
-                            if (++parseCounter === options.length)
-                            // Option similarity
-                                getAuthorSimilarOptions(author, options, (result) => {
-                                    // Sort result
-                                    result = result.sort((a, b) => (b.optionSuggested - a.optionSuggested));
-                                    // Callback
-                                    callback({'options': result, 'fields': authorFields});
-                                });
-
-                        });
-                    } else
-                        parseCounter++;
+                if(options.length > 0) {
+                enrichAllViafOptions(options, 0, function (options) {
+                    getAuthorSimilarOptions(author, options, (result) => {
+                        // Sort result
+                        result = result.sort((a, b) => (b.optionSuggested - a.optionSuggested));
+                        // Callback
+                        callback({'options': result, 'fields': authorFields});
+                    });
                 });
             } else
-            // Callback
+                // Callback
                 callback({'options': [], 'fields': authorFields});
         });
     });
 
+}
+
+
+function enrichAllViafOptions(options, position, callback) {
+    position++;
+    if (position === options.length) {
+        callback(options)
+
+    } else {
+
+        let option = options[position];
+        if (option.optionViaf) {
+            let viafUriParameters = option.optionViaf.split('/');
+            getViafDetails(viafUriParameters[viafUriParameters.length - 1], (result) => {
+
+                // Store titles
+                if(result.optionTitles) {
+                    // Generate object
+                    let optionTitlesObject = {'titlesSource': 'VIAF', 'titlesItem': result.optionTitles};
+                    // Handle Wikidata titles
+                    if(!option.optionTitles)
+                        option.optionTitles = [optionTitlesObject];
+                    else
+                        option.optionTitles.push(optionTitlesObject);
+                }
+
+                // Store occupations
+                if(result.optionOccupations) {
+                    // Merge occupations into description
+                    if(option.optionDescription)
+                        result.optionOccupations.unshift(option.optionDescription);
+                    option.optionDescription = result.optionOccupations.join(', ');
+                }
+
+                // Store birthDate
+                if (!option.optionBirthDate && result.optionBirthDate !== '0')
+                    option.optionBirthDate = result.optionBirthDate;
+
+                // Store deathDate
+                if (!option.optionDeathDate && result.optionDeathDate !== '0')
+                    option.optionDeathDate = result.optionDeathDate;
+
+                enrichAllViafOptions(options, position, callback)
+            });
+        } else {
+            enrichAllViafOptions(options, position, callback)
+        }
+    }
 }
 
 function parseWikidataOptions(wikidataBody, knownViaf, callback) {
@@ -242,7 +252,7 @@ function parseViafOptions(viafBody, knownViaf, callback) {
 
     // Parse results
     let results = viafBody.result;
-    if(results) {
+    if(results && results !== null ) {
         results.forEach((result) => {
             // Generate new option
             let viafOption = {};

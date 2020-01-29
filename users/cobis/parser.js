@@ -44,26 +44,101 @@ function parseAuthorOptions(author, bodies, callback) {
     let wikidataBody = bodies[0];
     let viafBody = bodies[1];
 
-    // Get wikidata options
-    let wikidataOptions = parseWikidataOptions(wikidataBody);
-    let viafOptions = parseViafOptions(viafBody, wikidataOptions.filter(el => el.viaf).map(el => el.getViafId()));
-    let options = wikidataOptions.concat(viafOptions);
+    // Parse wikidata body
+    let knownViaf = [];
+    let parseCounter = 0;
+    parseWikidataOptions(wikidataBody, knownViaf, (wikidataOptions) => {
+        parseViafOptions(viafBody, knownViaf, (viafOptions) => {
+            // Compose options object
+            let options = wikidataOptions.concat(viafOptions);
+            // Get viaf details
 
-    // Enrich all options with VIAF and return them
-    Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
-
-        // Parse titles in order to find suggested options
-        options.map(option => suggestOption(author, option));
-        // Set up option string identifier
-        options.map(option => option.getString());
-
-        callback(options);
-
+                if(options.length > 0) {
+                enrichAllViafOptions(options, 0, function (options) {
+                    getAuthorSimilarOptions(author, options, (result) => {
+                        // Sort result
+                        result = result.sort((a, b) => (b.optionSuggested - a.optionSuggested));
+                        // Callback
+                        callback({'options': result, 'fields': authorFields});
+                    });
+                });
+            } else
+                // Callback
+                callback({'options': [], 'fields': authorFields});
+        });
     });
 
 }
 
-function parseWikidataOptions(body) {
+
+function enrichAllViafOptions(options, position, callback) {
+    position++;
+    if (position === options.length) {
+        callback(options)
+
+    } else {
+
+        let option = options[position];
+        if (option.optionViaf) {
+            let viafUriParameters = option.optionViaf.split('/');
+            getViafDetails(viafUriParameters[viafUriParameters.length - 1], (result) => {
+
+                // Store titles
+                if(result.optionTitles) {
+                    // Generate object
+                    let optionTitlesObject = {'titlesSource': 'VIAF', 'titlesItem': result.optionTitles};
+                    // Handle Wikidata titles
+                    if(!option.optionTitles)
+                        option.optionTitles = [optionTitlesObject];
+                    else
+                        option.optionTitles.push(optionTitlesObject);
+                }
+
+                // Store occupations
+                if(result.optionOccupations) {
+                    // Merge occupations into description
+                    if(option.optionDescription)
+                        result.optionOccupations.unshift(option.optionDescription);
+                    option.optionDescription = result.optionOccupations.join(', ');
+                }
+
+                // Store birthDate
+                if (!option.optionBirthDate && result.optionBirthDate !== '0')
+                    option.optionBirthDate = result.optionBirthDate;
+
+                // Store deathDate
+                if (!option.optionDeathDate && result.optionDeathDate !== '0')
+                    option.optionDeathDate = result.optionDeathDate;
+
+                enrichAllViafOptions(options, position, callback)
+            });
+        } else {
+            enrichAllViafOptions(options, position, callback)
+        }
+    }
+}
+
+function parseWikidataOptions(wikidataBody, knownViaf, callback) {
+
+    // Wikidata map
+    let wikidataMap = {
+        'optionWikidata': 'wikidata',
+        'optionName': 'nome',
+        'optionType': 'tipologia',
+        'optionDescription': 'descrizione',
+        'optionTitles': 'titles',
+        'optionBirthDate': 'birthDate',
+        'optionDeathDate': 'deathDate',
+        'optionImage': 'immagine',
+        'optionWikipediaIt': 'itwikipedia',
+        'optionTreccani': 'treccani',
+        'optionViaf': 'viafurl',
+        'optionSbn': 'sbn',
+        'optionSuggested': null
+    };
+
+    // Results array
+    let wikidataOptions = [];
 
     // Parse results
     let results = body.results.bindings;
@@ -79,9 +154,34 @@ function parseViafOptions(body, viafUris) {
     let invalidFields = ['uniformtitleexpression', 'uniformtitlework'];
 
     // Parse results
-    let results = body.result || [];
-    // Filter current results removing known authors and options with invalid fields
-    results = results.filter(el => !viafUris.includes(el['viafid']) && !invalidFields.includes(el['nametype']));
+    let results = viafBody.result;
+    if(results && results !== null ) {
+        results.forEach((result) => {
+            // Generate new option
+            let viafOption = {};
+            // Check VIAF id
+            if (!knownViaf.includes(result['viafid']) && !invalidFields.includes(result['nametype'])) {
+                // Map result
+                Object.keys(viafMap).forEach((key) => {
+                    if (viafMap[key] && result[viafMap[key]] && result[viafMap[key]] !== '') {
+                        viafOption[key] = result[viafMap[key]];
+                        if(key === 'optionViaf') {
+                            knownViaf.push(viafOption[key]);
+                            // Get titles for option
+                            viafOption[key] = 'http://viaf.org/viaf/' + viafOption[key];
+                        }
+                        if(key === 'optionSbn')
+                            viafOption[key] = "IT_ICCU_" + viafOption[key].substring(0, 4).toUpperCase() + "_" + viafOption[key].substring(4, 10);
+                    } else
+                        viafOption[key] = null;
+                });
+                // Parse option for selection
+                viafOption['optionItem'] = JSON.stringify(viafOption);
+                // Push option
+                viafOptions.push(viafOption);
+            }
+        });
+    }
 
     // Construct options from query results
     return results.map(el => new Option(el, 'viaf', config));
