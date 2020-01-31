@@ -25,8 +25,8 @@ function _fileExists(url) {
 
 function _loadAlternativeScripts(callback) {
 
-    [`/get/beweb/static/js/author/rendering/${params.userToken}.js`,
-        `/get/beweb/static/js/author/${params.userToken}.js`].forEach(url => {
+    [`/js/author/rendering/${params.userToken}.js`,
+        `/js/author/${params.userToken}.js`].forEach(url => {
 
         // Generate new <script> and populate it with user alternative scripts
         let s = document.createElement("script");

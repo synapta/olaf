@@ -54,7 +54,6 @@ module.exports = function(app) {
 
     // Setting up express
     app.use('/', express.static('./app'));
-    app.use('/get/beweb/static', express.static('./app'));
 
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(bodyParser.json());
@@ -116,7 +115,7 @@ module.exports = function(app) {
             let author = parser.parseAuthor(JSON.parse(body));
 
             // Query options
-            let requests = queries.authorOptions(author.authorName.nameFirst, author.authorName.nameLast);
+            let requests = queries.authorOptions((author.name || '').trim(), '');
  
             // Make options queries
             Promise.all(requests).then((bodies) => {
