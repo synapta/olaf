@@ -53,7 +53,7 @@ template = `
 // Get author, render author card, options and author labels
 $(document).ready(() => {
     // Load alternative scripts
-    $('table').tablesort()
+    //$('.big-table').tablesort()
         // Render navbar
     renderNavbar();
     // Load author list
