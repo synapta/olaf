@@ -5,16 +5,18 @@ template = `
 <tr id='{{id_beweb}}'>
     <td class="ui center aligned">
         <div class="ui inline loader"></div>
-        <div class="ui vertical animated button scarta-icon-button" data-info='{{{json}}}' tabindex="0">
-            <div class="hidden content">Scarta segnalazione</div>
-                <div class="visible content">
-                <i class="trash alternate outline icon"></i>
-            </div>
+
+        <div class="ui button scarta-icon-button" data-info='{{{json}}}' tabindex="0">
+            <div class="hidden content">Scarta</div>
         </div>
+        <a target="_blank" href="/get/beweb/author/{{id_beweb}}">
+            <div class="ui button">Vai a OLAF</div>
+            </div>
+        </a>
     </td>
-    <td><a target="_blank" href="/get/beweb/author/{{id_beweb}}">{{id_beweb}}</a></td>
+    <td>{{id_beweb}}</a></td>
     <td>{{nome_visualizzazione}}</td>
-    <td><a target="_blank" href="{{{wikidata}}}">{{wikidata_short}}</a></td>
+    <!--<td><a target="_blank" href="{{{wikidata}}}">{{wikidata_short}}</a></td>-->
     <td>{{data_inserimento}}</td>
     <td>{{numero_campi_modificati}}</td>
     <td>{{data_primo_cambiamento}}</td>
@@ -25,14 +27,24 @@ template = `
                 Visualizza Modifiche
             </div>
             <div class="content">
-                <ul>
-                {{#differenze}}
-                    <li>
-                    <b>{{nome}}</b>
-                    <p>{{originale}} -> {{modificato}}<p>
-                    </li>
-                {{/differenze}}
-                </ul>
+                <table class="ui definition table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Vecchio</th>
+                            <th>Nuovo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {{#differenze}}
+                        <tr> 
+                            <td><b>{{nome}}</b></td>
+                            <td>{{originale}}</td>
+                            <td>{{modificato}}</td>
+                        </tr>
+                    {{/differenze}}
+                    </tbody>
+                </table>
             </div>
         </div>
     </td>
