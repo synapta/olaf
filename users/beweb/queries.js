@@ -345,7 +345,6 @@ function makeWikidataQuery (name, surname) {
               qList.push("wd:" + elem.id);
           });
           nodeRequest(composeQueryWikidata(qList), function (error, response, body) {
-              console.log(body)
               if (error) {
                   console.error(error);
                   reject();

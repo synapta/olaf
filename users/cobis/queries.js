@@ -14,7 +14,7 @@ let authorSelect = (authorId) => {
                    (SAMPLE(?description) as ?description) 
                    (SAMPLE(?link) as ?link) 
                    (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) 
-                   (GROUP_CONCAT(distinct(?title); separator="###") as ?title) WHERE {
+                   (GROUP_CONCAT(distinct(?titleFull); separator="###") as ?title) WHERE {
 
                 {
                     SELECT ?personURI (COUNT(DISTINCT ?contribution) AS ?titlesCount) WHERE {
@@ -45,6 +45,8 @@ let authorSelect = (authorId) => {
                 ?contribution bf2:agent ?personURI .
                 ?instance bf2:title ?titleURI .
                 ?titleURI rdfs:label ?title .
+                OPTIONAL {?instance cobis:dataNormalizzata ?years .}
+                BIND(CONCAT(IF(BOUND(?years), ?years, "" ) , " ~ " , ?title) as ?titleFull)
 
                 OPTIONAL {?personURI schema:description ?description . }
                 OPTIONAL {?personURI foaf:isPrimaryTopicOf ?link . }
@@ -352,7 +354,49 @@ function makeViafQuery(name, surname) {
     });
 }
 
+function parseViafOptions(body, viafUris) {
 
+    // Invalid fields
+    let invalidFields = ['uniformtitleexpression', 'uniformtitlework'];
+
+    // Parse results
+    let results = (body.result || []).slice(0, 4);
+    // Filter current results removing known authors and options with invalid fields
+    results = results.filter(el => !viafUris.includes(el['viafid']) && !invalidFields.includes(el['nametype']));
+
+    // Construct options from query results
+    return results.map(el => new Option(el, 'viaf', config));
+
+}
+
+function parseWikidataOptions(body) {
+
+    // Parse results
+    let results = body.results.bindings;
+
+    // Construct options from query results
+    return results.map(el => new Option(el, 'wikidata', config));
+
+}
+
+function parseAuthorOptions(author, bodies, callback) {
+console.log('pippo');
+
+    // Store bodies
+    let wikidataBody = bodies[0];
+    let viafBody = bodies[1];
+
+    // Get wikidata options
+    let wikidataOptions = parseWikidataOptions(wikidataBody);
+    let viafOptions = parseViafOptions(viafBody, wikidataOptions.filter(el => el.viaf).map(el => el.getViafId()));
+    let options = wikidataOptions.concat(viafOptions);
+    // Enrich all options with VIAF and return them
+    Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
+        options.map(el => el.getString());
+        callback(options);
+    });
+
+}
 
 // Exports
 exports.authorSelect = (params) => {
@@ -361,6 +405,10 @@ exports.authorSelect = (params) => {
 
 exports.authorOptions = (name, surname) => {
     return authorOptions(name, surname);
+};
+
+exports.parseAuthorOptions = (author, bodies, callback) => {
+    parseAuthorOptions(author, bodies, callback);
 };
 
 exports.authorSkip = (body) => {

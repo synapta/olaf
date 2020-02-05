@@ -28,7 +28,7 @@ let authorSelect = (authorId) => {
                     MINUS {?personURI olaf:skipped ?skipped}
                     `}
                 
-                    GRAPH<http://dati.cobis.to.it/AMT/>{
+                    GRAPH<http://dati.cobis.to.it/SLVM/>{
                         SELECT ?personURI (COUNT(DISTINCT ?contribution) AS ?titlesCount) WHERE {
                             ?contribution bf2:agent ?personURI .
                             ?instance bf2:instanceOf ?work .
