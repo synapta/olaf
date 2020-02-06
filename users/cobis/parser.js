@@ -1,4 +1,6 @@
 // Requirements
+const fuzz           = require('fuzzball');
+
 const Option         = require('../../option').Option;
 const Author         = require('../../author').Author;
 
@@ -33,6 +35,40 @@ function parseAuthor(body){
     return new Author(parsedBody, config);
 }
 
+function getAuthorSimilarOptions(author, options, callback){
+
+    // Parse all options
+    options.forEach((option) => {
+        if(author.titles && author.titles.length > 0 && option.titles) {
+            if (!Array.isArray(author.titles)) {
+                author.titles = [author.titles]
+
+            }
+            // Match with author titles
+            author.titles.forEach((title) => {
+                if (title.length > 0) {
+                    let titleClean = title.replace(/[0-9]+ \~ /, '');
+
+                    // Threshold 0.8 match result
+                    let results = fuzz.extract(titleClean, option.titles, {scorer: fuzz.token_set_ratio, cutoff: 80});
+
+                    // Check similarity
+                    results.forEach((result) => {
+                        if (result.length > 0)
+                        // Set option suggested
+                            option.setOptionsAsSuggested();
+                    });
+                }
+            });
+        }
+    });
+
+    options = options.sort((a, b) => (b.suggested - a.suggested));
+    // Callback suggested options
+    callback(options);
+
+}
+
 /**
  * Extract feasible options for current author.
  * Compare Wikidata results and VIAF results in order to remove duplicates.
@@ -51,7 +87,10 @@ function parseAuthorOptions(author, bodies, callback) {
     // Enrich all options with VIAF and return them
     Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
         options.map(el => el.getString());
-        callback(options);
+
+        getAuthorSimilarOptions(author, options, function(options) {
+            callback(options);
+        });
     });
 
 }
@@ -87,7 +126,7 @@ function parseOutput(data){
     let outputDictionary = config.getInputDictionary();
     let configFields = config.getConfig().fields;
 
-    // Translate data output to Beweb dictionary
+    // Translate data output to Cobis dictionary
     Object.keys(data).map((field) => {
         if((configFields[field].limit === null || configFields[field].limit > 1) && !Array.isArray(data[field]))
             data[field] = [data[field]];

@@ -19,6 +19,7 @@ class Option {
 
         // Format input data
         this._formatFields();
+        this.suggested = false;
 
     };
 
