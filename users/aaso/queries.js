@@ -18,6 +18,8 @@ let authorSelect = (authorId) => {
                 ?personName 
                 (SAMPLE(?description) as ?description) 
                 (SAMPLE(?link) as ?link) 
+                (MIN(?years) as ?annoMin)
+                (MAX(?years) as ?annoMax)
                 (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) 
                 (GROUP_CONCAT(distinct(?titleFull); separator="###") as ?title) WHERE {
 

@@ -31,6 +31,14 @@
                 </p>
             {{/deathDate}}
 
+            {{#yearFirstBook}}
+                <a class="ui blue ribbon label"> <i class="fas fa-book"></i> Intervallo Date Opere</a>
+                <p class="card-box">
+                    dal {{yearFirstBook}} al {{yearLastBook}}
+                </p>
+            {{/yearFirstBook}}
+
+
             {{#titles.length}}
                 <a href="{{uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titles.length}}) - Visualizza tutte</a>
                 <ul class="ui bulleted list card-box">

@@ -75,6 +75,24 @@
       "label": "Data di morte/Luogo soppressione",
       "select": false
     },
+    "yearFirstBook": {
+      "input": "annoMin",
+      "wikidata": null,
+      "viaf": null,
+      "group": null,
+      "limit": 1,
+      "label": null,
+      "select": false
+    },
+    "yearLastBook": {
+      "input": "annoMax",
+      "wikidata": null,
+      "viaf": null,
+      "group": null,
+      "limit": 1,
+      "label": null,
+      "select": false
+    },
     "image": {
       "input": null,
       "wikidata": "immagine",
