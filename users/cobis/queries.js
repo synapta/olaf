@@ -8,13 +8,15 @@ let authorSelect = (authorId) => {
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
             PREFIX bookType: <http://dati.cobis.to.it/vocabulary/bookType/>
             PREFIX olaf: <http://olaf.synapta.io/onto/>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 
             SELECT ?personURI 
                    ?personName 
                    (SAMPLE(?description) as ?description) 
                    (SAMPLE(?link) as ?link) 
-                   (MIN(?years) as ?annoMin)
-                   (MAX(?years) as ?annoMax)
+                   (MIN(xsd:integer(?years)) as ?annoMin)
+                   (MAX(xsd:integer(?years)) as ?annoMax)
                    (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) 
                    (GROUP_CONCAT(distinct(?titleFull); separator="###") as ?title) WHERE {
 

@@ -7,21 +7,23 @@ Object.keys(cobisQuery).forEach(method => {
 // Queries
 let authorSelect = (authorId) => {
     return `PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
-            PREFIX schema: <http://schema.org/>
-            PREFIX dcterm: <http://purl.org/dc/terms/>
-            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            PREFIX owl: <http://www.w3.org/2002/07/owl#>
-            PREFIX bookType: <http://dati.cobis.to.it/vocabulary/bookType/>
-            PREFIX olaf: <http://olaf.synapta.io/onto/>
+    PREFIX schema: <http://schema.org/>
+    PREFIX dcterm: <http://purl.org/dc/terms/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX owl: <http://www.w3.org/2002/07/owl#>
+    PREFIX bookType: <http://dati.cobis.to.it/vocabulary/bookType/>
+    PREFIX olaf: <http://olaf.synapta.io/onto/>
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-            SELECT ?personURI 
-                ?personName 
-                (SAMPLE(?description) as ?description) 
-                (SAMPLE(?link) as ?link)
-                (MIN(?years) as ?annoMin)
-                (MAX(?years) as ?annoMax)
-                (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) 
-                (GROUP_CONCAT(distinct(?titleFull); separator="###") as ?title) WHERE {
+
+    SELECT ?personURI 
+           ?personName 
+           (SAMPLE(?description) as ?description) 
+           (SAMPLE(?link) as ?link) 
+           (MIN(xsd:integer(?years)) as ?annoMin)
+           (MAX(xsd:integer(?years)) as ?annoMax)
+           (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) 
+           (GROUP_CONCAT(distinct(?titleFull); separator="###") as ?title) WHERE {
 
                 {
                     ${authorId ? '': `
