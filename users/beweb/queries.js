@@ -467,6 +467,7 @@ function getChangedRecordsQuery () {
       data_inserimento,
       numero_campi_modificati,
       data_primo_cambiamento,
+      data_ultima_modifica_su_beweb,
       differenze
     from
       history

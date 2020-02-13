@@ -18,6 +18,7 @@ template = `
     <td>{{nome_visualizzazione}}</td>
     <!--<td><a target="_blank" href="{{{wikidata}}}">{{wikidata_short}}</a></td>-->
     <td>{{data_inserimento}}</td>
+    <td>{{data_ultima_modifica_su_beweb}}</td>
     <td>{{numero_campi_modificati}}</td>
     <td>{{data_primo_cambiamento}}</td>
     <td class="differenze-column">
@@ -64,7 +65,8 @@ $(document).ready(() => {
             element.wikidata_short = element.wikidata.split("/").pop();
             element.data_inserimento = element.data_inserimento.split('T')[0]
             element.data_primo_cambiamento = element.data_primo_cambiamento.split('T')[0]
-            console.log( JSON.stringify(element))
+            element.data_ultima_modifica_su_beweb = element.data_ultima_modifica_su_beweb.split('T')[0]
+
             element.json = JSON.stringify(element);
             output += Mustache.render(template, element);
         });
@@ -93,13 +95,9 @@ $(document).ready(() => {
                     type: "POST",
                     url: `/api/v1/${params.userToken}/add-author-again`,
                     data: info,
-                    success: function(aaa){ 
+                    success: function(data){ 
                         console.log(id)
                         $("#" + id).remove();
-                    },
-                    error: function (xhr, error) {
-                        console.debug("ERRORRRRRRR",xhr); 
-                        console.debug(error);
                     }
                 });
             });
