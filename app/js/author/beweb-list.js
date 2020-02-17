@@ -65,7 +65,7 @@ $(document).ready(() => {
             element.wikidata_short = element.wikidata.split("/").pop();
             element.data_inserimento = element.data_inserimento.split('T')[0]
             element.data_primo_cambiamento = element.data_primo_cambiamento.split('T')[0]
-            element.data_ultima_modifica_su_beweb = element.data_ultima_modifica_su_beweb.split('T')[0]
+            element.data_ultima_modifica_su_beweb = element.data_ultima_modifica_su_beweb ? element.data_ultima_modifica_su_beweb.split('T')[0] : ''
 
             element.json = JSON.stringify(element);
             output += Mustache.render(template, element);
@@ -73,7 +73,6 @@ $(document).ready(() => {
         $( "tbody" ).html(output);
 
         $('.ui.accordion').each(function(i){
-            console.log(i)
             $(this).accordion({ exclusive: false});
         });
 
