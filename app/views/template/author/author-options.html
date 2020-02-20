@@ -1,67 +1,77 @@
 <div class="ui two column grid">
     {{#options}}
     <div class="column">
-        <div data-item="{{optionItem}}" class="ui raised segment author-option">
-            {{#optionSuggested}}
+        <div data-item="{{string}}" class="ui raised segment author-option">
+            {{#suggested}}
             <a class="ui blue ribbon label">Autore consigliato</a>
-            {{/optionSuggested}}
+            {{/suggested}}
             <div class="author-name">
-                <div class="author-title">{{optionName}}</div>
+                <div class="author-title">{{name}}</div>
                 <div class="author-subtitle">
-                    <span>{{optionType}}</span>
+                    <span>{{type}}{{#gender}}, {{.}}{{/gender}}</span>
                 </div>
             </div>
             <a class="ui red ribbon label">Candidato</a>
             <div class="ui items">
                 <div class="item">
                     <div class="ui small image">
-                        <div style="background-image: url({{#optionImage}}{{.}}{{/optionImage}});" class="author-image">
-                            {{^optionImage}}<i class="fas fa-user"></i>{{/optionImage}}
+                        <div style="background-image: url({{#image}}{{.}}{{/image}});" class="author-image">
+                            {{^image}}<i class="fas fa-user"></i>{{/image}}
                         </div>
                     </div>
                     <div class="middle aligned content">
-                        {{#optionDescription}}<p>{{.}}</p>{{/optionDescription}}
-                        {{#optionBirthDate}}<p><b>Data di nascita:</b> {{.}}</p>{{/optionBirthDate}}
-                        {{#optionDeathDate}}<p><b>Data di morte: </b>{{.}}</p>{{/optionDeathDate}}
-                        {{^optionDescription}}
-                            {{^optionBirthDate}}
-                                {{^optionDeathDate}}
+                        {{#description}}<p>{{.}}</p>{{/description}}
+                        {{#positionHeld}}<p><b>Occupazione:</b> {{.}}</p>{{/positionHeld}}
+                        {{#birthDate}}<p><b>Data di nascita:</b> {{.}}{{#birthPlace}}, {{.}}{{/birthPlace}}</p>{{/birthDate}}
+                        {{#deathDate}}<p><b>Data di morte: </b> {{.}}{{#deathPlace}}, {{.}}{{/deathPlace}}</p>{{/deathDate}}
+                        {{^description}}
+                            {{^birthDate}}
+                                {{^deathDate}}
                                     <i>Non sono presenti informazioni aggiuntive riguardo questo elemento</i>
-                                {{/optionDeathDate}}
-                            {{/optionBirthDate}}
-                        {{/optionDescription}}
+                                {{/deathDate}}
+                            {{/birthDate}}
+                        {{/description}}
                     </div>
                 </div>
             </div>
-            {{#optionTitles.length}}
+            {{#titles.length}}
                 <a class="ui red ribbon label">Testi dell'autore</a>
-                {{#optionTitles}}
-                    <div class="ui items">
-                        <div class="ui accordion">
-                            <div class="title">
-                                <i class="dropdown icon"></i>
-                                Visualizza testi {{titlesSource}}
-                            </div>
-                            <div class="content">
-                                <ul class="ui bulleted list card-box">
-                                    {{#titlesItem}}
-                                        <li>
-                                            <div class="item">{{.}}</div>
-                                        </li>
-                                    {{/titlesItem}}
-                                </ul>
-                            </div>
+                <div class="ui items">
+                    <div class="ui accordion">
+                        <div class="active title">
+                            <i class="dropdown icon"></i>
+                            Visualizza testi {{titlesSource}}
+                        </div>
+                        <div class="active content">
+                            <ul class="ui bulleted list card-box">
+                                {{#titles}}
+                                    <li>
+                                        <div class="item">{{.}}</div>
+                                    </li>
+                                {{/titles}}
+                            </ul>
                         </div>
                     </div>
-                {{/optionTitles}}
-            {{/optionTitles.length}}
+                </div>
+            {{/titles.length}}
             <a class="ui red ribbon label">Esplora in...</a>
             <div class="center aligned card-box">
-                {{#optionWikidata}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikidata</a>{{/optionWikidata}}
-                {{#optionWikipediaIt}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia</a>{{/optionWikipediaIt}}
-                {{#optionViaf}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">VIAF</a>{{/optionViaf}}
-                {{#optionTreccani}}<a class="ui center aligned blue label" href="http://www.treccani.it/enciclopedia/{{.}}" target="_blank">Treccani</a>{{/optionTreccani}}
-                {{#optionSbn}}<a class="ui center aligned blue label" href="http://id.sbn.it/af/{{.}}" target="_blank">SBN</a>{{/optionSbn}}
+                {{#wikidata}}<a href="{{.}}" target="_blank" class="ui center aligned label basic">Fonte: Wikidata</a>{{/wikidata}}
+                {{#viaf}}<a class="ui center aligned basic label" href="{{.}}" target="_blank">Fonte:  VIAF</a>{{/viaf}}
+                {{#wikipedia}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia IT</a>{{/wikipedia}}
+                {{#wikimediaCommons}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikimedia Commons</a>{{/wikimediaCommons}}
+                {{#isni}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">ISNI</a>{{/isni}}
+                {{#wikipediaIt}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia</a>{{/wikipediaIt}}
+                {{#treccani}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Treccani</a>{{/treccani}}
+                {{#sbn}}<a class="ui center aligned blue label" href="https://opac.sbn.it/opacsbn/opac/iccu/scheda_authority.jsp?bid={{.}}" target="_blank">SBN</a>{{/sbn}}
+                {{#ch}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Catholic Hierarchy</a>{{/ch}}
+                {{#dbpedia}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Dbpedia</a>{{/dbpedia}}
+                {{#lcnaf}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">LCNAF</a>{{/lcnaf}}
+                {{#gnd}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">GND</a>{{/gnd}}
+                {{#bnf}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">BNF</a>{{/bnf}}
+                {{#ulan}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">ULAN</a>{{/ulan}}
+                {{#bav}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">BAV</a>{{/bav}}
+                {{#cerl}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">CERL</a>{{/cerl}}
             </div>
             <div class="ui divider"></div>
             <button onclick="authorSelect(this, this.parentElement.getAttribute('data-item'))" class="ui fluid green button author-selection">Seleziona candidato</button>

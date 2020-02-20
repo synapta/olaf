@@ -1,30 +1,68 @@
 <div class="column">
     <div class="ui raised segment">
-        <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Autore</a>
-        <p class="author-name">
-            <a target="_blank" href="{{authorUri}}">
-                <i id="author-link" class="fas fa-external-link-alt"></i> {{authorName.nameFull}}
-            </a>
-        </p>
-        {{#authorTitles}}
-        <a href="{{authorUri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titlesNumber}}) - Visualizza tutte</a>
-        <ul class="ui bulleted list card-box">
-            {{#titlesItem}}
-            <li>
-                <div class="item title">{{.}}</div>
-            </li>
-            {{/titlesItem}}
-        </ul>
-        {{/authorTitles}}
-        {{#authorRoles}}
-        <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
-        <div class="ui bulleted list card-box">
-            {{#rolesItem}}
-            <div class="item">{{.}}</div>
-            {{/rolesItem}}
+        <div id="author-fields">
+
+            <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Autore</a>
+
+            <p class="author-name">
+                <a target="_blank" href="{{uri}}">
+                    <i id="author-link" class="fas fa-external-link-alt"></i> {{rawName}}
+                </a>
+            </p>
+
+            {{#type}}
+                <a class="ui blue ribbon label"> <i class="fas fa-book"></i> Categoria</a>
+                <p class="card-box">
+                    {{type}}, {{gender}}
+                </p>
+            {{/type}}
+
+            {{#birthDate}}
+                <a class="ui blue ribbon label"> <i class="fas fa-star"></i> Data di nascita</a>
+                <p class="card-box">
+                    {{birthDate}}, {{birthPlace}}
+                </p>
+            {{/birthDate}}
+
+            {{#deathDate}}
+                <a class="ui blue ribbon label"> <i class="fas fa-cross"></i> Data di morte</a>
+                <p class="card-box">
+                    {{deathDate}}, {{deathPlace}}
+                </p>
+            {{/deathDate}}
+
+            {{#yearFirstBook}}
+                <a class="ui blue ribbon label"> <i class="fas fa-book"></i> Intervallo Date Opere</a>
+                <p class="card-box">
+                    dal {{yearFirstBook}} al {{yearLastBook}}
+                </p>
+            {{/yearFirstBook}}
+
+
+            {{#titles.length}}
+                <a href="{{uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titles.length}}) - Visualizza tutte</a>
+                <ul class="ui bulleted list card-box">
+                    {{#titles}}
+                    <li>
+                        <div class="item title">{{.}}</div>
+                    </li>
+                    {{/titles}}
+                </ul>
+            {{/titles.length}}
+
+            {{#roles.length}}
+                <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
+                <div class="ui bulleted list card-box">
+                    {{#roles}}
+                        <div class="item">{{.}}</div>
+                    {{/roles}}
+                </div>
+            {{/roles.length}}
+
         </div>
-        {{/authorRoles}}
+
         <div class="ui divider"></div>
+
         <div class="card-box">
             <div id="send-button">
                 <div class="fluid ui labeled button" tabindex="0">
@@ -36,7 +74,8 @@
                     </a>
                 </div>
             </div>
-            <div onclick="authorSkip('{{authorUri}}')" data-identifier="{{authorUri}}" class="fluid ui button">Salta autore</div>
+            <div onclick="authorSkip('{{uri}}')" data-identifier="{{uri}}" class="fluid ui button">Salta autore</div>
         </div>
+
     </div>
 </div>

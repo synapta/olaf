@@ -8,13 +8,17 @@ let authorSelect = (authorId) => {
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
             PREFIX bookType: <http://dati.cobis.to.it/vocabulary/bookType/>
             PREFIX olaf: <http://olaf.synapta.io/onto/>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 
             SELECT ?personURI 
                    ?personName 
                    (SAMPLE(?description) as ?description) 
                    (SAMPLE(?link) as ?link) 
+                   (MIN(xsd:integer(?years)) as ?annoMin)
+                   (MAX(xsd:integer(?years)) as ?annoMax)
                    (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) 
-                   (GROUP_CONCAT(distinct(?title); separator="###") as ?title) WHERE {
+                   (GROUP_CONCAT(distinct(?titleFull); separator="###") as ?title) WHERE {
 
                 {
                     SELECT ?personURI (COUNT(DISTINCT ?contribution) AS ?titlesCount) WHERE {
@@ -45,6 +49,8 @@ let authorSelect = (authorId) => {
                 ?contribution bf2:agent ?personURI .
                 ?instance bf2:title ?titleURI .
                 ?titleURI rdfs:label ?title .
+                OPTIONAL {?instance cobis:dataNormalizzata ?years .}
+                BIND(CONCAT(IF(BOUND(?years), ?years, "" ) , " ~ " , ?title) as ?titleFull)
 
                 OPTIONAL {?personURI schema:description ?description . }
                 OPTIONAL {?personURI foaf:isPrimaryTopicOf ?link . }
@@ -199,9 +205,9 @@ function authorLink(body) {
 
     // Get body params
     let authorUri = body.authorUri;
-    let optionWikidata = body.optionWikidata;
-    let optionViaf = body.optionViaf;
-    let optionSbn = body.optionSbn;
+    let optionWikidata = body.wikidata;
+    let optionViaf = body.viaf;
+    let optionSbn = body.sbn;
 
     // Single variables as arrays
     if(optionWikidata && !Array.isArray(optionWikidata))
@@ -329,7 +335,7 @@ function composeQueryVIAF(name, surname){
         method: 'GET',
         uri: 'https://www.viaf.org/viaf/AutoSuggest',
         qs: {
-            query: name + " " + surname
+            query: (name + " " + surname).trim()
         },
         headers: {
             'cache-control': 'no-cache',
@@ -352,7 +358,49 @@ function makeViafQuery(name, surname) {
     });
 }
 
+function parseViafOptions(body, viafUris) {
 
+    // Invalid fields
+    let invalidFields = ['uniformtitleexpression', 'uniformtitlework'];
+
+    // Parse results
+    let results = (body.result || []).slice(0, 4);
+    // Filter current results removing known authors and options with invalid fields
+    results = results.filter(el => !viafUris.includes(el['viafid']) && !invalidFields.includes(el['nametype']));
+
+    // Construct options from query results
+    return results.map(el => new Option(el, 'viaf', config));
+
+}
+
+function parseWikidataOptions(body) {
+
+    // Parse results
+    let results = body.results.bindings;
+
+    // Construct options from query results
+    return results.map(el => new Option(el, 'wikidata', config));
+
+}
+
+function parseAuthorOptions(author, bodies, callback) {
+console.log('pippo');
+
+    // Store bodies
+    let wikidataBody = bodies[0];
+    let viafBody = bodies[1];
+
+    // Get wikidata options
+    let wikidataOptions = parseWikidataOptions(wikidataBody);
+    let viafOptions = parseViafOptions(viafBody, wikidataOptions.filter(el => el.viaf).map(el => el.getViafId()));
+    let options = wikidataOptions.concat(viafOptions);
+    // Enrich all options with VIAF and return them
+    Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
+        options.map(el => el.getString());
+        callback(options);
+    });
+
+}
 
 // Exports
 exports.authorSelect = (params) => {
@@ -361,6 +409,10 @@ exports.authorSelect = (params) => {
 
 exports.authorOptions = (name, surname) => {
     return authorOptions(name, surname);
+};
+
+exports.parseAuthorOptions = (author, bodies, callback) => {
+    parseAuthorOptions(author, bodies, callback);
 };
 
 exports.authorSkip = (body) => {

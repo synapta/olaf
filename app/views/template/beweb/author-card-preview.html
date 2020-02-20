@@ -1,0 +1,56 @@
+<div id="header-table-divider" class="ui divider"></div>
+
+<table id="header-table" class="ui very basic fixed table">
+    <tbody>
+    <tr>
+        <td></td>
+        <td></td>
+        {{#first}}
+            <td>
+                <div class="ui cards">
+                    <div class="fluid card header-card">
+                        <div class="content">
+                            <div class="right floated header-image" style="background-image: url({{image}});"></div>
+                            <div class="header">
+                                {{name}}
+                            </div>
+                            <div class="description">
+                                {{description}}
+                            </div>
+                        </div>
+                        <div class="extra content">
+                            <div class="ui two buttons">
+                                {{#wikidata}}<a href="{{.}}" target="_blank" class="ui center aligned label basic">Fonte: Wikidata</a>{{/wikidata}}
+                                {{#viaf}}<a class="ui center aligned basic label" href="{{.}}" target="_blank">Fonte:  VIAF</a>{{/viaf}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        {{/first}}
+        {{#second}}
+            <td>
+                <div class="ui fluid cards">
+                    <div class="fluid card header-card">
+                        <div class="content">
+                            <div class="right floated header-image" style="background-image: url({{image}});"></div>
+                            <div class="header">
+                                {{name}}
+                            </div>
+                            <div class="description">
+                                {{description}}
+                            </div>
+                        </div>
+                        <div class="extra content">
+                            <div class="ui two buttons">
+                                {{#wikidata}}<a href="{{.}}" target="_blank" class="ui center aligned label basic">Fonte: Wikidata</a>{{/wikidata}}
+                                {{#viaf}}<a class="ui center aligned basic label" href="{{.}}" target="_blank">Fonte:  VIAF</a>{{/viaf}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        {{/second}}
+    </tr>
+    </tbody>
+</table>

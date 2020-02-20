@@ -1,16 +1,16 @@
 {{#selectedFields}}
-{{#values.length}}
-<div class="ui raised segment">
-    <div class="ui bottom left attached label">{{label}}</div>
-    <div>
-        {{#values}}
-        <div style="margin-bottom: 10px;" class="ui fluid input">
-            <input type="text" name="{{label}}" placeholder="{{label}}" value="{{.}}" />
+    {{#values.length}}
+        <div class="ui raised segment selection-segment">
+            <div class="ui bottom left attached label">{{label}}</div>
+            <div>
+                {{#values}}
+                <div class="ui fluid input">
+                    <input type="text" name="{{field}}" placeholder="{{label}}" value="{{.}}" />
+                </div>
+                {{/values}}
+            </div>
         </div>
-        {{/values}}
-    </div>
-</div>
-{{/values.length}}
+    {{/values.length}}
 {{/selectedFields}}
 <div class="ui icon message">
     <i class="fas fa-arrow-left"></i>

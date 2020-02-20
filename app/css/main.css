@@ -10,7 +10,8 @@
 
 .navbar
 {
-    height: 65px;
+    display: block !important;
+    min-height: 65px;
     text-align: center;
 }
 
@@ -18,6 +19,25 @@
 {
     width: 100%;
     line-height: 65px;
+}
+
+#navbar-table {
+    width:100%;
+    height: 65px;
+    padding: 0 3%;
+    display: table;
+}
+
+.navbar-fixed-column {
+    width: 300px;
+}
+
+.navbar-fixed-column #send-button {
+    margin: 0 !important;
+}
+
+.header span {
+    color: #aaa;
 }
 
 .card-box
@@ -59,9 +79,12 @@ ul.card-box > li
 #author-link
 {
     font-size: 12px;
-    position: relative;
-    top: -3px;
     margin-right: 5px;
+}
+
+.author-option .label
+{
+    margin: 2.5px 0 !important;
 }
 
 #send-button
@@ -129,6 +152,11 @@ ul.card-box > li
     margin-bottom: 10px;
 }
 
+.add_match span {
+    position: relative;
+    top: -14px;
+}
+
 /* Matches selection */
 
 .fa-arrow-left, .fa-arrow-right, .fa-spinner
@@ -141,6 +169,82 @@ ul.card-box > li
 {
     -webkit-animation: rotation 2s infinite linear !important;
     animation: rotation 2s infinite linear !important;
+}
+
+.selection-segment {
+    margin-bottom: 10px;
+}
+
+.selection-segment input {
+    margin: 5px 0 !important;
+}
+
+/* Beweb selection */
+
+#header-table-divider {
+    margin: 0 !important;
+}
+
+#header-table {
+    padding: 0 40px;
+    margin-top: 0 !important;
+}
+
+.header-card {
+    width: calc(100% - 15px) !important;
+}
+
+.header-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    background-size: cover;
+    background-color: #E8E8E8
+}
+
+.selection-input {
+    margin-bottom: 10px;
+}
+
+.field_selection {
+    margin: 2.5px !important;
+    cursor: pointer;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: calc(100% - 30px);
+}
+
+.selection-input-wrapper {
+    width: calc(100% - 35px);
+}
+
+.label-wrapper{
+    display: inline;
+}
+
+.wrapper_link {
+    position: relative;
+    top: -10px;
+}
+
+.selection-row {
+    transition: background-color 500ms;
+}
+
+.selection-row .fa-check {
+    color: #21BA45;
+}
+
+.title h2 {
+    display: inline;
+}
+
+/* Messages */
+
+.message .fas {
+    font-size: 35px;
+    margin-right: 15px;
 }
 
 /* Footer */
@@ -229,6 +333,14 @@ ul.card-box > li
 #piemonte-logo {
     height: 28px;
     margin: 0 10px;
+}
+
+.scarta-icon-button {
+    /* width: 10em; */
+}
+
+.differenze-column {
+    width: 40em;
 }
 
 /* VERY SMALL SCREENS AND LARGE TABLETS */

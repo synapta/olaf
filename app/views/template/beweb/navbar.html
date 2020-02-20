@@ -1,0 +1,35 @@
+<table id="navbar-table">
+    <tr>
+        <td class="navbar-fixed-column">
+            {{^selection}}
+                <div onclick="location.reload()" data-identifier="{{uri}}" class="fluid ui button">Torna indietro</div>
+            {{/selection}}
+        </td>
+        <td>
+            <h3 class="ui header">
+                <i class="fas fa-book-reader" style="font-size: larger; margin-right: 10px;" aria-hidden="true"></i>
+                Open Linked Authority Files
+                <span >on <span style="text-transform: uppercase" id="user-token"></span></span>
+            </h3>
+        </td>
+        <td class="navbar-fixed-column">
+            {{#selection}}
+                <div id="send-button">
+                    <div class="fluid ui labeled button" tabindex="0">
+                        <button id="selected-options-send" onclick="authorMatch()" class="fluid ui button disabled">
+                            Confronta schede selezionate
+                        </button>
+                        <a id="selected-options-counter" class="ui basic label">
+                            0
+                        </a>
+                    </div>
+                </div>
+            {{/selection}}
+            {{^selection}}
+                <div id="form-submit" onclick="authorSend()" class="ui fluid blue button">Invia i dati</div>
+            {{/selection}}
+        </td>
+    </tr>
+</table>
+
+<div id="selection-header"></div>
