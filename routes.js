@@ -6,8 +6,8 @@ const pgp = require('pg-promise')({});
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
 const Config         = require('./config').Config;
-//const pgConnection         = require('./pgConfig').pgConnection;
-//var schedule = require('node-schedule');
+const pgConnection         = require('./pgConfig').pgConnection;
+var schedule = require('node-schedule');
 
 
 // Modules
@@ -16,12 +16,12 @@ let parser           = null;
 let config           = null;
 let configToken      = null;
 
-//const db = pgp(pgConnection)
+const db = pgp(pgConnection);
 
-//const bewebQueries = require('./users/beweb/queries');
+const bewebQueries = require('./users/beweb/queries');
 
-/*schedule.scheduleJob('21 4 * * *', function(firedate) {
-    console.log(firedate, "checking modifications")
+schedule.scheduleJob('21 */4 * * *', function(firedate) {
+    console.log(firedate, "checking modifications");
     bewebQueries.getAllIdBeweb(db, function(data) {
         let parseAnother = function() {
             if (data.length === 0 ) {
@@ -34,7 +34,7 @@ let configToken      = null;
         };
         parseAnother();
     })
-});*/
+});
 
 
 // Token validation
