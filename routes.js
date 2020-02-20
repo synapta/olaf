@@ -2,11 +2,11 @@
 const express        = require('express');
 const bodyParser     = require('body-parser');
 const nodeRequest    = require('request');
-const pgp            = require('pg-promise')({});
+//const pgp            = require('pg-promise')({});
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
 const Config         = require('./config').Config;
-const pgConnection   = require('./pgConfig').pgConnection;
+//const pgConnection   = require('./pgConfig').pgConnection;
 const schedule       = require('node-schedule');
 
 // Modules
@@ -14,11 +14,12 @@ let queries          = null;
 let parser           = null;
 let config           = null;
 let configToken      = null;
+let driver           = null;
 
-const db = pgp(pgConnection);
-const bewebQueries = require('./users/beweb/queries');
+//const db = pgp(pgConnection);
+//const bewebQueries = require('./users/beweb/queries');
 
-schedule.scheduleJob('21 */4 * * *', function(firedate) {
+/*schedule.scheduleJob('21 4 * * *', function(firedate) {
     console.log(firedate, "checking modifications");
     bewebQueries.getAllIdBeweb(db, function(data) {
         let parseAnother = function() {
@@ -32,7 +33,7 @@ schedule.scheduleJob('21 */4 * * *', function(firedate) {
         };
         parseAnother();
     })
-});
+});*/
 
 
 // Token validation
@@ -41,14 +42,14 @@ function validateToken(token) {
     // Get valid tokens
     let validTokens = ['cobis', 'aaso', 'amt', 'cai', 'cmus', 'dssp',
                        'fga', 'ibmp', 'inaf', 'inrim', 'oato', 'plev',
-                       'slvm', 'toas', 'beweb'];
+                       'slvm', 'toas', 'beweb', 'arco'];
 
     // Check if token is valid
     return validTokens.includes(token);
 
 }
 
-module.exports = function(app) {
+module.exports = function(app, db) {
 
     // Setting up express
     app.use('/', express.static('./app'));
@@ -74,6 +75,8 @@ module.exports = function(app) {
             // Load modules
             queries = require('./users/' + token + '/queries');
             parser = require('./users/' + token + '/parser');
+            if(token === 'arco')
+                driver = require('./users/' + token + '/db');
 
             // Initialize configuration
             parser.configInit(config);
@@ -98,6 +101,14 @@ module.exports = function(app) {
         if (request.params.token === 'beweb') {
             response.sendFile('author-list.html', {root: __dirname + '/app/views'});
         }
+    });
+
+
+    // Try database
+    app.get('/api/v1/:token/user', (request, response) => {
+
+        driver.retrieveUser(db);
+
     });
 
 

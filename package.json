@@ -32,6 +32,10 @@
     "require": "^2.4.20",
     "semantic-ui-grid": "^2.4.1",
     "sugar": "latest",
-    "underscore": "^1.9.1"
+    "underscore": "^1.9.1",
+    "mongodb": "latest",
+    "bcrypt": "latest",
+    "passport": "latest",
+    "passport-local": "latest"
   }
 }
