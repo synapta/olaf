@@ -2,13 +2,12 @@
 const express        = require('express');
 const bodyParser     = require('body-parser');
 const nodeRequest    = require('request');
-const pgp = require('pg-promise')({});
+const pgp            = require('pg-promise')({});
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
 const Config         = require('./config').Config;
-const pgConnection         = require('./pgConfig').pgConnection;
-var schedule = require('node-schedule');
-
+const pgConnection   = require('./pgConfig').pgConnection;
+const schedule       = require('node-schedule');
 
 // Modules
 let queries          = null;
@@ -17,7 +16,6 @@ let config           = null;
 let configToken      = null;
 
 const db = pgp(pgConnection);
-
 const bewebQueries = require('./users/beweb/queries');
 
 schedule.scheduleJob('21 */4 * * *', function(firedate) {

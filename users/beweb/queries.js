@@ -238,11 +238,11 @@ let wikidataQuery = (options) => {
               }
               
               MINUS {
-                ?item wdt:P31 wd:Q28798908
+                ?i wdt:P31 wd:Q28798908
               }
             
               MINUS {
-                ?item wdt:P31 wd:Q13442814
+                ?i wdt:P31 wd:Q13442814
               }
             
               MINUS{
