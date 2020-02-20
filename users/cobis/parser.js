@@ -113,41 +113,11 @@ function parseViafOptions(body, viafUris) {
     // Parse results
     let results = body.result || [];
     // Filter current results removing known authors and options with invalid fields
+    results = results.filter((object, index, array) => array.map((el) => el.viafid).indexOf(object.viafid) === index);
     results = results.filter(el => !viafUris.includes(el['viafid']) && !invalidFields.includes(el['nametype']));
 
     // Construct options from query results
     return results.map(el => new Option(el, 'viaf', config));
-
-}
-
-function parseOutput(data){
-
-    let output = {};
-    let outputDictionary = config.getInputDictionary();
-    let configFields = config.getConfig().fields;
-
-    // Translate data output to Cobis dictionary
-    Object.keys(data).map((field) => {
-        if((configFields[field].limit === null || configFields[field].limit > 1) && !Array.isArray(data[field]))
-            data[field] = [data[field]];
-        output[outputDictionary[field]] = data[field];
-    });
-
-    // Get composite fields
-    Object.keys(configFields).filter(field => configFields[field].composite).forEach(compositeField => {
-        // Initialize output composite object
-        output[outputDictionary[compositeField]] = [];
-        // Populate output composite object and remove unnecessary composite fields
-        Object.keys(data).filter(field => field.includes(compositeField)).map(field => {
-            if((configFields[field].limit === null || configFields[field].limit > 1) && !Array.isArray(data[field]))
-                data[field] = [data[field]];
-            let subfieldKey = field.replace(compositeField, '').toLowerCase();
-            output[outputDictionary[compositeField]].push({[subfieldKey]: data[field]});
-            delete output[outputDictionary[field]];
-        });
-    });
-
-    return output;
 
 }
 
