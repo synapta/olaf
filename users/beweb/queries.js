@@ -236,6 +236,14 @@ let wikidataQuery = (options) => {
               MINUS{
                 ?i wdt:P31 wd:Q4167410
               }
+              
+              MINUS {
+                ?i wdt:P31 wd:Q28798908
+              }
+            
+              MINUS {
+                ?i wdt:P31 wd:Q13442814
+              }
             
               MINUS{
                 ?i wdt:P31 ?class.
