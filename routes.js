@@ -62,7 +62,7 @@ function loggingFlow(url) {
     let allowedUrl = [
         '/get/:token/login',
         '/api/v1/:token/login',
-        '/api/v1/:token/login'
+        '/api/v1/:token/signup',
     ];
 
     // Replace placeholder with current token
@@ -133,7 +133,7 @@ module.exports = function(app, passport = null, driver = null) {
 
     // Arco users
     app.post('/api/v1/arco/signup', (request, response) => {
-        auth.insertUser(driver, request.query.email, request.query.password, request.query.username, () => {
+        auth.insertUser(driver, request.body.email, request.body.password, request.body.username, () => {
             response.json({result: 'ok'})
         });
     });

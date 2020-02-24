@@ -11,7 +11,7 @@ function insertUser(driver, email, password, username, callback) {
             '_id': email,
             password: hash,
             username: username
-        }, callback)
+        }, callback())
     });
 
 }
