@@ -98,8 +98,8 @@ module.exports = function(app, driver = null) {
             parser.configInit(config);
 
             // Next route
-            if(loginToken(token) && !request.user)
-                response.redirect('login');
+            if(loginToken(token) && !request.user && request.originalUrl !== '/get/' + token + '/login')
+                response.redirect('/get/' + token + '/login');
             else
                 next()
 
@@ -108,7 +108,7 @@ module.exports = function(app, driver = null) {
             // Set not allowed response
             response.status(403);
             response.send('Not allowed to read this resource.');
-            
+
         }
 
     });
@@ -118,7 +118,11 @@ module.exports = function(app, driver = null) {
         response.sendFile('author.html', {root: __dirname + '/app/views'});
     });
 
-    app.get(['/get/:token/author-list/'], (request, response) => {
+    app.get('/get/:token/login', (request, response) => {
+        response.sendFile('login.html', {root: __dirname + '/app/views'});
+    });
+
+    app.get('/get/:token/author-list/', (request, response) => {
         if (request.params.token === 'beweb') {
             response.sendFile('author-list.html', {root: __dirname + '/app/views'});
         }
