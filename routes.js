@@ -1,5 +1,6 @@
 // Requirements
 const express        = require('express');
+const session        = require('express-session');
 const bodyParser     = require('body-parser');
 const nodeRequest    = require('request');
 //const pgp            = require('pg-promise')({});
@@ -9,6 +10,7 @@ const Config         = require('./config').Config;
 //const pgConnection   = require('./pgConfig').pgConnection;
 const schedule       = require('node-schedule');
 const passport       = require('passport');
+const flash          = require('connect-flash');
 
 // Modules
 let queries          = null;
@@ -16,7 +18,6 @@ let parser           = null;
 let auth             = null;
 let config           = null;
 let configToken      = null;
-let driver           = null;
 
 //const db = pgp(pgConnection);
 //const bewebQueries = require('./users/beweb/queries');
@@ -68,6 +69,11 @@ module.exports = function(app, driver = null) {
 
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(bodyParser.json());
+    app.use(session({ cookie: { maxAge: 60000 },
+        secret: 'woot',
+        resave: false,
+        saveUninitialized: false}));
+    app.use(flash());
     app.use(passport.initialize());
     app.use(passport.session());
 
@@ -98,10 +104,10 @@ module.exports = function(app, driver = null) {
             parser.configInit(config);
 
             // Next route
-            if(loginToken(token) && !request.user && request.originalUrl !== '/get/' + token + '/login')
+            /*if(loginToken(token) && !request.user && !request.originalUrl.includes(token + '/login'))
                 response.redirect('/get/' + token + '/login');
-            else
-                next()
+            else*/
+            next()
 
         } else {
 
@@ -138,7 +144,7 @@ module.exports = function(app, driver = null) {
     app.post('/api/v1/arco/login',
         passport.authenticate('local', {
             successRedirect: '/',
-            failureRedirect: '/login',
+            failureRedirect: '/get/arco/login',
             failureFlash: true
         })
     );

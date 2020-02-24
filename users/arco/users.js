@@ -3,7 +3,7 @@ const saltRounds = 10;
 
 
 // Insert new user
-function insertUser(driver, email, username, password, callback) {
+function insertUser(driver, email, password, username, callback) {
 
     // Generate hash and store new user
     bcrypt.hash(password, saltRounds, (err, hash) => {
@@ -16,10 +16,19 @@ function insertUser(driver, email, username, password, callback) {
 
 }
 
+// Find user by email (if)
+function findUserById(driver, email, callback) {
+
+    driver.collection('users').findOne({'_id': email}, (err, res) => {
+        callback(err, res);
+    });
+
+}
+
 // Retrieve user by email (id)
 function retrieveUser(driver, email, password, callback) {
 
-    driver.collection('users').findOne({'_id': username}, (err, res) => {
+    findUserById(driver, email, (err, res) => {
 
         // Not existing user
         if(err)
@@ -38,4 +47,5 @@ function retrieveUser(driver, email, password, callback) {
 }
 
 exports.insertUser = insertUser;
+exports.findUserById = findUserById;
 exports.retrieveUser = retrieveUser;

@@ -36,6 +36,8 @@
     "mongodb": "latest",
     "bcrypt": "latest",
     "passport": "latest",
-    "passport-local": "latest"
+    "passport-local": "latest",
+    "connect-flash": "latest",
+    "express-session": "latest"
   }
 }
