@@ -1,4 +1,4 @@
-const db = require('./db');
+const db = require('./users');
 
 // Import different login strategies
 const LocalStrategy = require('passport-local').Strategy;

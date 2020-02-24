@@ -51,6 +51,16 @@ function validateToken(token) {
 
 }
 
+function loginToken(token) {
+
+    // Get tokens that need login
+    let loginTokens = ['arco'];
+
+    // Check if current token need login
+    return loginTokens.includes(token);
+
+}
+
 module.exports = function(app, driver = null) {
 
     // Setting up express
@@ -79,21 +89,26 @@ module.exports = function(app, driver = null) {
             // Load modules
             queries = require('./users/' + token + '/queries');
             parser = require('./users/' + token + '/parser');
-            if(token === 'arco') {
+            if(loginToken(token)) {
                 require('./users/' + token + '/passport')(passport, driver);
-                auth = require('./users/' + token + '/db');
+                auth = require('./users/' + token + '/users');
             }
 
             // Initialize configuration
             parser.configInit(config);
 
             // Next route
-            next();
+            if(loginToken(token) && !request.user)
+                response.redirect('login');
+            else
+                next()
 
         } else {
+
             // Set not allowed response
             response.status(403);
             response.send('Not allowed to read this resource.');
+            
         }
 
     });
@@ -111,12 +126,9 @@ module.exports = function(app, driver = null) {
 
     // Arco users
     app.post('/api/v1/arco/signup', (request, response) => {
-
-        console.log(request.query);
         auth.insertUser(driver, request.query.email, request.query.password, request.query.username, () => {
             response.json({result: 'ok'})
         });
-
     });
 
     app.post('/api/v1/arco/login',
