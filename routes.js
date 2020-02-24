@@ -1,16 +1,10 @@
 // Requirements
-const express        = require('express');
-const session        = require('express-session');
-const bodyParser     = require('body-parser');
 const nodeRequest    = require('request');
 //const pgp            = require('pg-promise')({});
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
 const Config         = require('./config').Config;
 //const pgConnection   = require('./pgConfig').pgConnection;
-const schedule       = require('node-schedule');
-const passport       = require('passport');
-const flash          = require('connect-flash');
 
 // Modules
 let queries          = null;
@@ -62,20 +56,7 @@ function loginToken(token) {
 
 }
 
-module.exports = function(app, driver = null) {
-
-    // Setting up express
-    app.use('/', express.static('./app'));
-
-    app.use(bodyParser.urlencoded({extended: false}));
-    app.use(bodyParser.json());
-    app.use(session({ cookie: { maxAge: 60000 },
-        secret: 'woot',
-        resave: false,
-        saveUninitialized: false}));
-    app.use(flash());
-    app.use(passport.initialize());
-    app.use(passport.session());
+module.exports = function(app, passport = null, driver = null) {
 
     // Token middleware
     app.all(['/api/v1/:token/*', '/get/:token/*'], (request, response, next) => {
@@ -104,10 +85,10 @@ module.exports = function(app, driver = null) {
             parser.configInit(config);
 
             // Next route
-            /*if(loginToken(token) && !request.user && !request.originalUrl.includes(token + '/login'))
+            if(loginToken(token) && !request.user && !request.originalUrl.includes(token + '/login'))
                 response.redirect('/get/' + token + '/login');
-            else*/
-            next()
+            else
+                next()
 
         } else {
 
@@ -143,7 +124,7 @@ module.exports = function(app, driver = null) {
 
     app.post('/api/v1/arco/login',
         passport.authenticate('local', {
-            successRedirect: '/',
+            successRedirect: '/get/arco/author',
             failureRedirect: '/get/arco/login',
             failureFlash: true
         })
