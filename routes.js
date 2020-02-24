@@ -13,6 +13,7 @@ const passport       = require('passport');
 // Modules
 let queries          = null;
 let parser           = null;
+let auth             = null;
 let config           = null;
 let configToken      = null;
 let driver           = null;
@@ -80,8 +81,7 @@ module.exports = function(app, dbConnection = null) {
             parser = require('./users/' + token + '/parser');
             if(token === 'arco') {
                 require('./users/' + token + '/passport')(passport, dbConnection);
-                //console.log(passport);
-                //driver = require('./users/' + token + '/db');
+                auth = require('./users/' + token + '/db');
             }
 
             // Initialize configuration
@@ -109,14 +109,21 @@ module.exports = function(app, dbConnection = null) {
         }
     });
 
-    // Try database
-    app.post('/api/v1/arco/login', (request, response, next) => {
+    // Arco users
+    app.post('/api/v1/arco/signup', (request, response) => {
 
+        console.log(request.query);
+        auth.insertUser(dbConnection, request.query.email, request.query.password, request.query.username, () => {
+            response.json({result: 'ok'})
+        });
+
+    });
+
+    app.post('/api/v1/arco/login', (request, response, next) => {
         // Authenticate with Mongo
         passport.authenticate('local', (err, user, info) => {
             response.json(user);
         })(request, response, next);
-
     });
 
 
