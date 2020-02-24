@@ -39,7 +39,7 @@ module.exports = (passport, driver) => {
                     'message': 'incorrectPasswordError'
                 });
             }
-            
+
             return done(null, user, {});
 
         });

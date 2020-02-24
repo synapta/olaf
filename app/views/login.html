@@ -41,7 +41,7 @@
         </form>
 
         <h2 class="ui dividing header">Registrazione</h2>
-        <form id="signup-form" class="ui form">
+        <form id="signup-form" class="ui form" action="/api/v1/arco/signup" method="post">
 
             <div class="field">
                 <label>Indirizzo e-mail</label>
@@ -64,12 +64,12 @@
                 <input type="text" name="username" placeholder="Scegli il tuo username">
             </div>
 
-            <div class="field">
+            <!--<div class="field">
                 <div class="ui checkbox">
                     <input type="checkbox" tabindex="0" class="hidden">
                     <label>I agree to the Terms and Conditions</label>
                 </div>
-            </div>
+            </div>-->
             <button class="ui button" type="submit">Submit</button>
 
         </form>

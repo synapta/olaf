@@ -56,6 +56,22 @@ function loginToken(token) {
 
 }
 
+function loggingFlow(url) {
+
+    // Get allowed login url
+    let allowedUrl = [
+        '/get/:token/login',
+        '/api/v1/:token/login',
+        '/api/v1/:token/login'
+    ];
+
+    // Replace placeholder with current token
+    allowedUrl = allowedUrl.map((el) => el.replace(':token', configToken));
+
+    return allowedUrl.includes(url);
+
+}
+
 module.exports = function(app, passport = null, driver = null) {
 
     // Token middleware
@@ -85,7 +101,7 @@ module.exports = function(app, passport = null, driver = null) {
             parser.configInit(config);
 
             // Next route
-            if(loginToken(token) && !request.user && !request.originalUrl.includes(token + '/login'))
+            if(loginToken(token) && !request.user && !loggingFlow(request.originalUrl))
                 response.redirect('/get/' + token + '/login');
             else
                 next()
