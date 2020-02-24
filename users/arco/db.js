@@ -19,16 +19,21 @@ function insertUser(driver) {
 // Retrieve user by email (id)
 function retrieveUser(driver, username, password, callback) {
 
-    driver.collection('users').findOne({'_id': 'provaa@ciao.it'}, (err, res) => {
+    driver.collection('users').findOne({'_id': username}, (err, res) => {
 
         // Not existing user
-        if(err) callback(err, );
-        // Compare user password with given token
-        bcrypt.compare('prova', res.password, function(err, comparison) {
-            callback(err, comparison ? res : comparison);
-        });
+        if(err)
+            callback(err, null);
+        else if (!res)
+            callback(null, null);
+        else {
+            // Compare user password with given token
+            bcrypt.compare(password, res.password, (err, comparison) => {
+                callback(null, comparison ? res : comparison);
+            });
+        }
 
-    })
+    });
 
 }
 

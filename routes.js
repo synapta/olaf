@@ -8,6 +8,7 @@ const fs             = require('fs');
 const Config         = require('./config').Config;
 //const pgConnection   = require('./pgConfig').pgConnection;
 const schedule       = require('node-schedule');
+const passport       = require('passport');
 
 // Modules
 let queries          = null;
@@ -49,13 +50,15 @@ function validateToken(token) {
 
 }
 
-module.exports = function(app, db) {
+module.exports = function(app, dbConnection = null) {
 
     // Setting up express
     app.use('/', express.static('./app'));
 
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(bodyParser.json());
+    app.use(passport.initialize());
+    app.use(passport.session());
 
     // Token middleware
     app.all(['/api/v1/:token/*', '/get/:token/*'], (request, response, next) => {
@@ -75,8 +78,11 @@ module.exports = function(app, db) {
             // Load modules
             queries = require('./users/' + token + '/queries');
             parser = require('./users/' + token + '/parser');
-            if(token === 'arco')
-                driver = require('./users/' + token + '/db');
+            if(token === 'arco') {
+                require('./users/' + token + '/passport')(passport, dbConnection);
+                //console.log(passport);
+                //driver = require('./users/' + token + '/db');
+            }
 
             // Initialize configuration
             parser.configInit(config);
@@ -103,11 +109,13 @@ module.exports = function(app, db) {
         }
     });
 
-
     // Try database
-    app.get('/api/v1/:token/user', (request, response) => {
+    app.post('/api/v1/arco/login', (request, response, next) => {
 
-        driver.retrieveUser(db);
+        // Authenticate with Mongo
+        passport.authenticate('local', (err, user, info) => {
+            response.json(user);
+        })(request, response, next);
 
     });
 
