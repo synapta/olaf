@@ -133,8 +133,8 @@ module.exports = function(app, passport = null, driver = null) {
 
     // Arco users
     app.post('/api/v1/arco/signup', (request, response) => {
-        auth.insertUser(driver, request.body.email, request.body.password, request.body.username, () => {
-            response.json({result: 'ok'})
+        auth.insertUser(driver, request.body.email, request.body.password, request.body.username, (err) => {
+            response.json({error: err})
         });
     });
 
