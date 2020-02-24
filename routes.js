@@ -51,7 +51,7 @@ function validateToken(token) {
 
 }
 
-module.exports = function(app, dbConnection = null) {
+module.exports = function(app, driver = null) {
 
     // Setting up express
     app.use('/', express.static('./app'));
@@ -80,7 +80,7 @@ module.exports = function(app, dbConnection = null) {
             queries = require('./users/' + token + '/queries');
             parser = require('./users/' + token + '/parser');
             if(token === 'arco') {
-                require('./users/' + token + '/passport')(passport, dbConnection);
+                require('./users/' + token + '/passport')(passport, driver);
                 auth = require('./users/' + token + '/db');
             }
 
@@ -113,19 +113,19 @@ module.exports = function(app, dbConnection = null) {
     app.post('/api/v1/arco/signup', (request, response) => {
 
         console.log(request.query);
-        auth.insertUser(dbConnection, request.query.email, request.query.password, request.query.username, () => {
+        auth.insertUser(driver, request.query.email, request.query.password, request.query.username, () => {
             response.json({result: 'ok'})
         });
 
     });
 
-    app.post('/api/v1/arco/login', (request, response, next) => {
-        // Authenticate with Mongo
-        passport.authenticate('local', (err, user, info) => {
-            response.json(user);
-        })(request, response, next);
-    });
-
+    app.post('/api/v1/arco/login',
+        passport.authenticate('local', {
+            successRedirect: '/',
+            failureRedirect: '/login',
+            failureFlash: true
+        })
+    );
 
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
