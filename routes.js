@@ -103,7 +103,7 @@ module.exports = function(app, passport = null, driver = null) {
 
             // Next route
             if(loginToken(token) && !request.user && !loggingFlow(request.originalUrl))
-                response.redirect('/get/' + token + '/login');
+                response.redirect('/get/' + token + '/login?redirect=' + request.originalUrl);
             else
                 next()
 
@@ -139,13 +139,21 @@ module.exports = function(app, passport = null, driver = null) {
         });
     });
 
-    app.post('/api/v1/arco/login',
-        passport.authenticate('local', {
-            successRedirect: '/get/arco/author',
-            failureRedirect: '/get/arco/login',
-            failureFlash: true
-        })
-    );
+    app.post('/api/v1/arco/login', (request, response, next) => {
+        passport.authenticate('local', (err, user, info) => {
+
+            if (err)
+                return next(err);
+            if (!user)
+                return response.redirect('/get/' + configToken + '/login');
+
+            request.logIn(user, (err) => {
+                if (err) return next(err);
+                return response.redirect('/get/' + configToken + '/author/' + request.query.author);
+            });
+
+        })(request, response, next);
+    });
 
     app.get('/api/v1/arco/verify-user/:token', passport.authenticate('authtoken', {params: 'token'}), (request, response) => {
         /*if (request.user.return_to)
