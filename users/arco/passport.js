@@ -54,11 +54,9 @@ module.exports = (passport, driver) => {
     passport.use('authtoken', new AuthTokenStrategy((token, done) => {
         if (/[a-f0-9]{128}/.test(token)) {
             db.verifyUser(driver, token, (err, res) => {
-                if(!err && res.value._id){
-                    db.findUserById(driver, res.value._id, (err, user) => {
-                        done(null, user);
-                    })
-                } else
+                if(!err && res)
+                    done(null, res.value);
+                else
                     done(null, false);
             });
         } else

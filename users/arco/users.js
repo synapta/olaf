@@ -70,8 +70,12 @@ function retrieveUser(driver, email, password, callback) {
 // Verify user by token
 function verifyUser(driver, token, callback) {
     findUserByToken(driver, token, (err, user) => {
-        driver.collection('users').findOneAndUpdate({'_id': user._id}, {$set : {verified: true}}, (err, res) => {
-            callback(err, res);
+        driver.collection('users').findOneAndUpdate(
+            {'_id': user._id},
+            {$set : {verified: true}},
+            {returnNewDocument: true},
+            (err, res) => {
+                callback(err, res);
         });
     })
 }
