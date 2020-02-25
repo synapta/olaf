@@ -316,6 +316,7 @@ $(document).ready(() => {
 
         // Render navbar
         renderNavbar();
+        renderVerificationMessage();
 
         // Load configuration
         $.get(`/api/v1/${params.userToken}/config/`, (json) => {

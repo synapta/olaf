@@ -5,6 +5,26 @@ function renderNavbar() {
     })
 }
 
+// Render verification message
+function renderVerificationMessage(){
+
+    // Get queries from url
+    let queries = getQueriesFromUrl(window.location.href);
+
+    // Store message
+    let message =
+        `<div class="ui positive message">
+            <i onclick="$(this).parent().remove()" class="close icon"></i>
+            <div class="header">
+                Hai verificato il tuo account con successo
+            </div>
+        </div>`;
+
+    if('verified' in queries)
+        $('.container').prepend(message);
+
+}
+
 // Render user token
 function showUserToken(userToken){
     $('#user-token').html(userToken);
