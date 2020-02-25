@@ -2,6 +2,7 @@ const db = require('./users');
 
 // Import different login strategies
 const LocalStrategy = require('passport-local').Strategy;
+const AuthTokenStrategy = require('passport-auth-token').Strategy;
 
 // Set up local strategy
 module.exports = (passport, driver) => {
@@ -38,11 +39,30 @@ module.exports = (passport, driver) => {
                 return done(null, false, {
                     'message': 'incorrectPasswordError'
                 });
+            } else if (!user.verified) {
+                return done(null, false, {
+                    message: 'emailNotVerifiedError'
+                });
             }
 
             return done(null, user, {});
 
         });
+    }));
+
+    // Implement token strategy
+    passport.use('authtoken', new AuthTokenStrategy((token, done) => {
+        if (/[a-f0-9]{128}/.test(token)) {
+            db.findUserByToken(driver, token, (err, user) => {
+                if(!err && user['_id']){
+                    db.findUserById(driver, user['_id'], (err, user) => {
+                        done(null, user);
+                    })
+                } else
+                    done(null, false);
+            });
+        } else
+            done(null, false);
     }));
 
 };

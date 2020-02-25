@@ -37,6 +37,7 @@
     "bcrypt": "latest",
     "passport": "latest",
     "passport-local": "latest",
+    "passport-auth-token": "latest",
     "connect-flash": "latest",
     "express-session": "latest"
   }

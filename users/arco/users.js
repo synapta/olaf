@@ -1,27 +1,28 @@
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const saltRounds = 10;
 
 
 // Insert new user
 function insertUser(driver, email, password, username, callback) {
-
     // Generate hash and store new user
-    checkUser(driver, email, username, (err, res) => {
+    checkUserExistence(driver, email, username, (err, res) => {
        if(!res){
            bcrypt.hash(password, saltRounds, (err, hash) => {
                driver.collection('users').insertOne({
                    '_id': email,
                    password: hash,
-                   username: username
-               }).then(callback(null))
+                   username: username,
+                   token: crypto.randomBytes(64).toString('hex'),
+                   verified: false
+               }).then(callback(false))
            });
        } else
            callback(true)
     });
-
 }
 
-// Find user by email (id) or username
+// Find user by email (id), username or token
 function findUserById(driver, email, callback) {
     driver.collection('users').findOne({'_id': email}, (err, res) => {
         callback(err, res);
@@ -34,7 +35,13 @@ function findUserByUsername(driver, username, callback) {
     });
 }
 
-function checkUser(driver, email, username, callback) {
+function findUserByToken(driver, token, callback) {
+    driver.collection('users').findOne({token: token}, (err, res) => {
+        callback(err, res);
+    })
+}
+
+function checkUserExistence(driver, email, username, callback) {
     driver.collection('users').findOne({$or: [
         {'_id': email},
         {'username': username}
@@ -45,9 +52,7 @@ function checkUser(driver, email, username, callback) {
 
 // Retrieve user by email (id)
 function retrieveUser(driver, email, password, callback) {
-
     findUserById(driver, email, (err, res) => {
-
         // Not existing user
         if(err)
             callback(err, null);
@@ -59,13 +64,12 @@ function retrieveUser(driver, email, password, callback) {
                 callback(null, comparison ? res : comparison);
             });
         }
-
     });
-
 }
 
 exports.insertUser = insertUser;
 exports.findUserById = findUserById;
 exports.findUserByUsername = findUserByUsername;
-exports.checkUser = checkUser;
+exports.findUserByToken = findUserByToken;
+exports.checkUserExistence = checkUserExistence;
 exports.retrieveUser = retrieveUser;
