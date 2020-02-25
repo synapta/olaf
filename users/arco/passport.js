@@ -9,7 +9,7 @@ module.exports = (passport, driver) => {
 
     // Used to serialize the user for the session
     passport.serializeUser((user, done) => {
-        done(null, user['_id']);
+        done(null, user._id);
     });
 
     // Used to deserialize the user
@@ -53,9 +53,9 @@ module.exports = (passport, driver) => {
     // Implement token strategy
     passport.use('authtoken', new AuthTokenStrategy((token, done) => {
         if (/[a-f0-9]{128}/.test(token)) {
-            db.findUserByToken(driver, token, (err, user) => {
-                if(!err && user['_id']){
-                    db.findUserById(driver, user['_id'], (err, user) => {
+            db.verifyUser(driver, token, (err, res) => {
+                if(!err && res.value._id){
+                    db.findUserById(driver, res.value._id, (err, user) => {
                         done(null, user);
                     })
                 } else

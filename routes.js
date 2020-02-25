@@ -63,12 +63,13 @@ function loggingFlow(url) {
         '/get/:token/login',
         '/api/v1/:token/login',
         '/api/v1/:token/signup',
+        '/api/v1/:token/verify-user'
     ];
 
     // Replace placeholder with current token
     allowedUrl = allowedUrl.map((el) => el.replace(':token', configToken));
 
-    return allowedUrl.includes(url);
+    return allowedUrl.map((el) => url.includes(el)).some((el) => el);
 
 }
 
@@ -145,6 +146,14 @@ module.exports = function(app, passport = null, driver = null) {
             failureFlash: true
         })
     );
+
+    app.get('/api/v1/arco/verify-user/:token', passport.authenticate('authtoken', {params: 'token'}), (request, response) => {
+        /*if (request.user.return_to)
+            response.redirect(request.user.return_to);
+        else
+            response.redirect('/?message=welcome');*/
+        console.log(request.user);
+    });
 
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
