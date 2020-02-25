@@ -39,6 +39,7 @@
     "passport-local": "latest",
     "passport-auth-token": "latest",
     "connect-flash": "latest",
-    "express-session": "latest"
+    "express-session": "latest",
+    "nodemailer": "latest"
   }
 }
