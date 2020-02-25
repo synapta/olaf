@@ -62,6 +62,7 @@ function loggingFlow(url) {
     // Get allowed login url
     let allowedUrl = [
         '/get/:token/login',
+        '/get/:token/user-verification',
         '/api/v1/:token/login',
         '/api/v1/:token/signup',
         '/api/v1/:token/verify-user'
@@ -128,6 +129,10 @@ module.exports = function(app, passport = null, driver = null) {
         response.sendFile('login.html', {root: __dirname + '/app/views'});
     });
 
+    app.get('/get/:token/user-verification', (request, response) => {
+        response.sendFile('user-verification.html', {root: __dirname + '/app/views'});
+    });
+
     app.get('/get/:token/author-list/', (request, response) => {
         if (request.params.token === 'beweb') {
             response.sendFile('author-list.html', {root: __dirname + '/app/views'});
@@ -139,10 +144,10 @@ module.exports = function(app, passport = null, driver = null) {
         auth.insertUser(driver, request.body.email, request.body.password, request.body.username, (email, token, err) => {
             if(!err)
                 mailer.sendVerificationEmail(email, token, request.body.redirect, () => {
-                    response.json({error: err})
+                    response.redirect('/get/arco/user-verification')
                 });
             else
-                response.json({error: err});
+                response.redirect('/get/arco/login?message=genericError');
         });
     });
 
@@ -163,7 +168,7 @@ module.exports = function(app, passport = null, driver = null) {
     });
 
     app.get('/api/v1/arco/verify-user/:token', passport.authenticate('authtoken', {params: 'token'}), (request, response) => {
-        response.redirect(request.query.redirect ? request.query.redirect : '/get/' + configToken + '/login');
+        response.redirect(request.query.redirect ? request.query.redirect : '/get/' + configToken + '/author');
     });
 
     // API
