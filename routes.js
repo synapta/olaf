@@ -149,7 +149,7 @@ module.exports = function(app, passport = null, driver = null) {
 
             request.logIn(user, (err) => {
                 if (err) return next(err);
-                return response.redirect('/get/' + configToken + '/author/' + request.query.author);
+                return response.redirect(request.body.redirect);
             });
 
         })(request, response, next);
