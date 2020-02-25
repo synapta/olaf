@@ -9,13 +9,16 @@ function insertUser(driver, email, password, username, callback) {
     checkUserExistence(driver, email, username, (err, res) => {
        if(!res){
            bcrypt.hash(password, saltRounds, (err, hash) => {
+               // Store token
+               let token = crypto.randomBytes(64).toString('hex');
+               // Insert new user into collection
                driver.collection('users').insertOne({
                    '_id': email,
                    password: hash,
                    username: username,
-                   token: crypto.randomBytes(64).toString('hex'),
+                   token: token,
                    verified: false
-               }).then(callback(email, hash, false))
+               }).then(callback(email, token, false))
            });
        } else
            callback(null, null, true)
@@ -70,13 +73,16 @@ function retrieveUser(driver, email, password, callback) {
 // Verify user by token
 function verifyUser(driver, token, callback) {
     findUserByToken(driver, token, (err, user) => {
-        driver.collection('users').findOneAndUpdate(
-            {'_id': user._id},
-            {$set : {verified: true}},
-            {returnNewDocument: true},
-            (err, res) => {
-                callback(err, res);
-        });
+        if(user) {
+            driver.collection('users').findOneAndUpdate(
+                {'_id': user._id, verified: false},
+                {$set: {verified: true}},
+                {returnNewDocument: true},
+                (err, res) => {
+                    callback(err, res);
+                });
+        } else
+            callback(err, user);
     })
 }
 

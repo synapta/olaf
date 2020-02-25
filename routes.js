@@ -163,11 +163,7 @@ module.exports = function(app, passport = null, driver = null) {
     });
 
     app.get('/api/v1/arco/verify-user/:token', passport.authenticate('authtoken', {params: 'token'}), (request, response) => {
-        /*if (request.user.return_to)
-            response.redirect(request.user.return_to);
-        else
-            response.redirect('/?message=welcome');*/
-        console.log(request);
+        response.redirect(request.query.redirect ? request.query.redirect : '/get/' + configToken + '/login');
     });
 
     // API

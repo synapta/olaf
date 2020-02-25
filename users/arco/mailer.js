@@ -19,7 +19,7 @@ let emailConfiguration = (destination, verification, redirect) => {
         from: 'olaf@synapta.io',
         to: destination,
         subject: 'Conferma la tua email',
-        html: `<a href="http://localhost:3656/api/v1/arco/verify-user/${verification}?redirect=${redirect}">Verifica il tuo account OLAF</a>`
+        html: `<a href="http://localhost:3646/api/v1/arco/verify-user/${verification}?redirect=${redirect}">Verifica il tuo account OLAF</a>`
     }
 };
 
