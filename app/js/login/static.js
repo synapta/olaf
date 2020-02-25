@@ -10,5 +10,8 @@ $(document).ready(() => {
         renderRedirectInput();
         renderErrorMessage();
 
+        // Set form behavior
+        setFormBehavior();
+
     });
 });

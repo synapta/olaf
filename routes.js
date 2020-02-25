@@ -65,7 +65,9 @@ function loggingFlow(url) {
         '/get/:token/user-verification',
         '/api/v1/:token/login',
         '/api/v1/:token/signup',
-        '/api/v1/:token/verify-user'
+        '/api/v1/:token/verify-user',
+        '/api/v1/:token/username-existence',
+        '/api/v1/:token/email-existence'
     ];
 
     // Replace placeholder with current token
@@ -169,6 +171,18 @@ module.exports = function(app, passport = null, driver = null) {
 
     app.get('/api/v1/arco/verify-user/:token', passport.authenticate('authtoken', {params: 'token'}), (request, response) => {
         response.redirect(request.query.redirect ? request.query.redirect + '?verified=true' : '/get/' + configToken + '/author?verified=true');
+    });
+
+    app.get('/api/v1/arco/email-existence/:email', (request, response) => {
+        auth.findUserById(driver, request.params.email, (err, res) => {
+            response.json({'exists': !!(!err && res)});
+        })
+    });
+
+    app.get('/api/v1/arco/username-existence/:username', (request, response) => {
+       auth.findUserByUsername(driver, request.params.username, (err, res) => {
+           response.json({'exists': !!(!err && res)});
+       })
     });
 
     // API
