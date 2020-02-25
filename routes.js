@@ -12,6 +12,7 @@ let parser           = null;
 let auth             = null;
 let config           = null;
 let configToken      = null;
+let mailer           = null;
 
 //const db = pgp(pgConnection);
 //const bewebQueries = require('./users/beweb/queries');
@@ -96,6 +97,7 @@ module.exports = function(app, passport = null, driver = null) {
             if(loginToken(token)) {
                 require('./users/' + token + '/passport')(passport, driver);
                 auth = require('./users/' + token + '/users');
+                mailer = require('./users/' + token + '/mailer');
             }
 
             // Initialize configuration
@@ -134,8 +136,13 @@ module.exports = function(app, passport = null, driver = null) {
 
     // Arco users
     app.post('/api/v1/arco/signup', (request, response) => {
-        auth.insertUser(driver, request.body.email, request.body.password, request.body.username, (err) => {
-            response.json({error: err})
+        auth.insertUser(driver, request.body.email, request.body.password, request.body.username, (email, token, err) => {
+            if(!err)
+                mailer.sendVerificationEmail(email, token, request.body.redirect, () => {
+                    response.json({error: err})
+                });
+            else
+                response.json({error: err});
         });
     });
 
@@ -160,7 +167,7 @@ module.exports = function(app, passport = null, driver = null) {
             response.redirect(request.user.return_to);
         else
             response.redirect('/?message=welcome');*/
-        console.log(request.user);
+        console.log(request);
     });
 
     // API

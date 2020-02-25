@@ -15,10 +15,10 @@ function insertUser(driver, email, password, username, callback) {
                    username: username,
                    token: crypto.randomBytes(64).toString('hex'),
                    verified: false
-               }).then(callback(false))
+               }).then(callback(email, hash, false))
            });
        } else
-           callback(true)
+           callback(null, null, true)
     });
 }
 
