@@ -152,11 +152,11 @@ module.exports = function(app, passport = null, driver = null) {
             if (err)
                 return next(err);
             if (!user)
-                return response.redirect('/get/' + configToken + '/login');
+                return response.redirect('/get/' + configToken + '/login?message=' + info.message);
 
             request.logIn(user, (err) => {
                 if (err) return next(err);
-                return response.redirect(request.body.redirect);
+                return response.redirect(request.body.redirect ? request.body.redirect : '/get/arco/author');
             });
 
         })(request, response, next);

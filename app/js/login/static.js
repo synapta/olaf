@@ -7,7 +7,8 @@ $(document).ready(() => {
         renderNavbar();
 
         // Render redirect input
-        renderRedirectInput()
+        renderRedirectInput();
+        renderErrorMessage();
 
     });
 });
