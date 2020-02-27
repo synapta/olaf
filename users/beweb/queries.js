@@ -403,12 +403,12 @@ function makeViafQuery(name, surname) {
   });
 }
 
-function pgStoreQuery(id_beweb, nome, data) {
+function pgStoreQuery(id_beweb, nome, data, data_ultima_modifica_su_beweb) {
     let argListParams = [];
     let params = [];
     let argListCols = [];
     let columns = []
-    let i = 3;
+    let i = 4;
 
     Object.keys(data).forEach(key => {
         argListCols.push('$' + i + "~");
@@ -426,9 +426,9 @@ function pgStoreQuery(id_beweb, nome, data) {
       pgQuery: `
           insert
               into
-              history (id_beweb, nome_visualizzazione, ${argListCols.join(',')} , data_inserimento)
-          values ($1, $2, ${argListParams.join(',')} , now() )`, 
-      params: [id_beweb, nome].concat(columns).concat(params)
+              history (id_beweb, nome_visualizzazione, ${argListCols.join(',')} , data_inserimento, data_ultima_modifica_su_beweb)
+          values ($1, $2, ${argListParams.join(',')} , now(), $3)`, 
+      params: [id_beweb, nome, data_ultima_modifica_su_beweb].concat(columns).concat(params)
     }
 }
 
@@ -454,7 +454,8 @@ function updateRecordInfoQuery () {
         ha_modifiche = true,
         numero_campi_modificati = $2,
         data_primo_cambiamento = $3,
-        differenze = $4
+        differenze = $4,
+        data_ultima_modifica_su_beweb = $5::timestamp
       where id_beweb = $1
     `;
 }
@@ -500,71 +501,88 @@ function getAllIdBeweb(db, cb) {
     });
 }
 
+
 function checkWikidataModification (db, id_beweb, cb) {
-    // Query wikidata
-    db.one(pgGetRecordQuery(), [id_beweb]).then((data)=> {
-        nodeRequest( composeQueryWikidata([data.wikidata.replace("http://www.wikidata.org/entity/", "wd:")]), function (err, res, body) {
+  nodeRequest(composeQuery(authorSelect(id_beweb)), (err, res, body) => {
+      if (err) {
+          console.error(err);
+      }
+      let data_ultima_modifica_su_beweb = null;
+      data_ultima_modifica_su_beweb = JSON.parse(body).Data_ultima_modifica.replace(/([0-9]{2})\/([0-9]{2})\/([0-9]{4})/, '$3-$2-$1 00:00:00Z');
+      console.log(data_ultima_modifica_su_beweb)
+      // Query wikidata
+      db.one(pgGetRecordQuery(), [id_beweb]).then((data)=> {
+          nodeRequest( composeQueryWikidata([data.wikidata.replace("http://www.wikidata.org/entity/", "wd:")]), function (err, res, body) {
 
-            let results = JSON.parse(body).results.bindings;
-            let cleanObj = flattenSparqlResponse(results[0]);
-            delete cleanObj.descrizione;
-            let diff = 0
-            let differenzeObj = [];
+              let results = JSON.parse(body).results.bindings;
+              let cleanObj = flattenSparqlResponse(results[0]);
+              delete cleanObj.descrizione;
+              let diff = 0
+              let differenzeObj = [];
 
-            Object.keys(cleanObj).forEach(key => {
-                if (cleanObj[key] !== data[key.toLowerCase()]) {
-                    diff++;
-                    differenzeObj.push({ 
-                        nome: wikidata2bewebLabel(key),
-                        originale: data[key.toLowerCase()],
-                        modificato: cleanObj[key]
-                    });
-                }
-            });
-            if (diff > 0) {
-                db.none(updateRecordInfoQuery(), [
-                  id_beweb,
-                  diff,
-                  data.data_primo_cambiamento !== null ? data.data_primo_cambiamento : (new Date ()),
-                  JSON.stringify(differenzeObj)
-                ]).then(()=> {
-                    cb();
-                    console.log("aggiornato campo " + id_beweb);
-                }).catch(err => {
-                    console.error(err);
-                });
-            } else {
-                console.log("nessuna modifica per " + id_beweb);
-                cb();
-            };
-        });
-    }).catch((err)=>{
-        console.error(err)
-    });
+              Object.keys(cleanObj).forEach(key => {
+                  if (cleanObj[key] !== data[key.toLowerCase()]) {
+                      diff++;
+                      differenzeObj.push({
+                          nome: wikidata2bewebLabel(key),
+                          originale: data[key.toLowerCase()],
+                          modificato: cleanObj[key]
+                      });
+                  }
+              });
+              if (diff > 0) {
+                  db.none(updateRecordInfoQuery(), [
+                    id_beweb,
+                    diff,
+                    data.data_primo_cambiamento !== null ? data.data_primo_cambiamento : (new Date ()),
+                    JSON.stringify(differenzeObj),
+                    data_ultima_modifica_su_beweb,
+                  ]).then(()=> {
+                      cb();
+                      console.log("aggiornato campo " + id_beweb);
+                  }).catch(err => {
+                      console.error(err);
+                  });
+              } else {
+                  console.log("nessuna modifica per " + id_beweb);
+                  cb();
+              };
+          });
+      }).catch((err)=>{
+          console.error(err)
+      });
+  });
 }
 
 function storeWikidataInfo(db, data, cb) {
-    // Query a wikidata
-    nodeRequest( composeQueryWikidata([data.Wikidata.replace("http://www.wikidata.org/entity/", "wd:")]), function (err, res, body) {
+    nodeRequest(composeQuery(authorSelect(data.Idrecord)), (err, res, body) => {
+        if (err) {
+            console.error(err);
+        }
+        let data_ultima_modifica_su_beweb = JSON.parse(body).Data_ultima_modifica.replace(/([0-9]{2})\/([0-9]{2})\/([0-9]{4})/, '$3-$2-$1 00:00:00Z');
+        // Query a wikidata
+        nodeRequest( composeQueryWikidata([data.Wikidata.replace("http://www.wikidata.org/entity/", "wd:")]), function (err, res, body) {
 
-        let results = JSON.parse(body).results.bindings;
+            let results = JSON.parse(body).results.bindings;
+            
+            let cleanObj = flattenSparqlResponse(results[0]);
+            delete cleanObj.descrizione;
 
-        let cleanObj = flattenSparqlResponse(results[0]);
-        delete cleanObj.descrizione;
+            //salvo risposta su db. 
+            let { pgQuery, params } = pgStoreQuery(data.Idrecord, data.Visualizzazione_su_BEWEB, cleanObj, data_ultima_modifica_su_beweb)
+            console.log(data)
+            db.none(deleteRecordQuery(), [data.Idrecord]).then(()=> {
+                db.none(pgQuery, params).then(()=> {
+                    if (typeof cb === 'function') {
+                      cb();
+                    }
 
-        //salvo risposta su db. 
-        let { pgQuery, params } = pgStoreQuery(data.Idrecord, data.Visualizzazione_su_BEWEB, cleanObj)
-        db.none(deleteRecordQuery(), [data.Idrecord]).then(()=> {
-            db.none(pgQuery, params).then(()=> {
-                if (typeof cb === 'function') {
-                  cb();
-                }
-
-              }).catch((err)=>{
-                console.error(err)
+                  }).catch((err)=>{
+                    console.error(err);
+                });
             });
         });
-    })
+    });
 }
 
 
