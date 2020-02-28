@@ -1,7 +1,14 @@
 // Render navbar
 function renderNavbar() {
     $.get('/views/template/author/navbar.html', (template) => {
-        $('.navbar').html(template).promise().done(showUserToken(params.userToken));
+        //let output = Mustache.render(template, user);
+        $('.navbar').html(template).promise().done(() => {
+            // Show user token
+            showUserToken(params.userToken);
+            // Append username
+            if(user)
+                $('.navbar > .header').append(`<span style="color: black"> - Benvenuto ${user.username}!</span>`)
+        });
     })
 }
 

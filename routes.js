@@ -67,7 +67,8 @@ function loggingFlow(url) {
         '/api/v1/:token/signup',
         '/api/v1/:token/verify-user',
         '/api/v1/:token/username-existence',
-        '/api/v1/:token/email-existence'
+        '/api/v1/:token/email-existence',
+        '/api/v1/:token/logged-user'
     ];
 
     // Replace placeholder with current token
@@ -183,6 +184,11 @@ module.exports = function(app, passport = null, driver = null) {
        auth.findUserByUsername(driver, request.params.username, (err, res) => {
            response.json({'exists': !!(!err && res)});
        })
+    });
+
+    app.get('/api/v1/:token/logged-user', (request, response) => {
+        console.log(request.user);
+        response.json(request.user);
     });
 
     // API
