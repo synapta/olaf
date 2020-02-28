@@ -40,26 +40,46 @@ function getAuthorSimilarOptions(author, options, callback){
     // Parse all options
     options.forEach((option) => {
         if(author.titles && author.titles.length > 0 && option.titles) {
-            if (!Array.isArray(author.titles)) {
-                author.titles = [author.titles]
 
-            }
+            // Handle non-array titles
+            if (!Array.isArray(author.titles))
+                author.titles = [author.titles];
+
+            // Similar authors collection and count
+            let similarTitles = [];
+            let similarCount = 0;
+
             // Match with author titles
-            author.titles.forEach((title) => {
-                if (title.length > 0) {
-                    let titleClean = title.replace(/[0-9]+ \~ /, '');
+            option.titles.forEach((title) => {
+                if(title.length > 0){
 
-                    // Threshold 0.8 match result
-                    let results = fuzz.extract(titleClean, option.titles, {scorer: fuzz.token_set_ratio, cutoff: 80});
-
-                    // Check similarity
-                    results.forEach((result) => {
-                        if (result.length > 0)
-                        // Set option suggested
-                            option.setOptionsAsSuggested();
+                    // Clean title and make a 0.8 cutoff comparison between titles
+                    let results = fuzz.extract(title.replace(/[0-9]+ \~ /, ''), author.titles, {
+                        scorer: fuzz.token_set_ratio,
+                        cutoff: 80
                     });
+
+                    // Count similar results
+                    let isSimilar = results.map((result) => result.length > 0).some(() => true);
+                    similarTitles.push(isSimilar);
+                    similarCount = similarCount + isSimilar;
+
                 }
             });
+
+            if(similarCount > 0) {
+
+                // Set current option as suggest
+                option.setOptionAsSuggested(similarCount);
+
+                // Highlight similar titles
+                option.titles.forEach((title, index) => {
+                    if(similarTitles[index])
+                        option.titles[index] = '<b>' + title + '</b>'
+                })
+
+            }
+
         }
     });
 

@@ -211,8 +211,9 @@ class Option {
         this.string = JSON.stringify(this);
     }
 
-    setOptionsAsSuggested() {
+    setOptionAsSuggested(numberOfSimilarTitles) {
         this.suggested = true;
+        this.similarFeatures = numberOfSimilarTitles;
     }
 
 }
