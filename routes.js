@@ -187,7 +187,6 @@ module.exports = function(app, passport = null, driver = null) {
     });
 
     app.get('/api/v1/:token/logged-user', (request, response) => {
-        console.log(request.user);
         response.json(request.user);
     });
 
