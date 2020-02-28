@@ -60,6 +60,8 @@ class Option {
             }
         });
 
+        console.log(this.rawBody);
+
     }
 
     _parseViafBody() {
