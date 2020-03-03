@@ -293,7 +293,7 @@ function authorLink(body) {
 function composeQuery(query) {
 
     // Query parameters
-    let queryUrl = 'http://testbbcc.glauco.it/AFXD/API/olaf/Services.do?';
+    let queryUrl = 'http://www.scrivaniabbcc.it/AFXD/API/olaf/Services.do?';
 
     return queryUrl + query;
 
