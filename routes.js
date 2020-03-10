@@ -1,10 +1,8 @@
 // Requirements
 const nodeRequest    = require('request');
-const pgp            = require('pg-promise')({});
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
 const Config         = require('./config').Config;
-const pgConnection   = require('./pgConfig').pgConnection;
 
 // Modules
 let queries          = null;
@@ -14,25 +12,6 @@ let config           = null;
 let configToken      = null;
 let mailer           = null;
 let enrichments      = require('./users/arco/enrichments');
-
-const db = pgp(pgConnection);
-const bewebQueries = require('./users/beweb/queries');
-
-/*schedule.scheduleJob('21 4 * * *', function(firedate) {
-    console.log(firedate, "checking modifications");
-    bewebQueries.getAllIdBeweb(db, function(data) {
-        let parseAnother = function() {
-            if (data.length === 0 ) {
-                return;
-            }
-            let record = data.pop();
-            bewebQueries.checkWikidataModification(db, record.id_beweb, function(data) {
-                setTimeout(function(){ parseAnother(); }, 10000); 
-            });
-        };
-        parseAnother();
-    })
-});*/
 
 
 // Token validation
@@ -72,7 +51,8 @@ function loggingFlow(url) {
         '/api/v1/:token/logged-user',
         '/api/v1/:token/feed-enrichments',
         '/api/v1/:token/author',
-        '/api/v1/:token/get-agents'
+        '/api/v1/:token/get-agents',
+        '/api/v1/:token/move-uris'
     ];
 
     // Replace placeholder with current token
@@ -196,18 +176,40 @@ module.exports = function(app, passport = null, driver = null) {
 
     // Enrichments
     app.get('/api/v1/:token/feed-enrichments', (request, response) => {
-        enrichments.feedEnrichments(db, () => {
+        enrichments.feedEnrichments(driver, () => {
             response.json({status: 'enriched'});
         });
     });
 
+    /*app.get('/api/v1/:token/move-uris', (request, response) => {
+       db.query('SELECT arco_uri FROM enrichments').then((data) => {
+
+           let documents = data.map((uri) => {
+               return {
+                   _id: uri.arco_uri,
+                   author: null,
+                   options: null,
+                   enriched: false,
+                   lock: null
+               }
+           });
+
+           driver.collection('enrichments').insertMany(documents, (err, res) => {
+               if(err) throw err;
+               else
+                   console.log("Successfully inserted: " , res);
+           })
+
+       })
+    });*/
+
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
-        enrichments.getAndLockAgent(db, request.params.authorId, (result) => {
+        enrichments.getAndLockAgent(driver, request.params.authorId, (result) => {
 
             if(result && !request.query.enrichment) {
                 // Send stored options and author
-                response.json({author: result[0].author, options: result[0].options.fields});
+                response.json({author: result.author, options: result.options.fields});
             } else {
 
                 // Compose author query
