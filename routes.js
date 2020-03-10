@@ -1,10 +1,10 @@
 // Requirements
 const nodeRequest    = require('request');
-//const pgp            = require('pg-promise')({});
+const pgp            = require('pg-promise')({});
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
 const Config         = require('./config').Config;
-//const pgConnection   = require('./pgConfig').pgConnection;
+const pgConnection   = require('./pgConfig').pgConnection;
 
 // Modules
 let queries          = null;
@@ -13,9 +13,10 @@ let auth             = null;
 let config           = null;
 let configToken      = null;
 let mailer           = null;
+let enrichments      = require('./users/arco/enrichments');
 
-//const db = pgp(pgConnection);
-//const bewebQueries = require('./users/beweb/queries');
+const db = pgp(pgConnection);
+const bewebQueries = require('./users/beweb/queries');
 
 /*schedule.scheduleJob('21 4 * * *', function(firedate) {
     console.log(firedate, "checking modifications");
@@ -68,7 +69,10 @@ function loggingFlow(url) {
         '/api/v1/:token/verify-user',
         '/api/v1/:token/username-existence',
         '/api/v1/:token/email-existence',
-        '/api/v1/:token/logged-user'
+        '/api/v1/:token/logged-user',
+        '/api/v1/:token/feed-enrichments',
+        '/api/v1/:token/author',
+        '/api/v1/:token/get-agents'
     ];
 
     // Replace placeholder with current token
@@ -190,31 +194,57 @@ module.exports = function(app, passport = null, driver = null) {
         response.json(request.user);
     });
 
+    // Enrichments
+    app.get('/api/v1/:token/feed-enrichments', (request, response) => {
+        enrichments.feedEnrichments(db, () => {
+            response.json({status: 'enriched'});
+        });
+    });
+
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
+        enrichments.getAndLockAgent(db, request.params.authorId, (result) => {
 
-        // Compose author query
-        let queryAuthor = queries.authorSelect(request.params.authorId);
+            if(result && !request.query.enrichment) {
+                // Send stored options and author
+                response.json({author: result[0].author, options: result[0].options.fields});
+            } else {
 
-        // Make request
-        nodeRequest(queryAuthor, (err, res, body) => {
-            // Handle and send author
-            let author = parser.parseAuthor(JSON.parse(body));
+                // Compose author query
+                let queryAuthor = queries.authorSelect(request.params.authorId);
 
-            // Query options
-            let requests = queries.authorOptions((author.name || '').trim(), '');
- 
-            // Make options queries
-            Promise.all(requests).then((bodies) => {
-                // Parse result
-                parser.parseAuthorOptions(author, bodies.map(body => JSON.parse(body)), (options) => {
-                    // Send back options and author response
-                    response.json({'author': author, 'options': options});
+                // Make request
+                nodeRequest(queryAuthor, (err, res, body) => {
+
+                    // Handle and send author
+                    let author = parser.parseAuthor(JSON.parse(body));
+                    // Query options
+                    let requests = queries.authorOptions((author.name || '').trim(), '');
+
+                    // Make options queries
+                    Promise.all(requests).then((bodies) => {
+
+                        bodies = bodies.map(body => {
+                            try {
+                                JSON.parse(body)
+                            } catch {
+                                return {};
+                            }
+                            return JSON.parse(body);
+                        });
+
+                        // Parse result
+                        parser.parseAuthorOptions(author, bodies, (options) => {
+                            // Send back options and author response
+                            response.json({'author': author, 'options': options});
+                        });
+                    }).catch((error) => console.log(error));
+
                 });
-            });
+
+            }
 
         });
-
     });
 
     app.get('/api/v1/:token/config/', (request, response) => {

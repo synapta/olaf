@@ -40,6 +40,7 @@
     "passport-auth-token": "latest",
     "connect-flash": "latest",
     "express-session": "latest",
-    "nodemailer": "latest"
+    "nodemailer": "latest",
+    "js-combinatorics": "latest"
   }
 }

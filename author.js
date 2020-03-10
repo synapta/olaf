@@ -64,11 +64,16 @@ class Author {
         this.rawName = this.name;
 
         // Parse name
+        if(Array.isArray(this.name))
+            this.name = this.name[0];
+
         this.name = this.name
-            .replace(/\s*\<.*\>|\_/gmi, ' ')
-            .split(',')
+            .replace(/\s*detto\s+/gmi, ' ')
+            .replace(/\s*\(.*\)/gmi, '')
+            .replace(/\s*\<.*\>|\_/gmi, '')
+            .split(' ')
+            //.reverse()
             .map(el => el.trim())
-            .reverse()
             .join(' ');
 
     }

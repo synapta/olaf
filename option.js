@@ -27,10 +27,14 @@ class Option {
 
         // Get Wikidata Map from module
         let map = this.config.getWikidataDictionary();
+        let groupedFields = ['titles', 'roles'];
 
         // Parse rawBody in order to populate current object
         Object.keys(map).forEach((key) => {
             if(this.rawBody[map[key]]) {
+
+                if(groupedFields.includes(key) && this.rawBody[map[key]].value)
+                    this.rawBody[map[key]].value = this.rawBody[map[key]].value.split('###');
 
                 // Store value in current object
                 this[key] = this.rawBody[map[key]].value;
@@ -207,8 +211,9 @@ class Option {
         this.string = JSON.stringify(this);
     }
 
-    setOptionsAsSuggested() {
+    setOptionAsSuggested(numberOfSimilarTitles) {
         this.suggested = true;
+        this.similarFeatures = numberOfSimilarTitles;
     }
 
 }

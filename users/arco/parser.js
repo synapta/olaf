@@ -1,4 +1,6 @@
 // Requirements
+const fuzz           = require('fuzzball');
+
 const Option         = require('../../option').Option;
 const Author         = require('../../author').Author;
 
@@ -16,7 +18,78 @@ function configInit(configObj) {
  * Parse author response in order to obtain OLAF author object
  * **/
 function parseAuthor(body){
-    return new Author(body, config);
+
+    // Map Cobis result to standard format
+    let binding = body.results.bindings[0];
+    let parsedBody = {};
+
+    Object.keys(binding).map((key) => {
+
+        if(binding[key].value.includes('$$$'))
+            binding[key].value = binding[key].value.split('$$$');
+
+        parsedBody[key] = binding[key].value
+
+    });
+
+    return new Author(parsedBody, config);
+}
+
+function getAuthorSimilarOptions(author, options, callback){
+
+    // Parse all options
+    options.forEach((option) => {
+        if(author.titles && author.titles.length > 0 && option.titles) {
+
+            // Handle non-array titles
+            if (!Array.isArray(author.titles))
+                author.titles = [author.titles];
+
+            // Similar authors collection and count
+            let similarTitles = [];
+            let similarCount = 0;
+
+            // Match with author titles
+            option.titles.forEach((title) => {
+                if(title.length > 0){
+
+                    // Clean title and make a 0.8 cutoff comparison between titles
+                    let results = fuzz.extract(title.replace(/[0-9]+ \~ /, ''), author.titles, {
+                        scorer: fuzz.token_set_ratio,
+                        cutoff: 80
+                    });
+
+                    // Count similar results
+                    let isSimilar = results.map((result) => result.length > 0).some(() => true);
+                    similarTitles.push(isSimilar);
+                    similarCount = similarCount + isSimilar;
+
+                }
+            });
+
+            if(similarCount > 0) {
+
+                // Set current option as suggest
+                option.setOptionAsSuggested(similarCount);
+
+                // Highlight similar titles
+                option.titles.forEach((title, index) => {
+                    if(similarTitles[index])
+                        option.titles[index] = '<b>' + title + '</b>';
+                });
+
+                // Order title by highlighting
+                option.titles = option.titles.sort((a, b) => b.includes('<b>') - a.includes('<b>'));
+
+            }
+
+        }
+    });
+
+    options = options.sort((a, b) => (b.suggested - a.suggested));
+    // Callback suggested options
+    callback(options);
+
 }
 
 /**
@@ -29,15 +102,24 @@ function parseAuthorOptions(author, bodies, callback) {
     let wikidataBody = bodies[0];
     let viafBody = bodies[1];
 
+    let wikidataOptions = [];
+    let viafOptions = [];
+
     // Get wikidata options
-    let wikidataOptions = parseWikidataOptions(wikidataBody);
-    let viafOptions = parseViafOptions(viafBody, wikidataOptions.filter(el => el.viaf).map(el => el.getViafId()));
+    if('results' in wikidataBody)
+        wikidataOptions = parseWikidataOptions(wikidataBody);
+    if(viafBody)
+        viafOptions = parseViafOptions(viafBody, wikidataOptions.filter(el => el.viaf).map(el => el.getViafId()));
+
     let options = wikidataOptions.concat(viafOptions);
 
     // Enrich all options with VIAF and return them
     Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
         options.map(el => el.getString());
-        callback(options);
+        //callback(options);
+        getAuthorSimilarOptions(author, options, function(options) {
+            callback(options);
+        });
     });
 
 }
@@ -67,6 +149,7 @@ function parseViafOptions(body, viafUris) {
     return results.map(el => new Option(el, 'viaf', config));
 
 }
+
 
 // Exports
 exports.parseAuthor = (body) => {
