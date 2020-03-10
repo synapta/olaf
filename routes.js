@@ -52,7 +52,7 @@ function loggingFlow(url) {
         '/api/v1/:token/feed-enrichments',
         '/api/v1/:token/author',
         '/api/v1/:token/get-agents',
-        '/api/v1/:token/move-uris'
+        '/api/v1/:token/update-documents'
     ];
 
     // Replace placeholder with current token
@@ -189,7 +189,11 @@ module.exports = function(app, passport = null, driver = null) {
 
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
-        enrichments.getAndLockAgent(driver, request.params.authorId, (result) => {
+
+        let user = (!request.query.enrichment && request.user) ? request.user.username : null;
+        let agent = request.params.authorId;
+
+        enrichments.getAndLockAgent(driver, user, agent, (result) => {
 
             if(result && !request.query.enrichment) {
                 // Send stored options and author
@@ -211,11 +215,8 @@ module.exports = function(app, passport = null, driver = null) {
                     Promise.all(requests).then((bodies) => {
 
                         bodies = bodies.map(body => {
-                            try {
-                                JSON.parse(body)
-                            } catch {
-                                return {};
-                            }
+                            try { JSON.parse(body) }
+                            catch { return {}; }
                             return JSON.parse(body);
                         });
 

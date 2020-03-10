@@ -30,10 +30,12 @@ function feedEnrichments(driver, callback, limit = 3) {
 
 
 
-function getAndlockAgent(driver, uri, callback) {
+function getAndlockAgent(driver, user, uri, callback) {
 
     // Change behavior on uri existance
-    let filter = uri ? {_id: uri, lock: null} : {enriched: true, lock: null};
+    let filter = uri ? {_id: uri} : {enriched: true};
+    filter.lock = null;
+    filter.matchedBy = {$nin: [user]};
 
     // Take the lock on the selected document
     driver.collection('enrichments').findOneAndUpdate(
