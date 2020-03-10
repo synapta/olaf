@@ -41,10 +41,19 @@ function getAndlockAgent(driver, uri, callback) {
         {$set: {lock: new Date()}},
         {returnOriginal: true},
         (err, res) => {
+        if(err) throw err;
         callback(res.value);
     });
 
 }
 
+function resetLocks(driver, callback) {
+    driver.collection('enrichments').update({}, {$set: {lock: null}}, {multi: true}, (err, res) => {
+        if(err) throw err;
+        callback();
+    });
+}
+
 exports.feedEnrichments = feedEnrichments;
 exports.getAndLockAgent = getAndlockAgent;
+exports.resetLocks      = resetLocks;

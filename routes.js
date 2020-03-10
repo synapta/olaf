@@ -2,6 +2,7 @@
 const nodeRequest    = require('request');
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
+const schedule       = require('node-schedule');
 const Config         = require('./config').Config;
 
 // Modules
@@ -12,7 +13,6 @@ let config           = null;
 let configToken      = null;
 let mailer           = null;
 let enrichments      = require('./users/arco/enrichments');
-
 
 // Token validation
 function validateToken(token) {
@@ -63,6 +63,12 @@ function loggingFlow(url) {
 }
 
 module.exports = function(app, passport = null, driver = null) {
+
+    schedule.scheduleJob('*/5 * * * *', (fireDate) => {
+        enrichments.resetLocks(driver, () => {
+            console.log(fireDate, "Reset locks");
+        });
+    });
 
     // Token middleware
     app.all(['/api/v1/:token/*', '/get/:token/*'], (request, response, next) => {
@@ -180,28 +186,6 @@ module.exports = function(app, passport = null, driver = null) {
             response.json({status: 'enriched'});
         });
     });
-
-    /*app.get('/api/v1/:token/move-uris', (request, response) => {
-       db.query('SELECT arco_uri FROM enrichments').then((data) => {
-
-           let documents = data.map((uri) => {
-               return {
-                   _id: uri.arco_uri,
-                   author: null,
-                   options: null,
-                   enriched: false,
-                   lock: null
-               }
-           });
-
-           driver.collection('enrichments').insertMany(documents, (err, res) => {
-               if(err) throw err;
-               else
-                   console.log("Successfully inserted: " , res);
-           })
-
-       })
-    });*/
 
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
