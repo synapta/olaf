@@ -225,8 +225,19 @@ module.exports = function(app, passport = null, driver = null) {
 
                         // Parse result
                         parser.parseAuthorOptions(author, bodies, (options) => {
+
+                            let responseObject = {
+                                author: author,
+                                options: options
+                            };
+
+                            // Store current result
+                            if(driver)
+                                enrichments.storeEnrichment(driver, responseObject);
+
                             // Send back options and author response
-                            response.json({'author': author, 'options': options});
+                            response.json(responseObject);
+
                         });
 
                     }).catch((error) => console.log(error));

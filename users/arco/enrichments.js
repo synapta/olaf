@@ -2,7 +2,7 @@ const nodeRequest = require('request-promise');
 
 // Enrich not enriched authors
 function storeEnrichment(driver, enrichment) {
-    return driver.collection('enrichments').findOneAndUpdate({_id: enrichment.author.uri}, {
+    return driver.collection('enrichments').findOneAndUpdate({_id: enrichment.author.uri, enriched: false}, {
         $set: {
             author: enrichment.author,
             options: enrichment.options,
