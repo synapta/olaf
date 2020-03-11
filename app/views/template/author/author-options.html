@@ -1,7 +1,31 @@
 <div class="ui two column grid">
     {{#options}}
     <div class="column">
-        <div data-item="{{string}}" class="ui raised segment author-option">
+        <div data-item="{{string}}"
+             data-suggested="{{suggested}}"
+             data-name="{{name}}"
+             data-gender="{{gender}}"
+             data-type="{{type}}"
+             data-image="{{image}}"
+             data-birth="{{birthDate}}"
+             data-death="{{deathDate}}"
+             data-wikidata="{{wikidata}}"
+             data-viaf="{{viaf}}"
+             data-wikipedia="{{wikipedia}}"
+             data-wimedia="{{wikimediaCommons}}"
+             data-isni="{{isni}}"
+             data-wikipedia_it="{{wikipediaIt}}"
+             data-treccani="{{treccani}}"
+             data-sbn="{{sbn}}"
+             data-ch="{{ch}}"
+             data-dbpedia="{{dbpedia}}"
+             data-lcnaf="{{lcnaf}}"
+             data-gnd="{{gnd}}"
+             data-bnf="{{bnf}}"
+             data-ulan="{{ulan}}"
+             data-bav="{{bav}}"
+             data-cerl="{{cerl}}"
+             class="ui raised segment author-option">
             {{#suggested}}
             <a class="ui blue ribbon label">Autore consigliato</a>
             {{/suggested}}
@@ -74,7 +98,7 @@
                 {{#cerl}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">CERL</a>{{/cerl}}
             </div>
             <div class="ui divider"></div>
-            <button onclick="authorSelect(this, this.parentElement.getAttribute('data-item'))" class="ui fluid green button author-selection">Seleziona candidato</button>
+            <button onclick="authorSelect(this)" class="ui fluid green button author-selection">Seleziona candidato</button>
         </div>
     </div>
     {{/options}}

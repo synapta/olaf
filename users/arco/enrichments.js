@@ -28,24 +28,27 @@ function feedEnrichments(driver, callback, limit = 3) {
     })
 }
 
-
-
 function getAndlockAgent(driver, user, uri, callback) {
 
-    // Change behavior on uri existance
-    let filter = uri ? {_id: uri} : {enriched: true};
-    filter.lock = null;
-    filter.matchedBy = {$nin: [user]};
+    if(driver) {
 
-    // Take the lock on the selected document
-    driver.collection('enrichments').findOneAndUpdate(
-        filter,
-        {$set: {lock: new Date()}},
-        {returnOriginal: true},
-        (err, res) => {
-        if(err) throw err;
-        callback(res.value);
-    });
+        // Change behavior on uri existance
+        let filter = uri ? {_id: uri} : {enriched: true};
+        filter.lock = null;
+        filter.matchedBy = {$nin: [user]};
+
+        // Take the lock on the selected document
+        driver.collection('enrichments').findOneAndUpdate(
+            filter,
+            {$set: {lock: new Date()}},
+            {returnOriginal: true},
+            (err, res) => {
+                if (err) throw err;
+                callback(res.value);
+            });
+
+    } else
+        callback(null);
 
 }
 
