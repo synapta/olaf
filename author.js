@@ -72,9 +72,14 @@ class Author {
             .replace(/\s*\(.*\)/gmi, '')
             .replace(/\s*\<.*\>|\_/gmi, '')
             .split(' ')
-            //.reverse()
+            .reverse()
             .map(el => el.trim())
-            .join(' ');
+            .join(' ')
+            .split(',')
+            .reverse()
+            .map(el => el.trim())
+            .join(' ')
+            .trim();
 
     }
 

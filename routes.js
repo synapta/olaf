@@ -52,7 +52,8 @@ function loggingFlow(url) {
         '/api/v1/:token/feed-enrichments',
         '/api/v1/:token/author',
         '/api/v1/:token/get-agents',
-        '/api/v1/:token/update-documents'
+        '/api/v1/:token/update-documents',
+        '/api/v1/:token/logged-user'
     ];
 
     // Replace placeholder with current token
@@ -64,11 +65,13 @@ function loggingFlow(url) {
 
 module.exports = function(app, passport = null, driver = null) {
 
-    schedule.scheduleJob('*/5 * * * *', (fireDate) => {
-        enrichments.resetLocks(driver, () => {
-            console.log(fireDate, "Reset locks");
+    if(driver) {
+        schedule.scheduleJob('*/5 * * * *', (fireDate) => {
+            enrichments.resetLocks(driver, () => {
+                console.log(fireDate, "Reset locks");
+            });
         });
-    });
+    }
 
     // Token middleware
     app.all(['/api/v1/:token/*', '/get/:token/*'], (request, response, next) => {
@@ -177,7 +180,7 @@ module.exports = function(app, passport = null, driver = null) {
     });
 
     app.get('/api/v1/:token/logged-user', (request, response) => {
-        response.json(request.user);
+        response.json({user: request.user ? request.user : null});
     });
 
     // Enrichments
@@ -197,7 +200,7 @@ module.exports = function(app, passport = null, driver = null) {
 
             if(result && !request.query.enrichment) {
                 // Send stored options and author
-                response.json({author: result.author, options: result.options.fields});
+                response.json({author: result.author, options: result.options});
             } else {
 
                 // Compose author query
@@ -215,8 +218,8 @@ module.exports = function(app, passport = null, driver = null) {
                     Promise.all(requests).then((bodies) => {
 
                         bodies = bodies.map(body => {
-                            try { JSON.parse(body) }
-                            catch { return {}; }
+                            try {JSON.parse(body)}
+                            catch {return {}}
                             return JSON.parse(body);
                         });
 
@@ -225,6 +228,7 @@ module.exports = function(app, passport = null, driver = null) {
                             // Send back options and author response
                             response.json({'author': author, 'options': options});
                         });
+
                     }).catch((error) => console.log(error));
 
                 });

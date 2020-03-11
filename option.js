@@ -131,7 +131,10 @@ class Option {
 
         // Query VIAF endpoint in order to get more author data
         if(this.getViafId()) {
-            await requests('https://www.viaf.org/viaf/' + this.getViafId() + '/?httpAccept=application/json').then((response) => {
+            await requests({
+                url: 'https://www.viaf.org/viaf/' + this.getViafId() + '/?httpAccept=application/json',
+                headers: {'User-Agent': 'topolino'}
+            }).then((response) => {
 
                 // Store response as JSON
                 response = JSON.parse(response);

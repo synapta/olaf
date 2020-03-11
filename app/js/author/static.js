@@ -50,7 +50,11 @@ function _getAllSelectableFields() {
     return Object.keys(config.fields).filter(el => config.fields[el].select && !config.fields[el].composite);
 }
 
-function authorSelect(el, optionString){
+function authorSelect(el){
+
+    console.log(el);
+    let dataset = el.parentElement.dataset;
+    console.log(dataset);
 
     // Parse item
     let option = JSON.parse(optionString);
@@ -314,13 +318,14 @@ function authorSend(){
 
 // Get author, render author card, options and author labels
 $(document).ready(() => {
+
     // Load alternative scripts
     _loadAlternativeScripts(() => {
         $.get('/api/v1/' + params.userToken + '/logged-user', (loggedUser) => {
 
             // Store logged user
             if(loggedUser)
-                user = loggedUser;
+                user = loggedUser.user;
 
             // Render navbar
             renderNavbar();
@@ -332,6 +337,8 @@ $(document).ready(() => {
                 // Store config
                 config = json;
 
+                console.log(config);
+
                 // Get current author and its options
                 $.ajax({
 
@@ -340,6 +347,8 @@ $(document).ready(() => {
                     dataType: 'json',
 
                     success: response => {
+
+                        console.log(response);
 
                         // Store author response
                         author = response.author;

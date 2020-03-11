@@ -56,7 +56,7 @@ function getAuthorSimilarOptions(author, options, callback){
                     results.forEach((result) => {
                         if (result.length > 0)
                         // Set option suggested
-                            option.setOptionsAsSuggested();
+                            option.setOptionAsSuggested();
                     });
                 }
             });
