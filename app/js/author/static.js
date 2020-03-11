@@ -52,9 +52,8 @@ function _getAllSelectableFields() {
 
 function authorSelect(el){
 
-    console.log(el);
     let dataset = el.parentElement.dataset;
-    console.log(dataset);
+    let optionString = dataset.item;
 
     // Parse item
     let option = JSON.parse(optionString);
@@ -337,8 +336,6 @@ $(document).ready(() => {
                 // Store config
                 config = json;
 
-                console.log(config);
-
                 // Get current author and its options
                 $.ajax({
 
@@ -347,8 +344,6 @@ $(document).ready(() => {
                     dataType: 'json',
 
                     success: response => {
-
-                        console.log(response);
 
                         // Store author response
                         author = response.author;

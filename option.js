@@ -1,4 +1,5 @@
 const requests  = require('request-promise');
+const SHA256    = require("crypto-js/sha256");
 
 /**
  * A class to model author options
@@ -212,6 +213,7 @@ class Option {
 
     getString() {
         this.string = JSON.stringify(this);
+        this.hash = SHA256(this.string).toString();
     }
 
     setOptionAsSuggested(numberOfSimilarTitles) {
