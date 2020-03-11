@@ -231,12 +231,12 @@ module.exports = function(app, passport = null, driver = null) {
                                 options: options
                             };
 
-                            // Store current result
                             if(driver)
-                                enrichments.storeEnrichment(driver, responseObject);
-
-                            // Send back options and author response
-                            response.json(responseObject);
+                                // Store current result
+                                enrichments.storeEnrichment(driver, responseObject).then(response.json(responseObject));
+                            else
+                                // Send back options and author response
+                                response.json(responseObject);
 
                         });
 
