@@ -1,6 +1,16 @@
 const nodeRequest = require('request-promise');
 
 // Enrich not enriched authors
+function storeEnrichment(driver, enrichment) {
+    return driver.collection('enrichments').findOneAndUpdate({_id: enrichment.author.uri}, {
+        $set: {
+            author: enrichment.author,
+            options: enrichment.options,
+            enriched: true
+        },
+    })
+}
+
 function feedEnrichments(driver, callback, limit = 3) {
     driver.collection('enrichments').find({enriched: false}, {fields: {_id: 1}, limit: limit}).toArray((err, res) => {
 
@@ -11,15 +21,8 @@ function feedEnrichments(driver, callback, limit = 3) {
 
             // Parse JSON result
             results = results.map(result => JSON.parse(result));
-
             // Store enrichment
-            let queries = results.map(result => driver.collection('enrichments').findOneAndUpdate({_id: result.author.uri}, {
-                $set: {
-                    author: result.author,
-                    options: result.options,
-                    enriched: true
-                },
-            }));
+            let queries = results.map(result => storeEnrichment(driver, result));
 
             Promise.all(queries).then(callback);
 
@@ -59,6 +62,7 @@ function resetLocks(driver, callback) {
     });
 }
 
+exports.storeEnrichment = storeEnrichment;
 exports.feedEnrichments = feedEnrichments;
 exports.getAndLockAgent = getAndlockAgent;
 exports.resetLocks      = resetLocks;
