@@ -209,53 +209,10 @@ function authorLink(request, driver) {
 
     let body = request.body;
     let user = request.user;
+    let option = body.option;
+    let agent = body.agent;
 
-    console.log(body);
-
-    // Get body params
-    /*let authorUri = body.authorUri;
-    let optionWikidata = body.wikidata;
-    let optionViaf = body.viaf;
-    let optionSbn = body.sbn;
-
-    // Single variables as arrays
-    if(optionWikidata && !Array.isArray(optionWikidata))
-        optionWikidata = [optionWikidata];
-    if(optionViaf && !Array.isArray(optionViaf))
-        optionViaf = [optionViaf];
-    if(optionSbn && !Array.isArray(optionSbn))
-        optionSbn = [optionSbn];
-
-    // Queries params and requests
-    let links = {'wikidata': optionWikidata, 'viaf': optionViaf, 'sbn': optionSbn};
-    let requests = [];
-
-    // Generate requests
-    Object.keys(links).forEach((key) => {
-
-        // Parse query
-        if(links[key] !== undefined) {
-            requests.push(composeQuery(cobisInsertTimestamp(authorUri)));
-
-            if (key === 'wikidata') {
-                optionWikidata.forEach((option) => {
-                    requests.push(composeQuery(cobisInsertWikidata(authorUri, option)));
-                });
-            } else if (key === 'viaf') {
-                optionViaf.forEach((option) => {
-                    requests.push(composeQuery(cobisInsertViaf(authorUri, option)));
-                });
-            } else if (key === 'sbn' && !authorUri.includes('IT_ICCU')){
-                optionSbn.forEach((option) => {
-                    requests.push(composeQuery(cobisInsertSbn(authorUri, option)));
-                })
-            }
-        }
-
-    });*/
-
-    /*if(!user.admin)
-        return enrichments.storeMatching(driver, user.username, );*/
+    return [enrichments.storeMatching(driver, user.username, option, agent)];
 
 }
 

@@ -92,13 +92,20 @@ function authorMatch(){
 
     if(config.interlinking){
 
+        //console.log(Object.keys(selectedOptions));
+        console.log(Object.values(selectedOptions));
+
         // Store matching
         $.ajax({
             type: 'POST',
             url: '/api/v1/' + params.userToken + '/enrich-author/',
             async: true,
             data: {
-                options: Object.keys(selectedOptions)
+                option: Object.keys(selectedOptions)[0],
+                agent: author.uri
+            },
+            success: (data) => {
+                window.location = '/get/' + params.userToken + '/author'
             }
         })
 

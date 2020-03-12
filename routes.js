@@ -53,7 +53,8 @@ function loggingFlow(url) {
         '/api/v1/:token/author',
         '/api/v1/:token/get-agents',
         '/api/v1/:token/update-documents',
-        '/api/v1/:token/logged-user'
+        '/api/v1/:token/logged-user',
+        '/api/v1/:token/blank-documents'
     ];
 
     // Replace placeholder with current token
@@ -190,6 +191,13 @@ module.exports = function(app, passport = null, driver = null) {
         });
     });
 
+    /*app.get('/api/v1/:token/blank-documents', (request, response) => {
+        driver.collection('enrichments').update({}, {$set: {author: null, options: null, enriched: false, lock: null, matchedBy: []}}, {multi: true}, (err, res) => {
+            if(err) throw err;
+            response.json({blanked: true});
+        })
+    });*/
+
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
 
@@ -279,7 +287,12 @@ module.exports = function(app, passport = null, driver = null) {
     app.post('/api/v1/:token/enrich-author/', (request, response) => {
 
         // Get requests
-        let requests = queries.authorLink(request).map(req => promiseRequest(req));
+        /*if(configToken === 'arco')
+            let requests = queries.authorLink(request, driver).map(req => promiseRequest(req));
+        else*/
+        let requests = queries.authorLink(request, driver);
+        if(configToken !== 'arco')
+            requests = requests.map(req => promiseRequest(req));
 
         // Send requests
         Promise.all(requests).then((data) => {

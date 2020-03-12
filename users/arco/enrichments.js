@@ -16,7 +16,6 @@ function feedEnrichments(driver, callback, limit = 3) {
 
         // Generate requests for each enrichment uri
         let requests = res.map(el => nodeRequest('http://localhost:3646/api/v1/arco/author/' + encodeURIComponent(el._id) + '/?enrichment=true'));
-        //console.log(requests);
         Promise.all(requests).then((results) => {
 
             // Parse JSON result
@@ -40,8 +39,6 @@ function getAndlockAgent(driver, user, agent, callback) {
         //filter.lock = null;
         filter.matchedBy = {$nin: [user]};
 
-        console.log(filter);
-
         // Take the lock on the selected document
         driver.collection('enrichments').findOneAndUpdate(
             filter,
@@ -49,7 +46,6 @@ function getAndlockAgent(driver, user, agent, callback) {
             {returnOriginal: true},
             (err, res) => {
                 if (err) throw err;
-                //console.log(res);
                 callback(res.value);
             });
 
@@ -65,15 +61,15 @@ function resetLocks(driver, callback) {
     });
 }
 
-function storeMatching(driver, user, agent) {
+function storeMatching(driver, user, option, agent) {
 
     // Store document of with do the upsert
-    let document = {user: user, agent: agent};
+    let document = {user: user, option: option, timestamp: new Date()};
 
     // Upsert document and store matching
     return driver.collection('matchings').update(document, document, {upsert: true}, (err, res) => {
         if(err) throw err;
-        driver.collection('enrichments').update({_id: agent}, {$addToSet: {matchedBy: [user]}});
+        driver.collection('enrichments').update({_id: agent}, {$addToSet: {matchedBy: user}});
     });
 
 }
