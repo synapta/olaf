@@ -104,7 +104,7 @@ module.exports = function(app, passport = null, driver = null) {
             if(loginToken(token) && !request.user && !loggingFlow(request.originalUrl))
                 response.redirect('/get/' + token + '/login?redirect=' + request.originalUrl);
             else
-                next()
+                next();
 
         } else {
 
@@ -279,10 +279,7 @@ module.exports = function(app, passport = null, driver = null) {
     app.post('/api/v1/:token/enrich-author/', (request, response) => {
 
         // Get requests
-        let requests = queries.authorLink(request.body);
-
-        // Map requests to make Promise
-        requests = requests.map(req => promiseRequest(req));
+        let requests = queries.authorLink(request).map(req => promiseRequest(req));
 
         // Send requests
         Promise.all(requests).then((data) => {

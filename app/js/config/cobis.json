@@ -2,6 +2,7 @@
   "limit" : null,
   "selection": "right",
   "matching": "toggle",
+  "interlinking": true,
   "fields": {
     "uri": {
       "input": "personURI",

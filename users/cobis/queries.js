@@ -231,7 +231,10 @@ function authorOptions(name, surname){
 
 }
 
-function authorLink(body) {
+function authorLink(request, driver) {
+
+    // Store body
+    let body = request.body;
 
     // Get body params
     let authorUri = body.authorUri;
@@ -437,6 +440,7 @@ function parseAuthorOptions(author, bodies, callback) {
     let wikidataOptions = parseWikidataOptions(wikidataBody);
     let viafOptions = parseViafOptions(viafBody, wikidataOptions.filter(el => el.viaf).map(el => el.getViafId()));
     let options = wikidataOptions.concat(viafOptions);
+
     // Enrich all options with VIAF and return them
     Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
         options.map(el => el.getString());
@@ -446,22 +450,9 @@ function parseAuthorOptions(author, bodies, callback) {
 }
 
 // Exports
-exports.authorSelect = (params) => {
-    return composeQuery(authorSelect(params));
-};
+exports.authorSelect = (params) => composeQuery(authorSelect(params));
+exports.authorOptions = authorOptions;
+exports.parseAuthorOptions = parseAuthorOptions;
+exports.authorSkip = authorSkip;
+exports.authorLink = authorLink;
 
-exports.authorOptions = (name, surname) => {
-    return authorOptions(name, surname);
-};
-
-exports.parseAuthorOptions = (author, bodies, callback) => {
-    parseAuthorOptions(author, bodies, callback);
-};
-
-exports.authorSkip = (body) => {
-    return authorSkip(body);
-};
-
-exports.authorLink = (body) => {
-    return authorLink(body)
-};

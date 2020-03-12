@@ -37,8 +37,10 @@ function getAndlockAgent(driver, user, agent, callback) {
 
         // Change behavior on uri existance
         let filter = agent ? {_id: agent} : {enriched: true};
-        filter.lock = null;
+        //filter.lock = null;
         filter.matchedBy = {$nin: [user]};
+
+        console.log(filter);
 
         // Take the lock on the selected document
         driver.collection('enrichments').findOneAndUpdate(
@@ -47,6 +49,7 @@ function getAndlockAgent(driver, user, agent, callback) {
             {returnOriginal: true},
             (err, res) => {
                 if (err) throw err;
+                //console.log(res);
                 callback(res.value);
             });
 
@@ -62,14 +65,17 @@ function resetLocks(driver, callback) {
     });
 }
 
-function storeMatching(driver, user, agent, callback) {
+function storeMatching(driver, user, agent) {
+
     // Store document of with do the upsert
     let document = {user: user, agent: agent};
+
     // Upsert document and store matching
-    driver.collection('matchings').update(document, document, {upsert: true}, (err, res) => {
+    return driver.collection('matchings').update(document, document, {upsert: true}, (err, res) => {
         if(err) throw err;
-        driver.collection('enrichments').update({_id: agent}, {$addToSet: {matchedBy: [user]}}, callback)
+        driver.collection('enrichments').update({_id: agent}, {$addToSet: {matchedBy: [user]}});
     });
+
 }
 
 exports.storeEnrichment = storeEnrichment;

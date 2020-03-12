@@ -1,4 +1,5 @@
-const nodeRequest = require('request');
+const nodeRequest   = require('request');
+const enrichments   = require('./enrichments');
 const Combinatorics = require('js-combinatorics');
 
 let authorSearch = (nameCombinations) => {
@@ -204,10 +205,15 @@ function authorOptions(name, surname){
 
 }
 
-function authorLink(body) {
+function authorLink(request, driver) {
+
+    let body = request.body;
+    let user = request.user;
+
+    console.log(body);
 
     // Get body params
-    let authorUri = body.authorUri;
+    /*let authorUri = body.authorUri;
     let optionWikidata = body.wikidata;
     let optionViaf = body.viaf;
     let optionSbn = body.sbn;
@@ -246,9 +252,10 @@ function authorLink(body) {
             }
         }
 
-    });
+    });*/
 
-    return requests;
+    /*if(!user.admin)
+        return enrichments.storeMatching(driver, user.username, );*/
 
 }
 
@@ -321,10 +328,6 @@ function makeWikidataQuery(name, surname) {
         permutations = Combinatorics.permutation(nameTokens, nameTokens.length).toArray();
 
     let namePermutations = permutations.map(el => '"' + el.join(' ') + '"');
-
-    /*console.log('Tokens: ' + nameTokens);
-    console.log('Perm:' + namePermutations);
-    console.log('-----------------');*/
 
     // Find the author on wikidata
     return new Promise((resolve, reject) => {
@@ -424,6 +427,7 @@ function parseAuthorOptions(author, bodies, callback) {
     let wikidataOptions = parseWikidataOptions(wikidataBody);
     let viafOptions = parseViafOptions(viafBody, wikidataOptions.filter(el => el.viaf).map(el => el.getViafId()));
     let options = wikidataOptions.concat(viafOptions);
+
     // Enrich all options with VIAF and return them
     Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
         options.map(el => el.getString());
@@ -433,26 +437,8 @@ function parseAuthorOptions(author, bodies, callback) {
 }
 
 // Exports
-exports.authorSelect = (params) => {
-    return composeQuery(authorSelect(params));
-};
-
-exports.authorOptions = (name, surname) => {
-    return authorOptions(name, surname);
-};
-
-exports.parseAuthorOptions = (author, bodies, callback) => {
-    parseAuthorOptions(author, bodies, callback);
-};
-
-exports.authorSkip = (body) => {
-    return authorSkip(body);
-};
-
-exports.authorLink = (body) => {
-    return authorLink(body)
-};
-
-exports.getAgents = (offset) => {
-    return composeQuery(getAgents(offset))
-};
+exports.authorSelect = (params) => composeQuery(authorSelect(params));
+exports.authorOptions = authorOptions;
+exports.parseAuthorOptions = parseAuthorOptions;
+exports.authorSkip = authorSkip;
+exports.authorLink = authorLink;

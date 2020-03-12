@@ -88,6 +88,7 @@ function parseAuthorOptions(author, bodies, callback) {
     Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
 
         options.map(el => el.getString());
+        console.log(options);
 
         getAuthorSimilarOptions(author, options, function(options) {
             callback(options);

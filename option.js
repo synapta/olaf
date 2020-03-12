@@ -212,8 +212,8 @@ class Option {
     }
 
     getString() {
+        this.hash = SHA256(JSON.stringify(this)).toString();
         this.string = JSON.stringify(this);
-        this.hash = SHA256(this.string).toString();
     }
 
     setOptionAsSuggested(numberOfSimilarTitles) {

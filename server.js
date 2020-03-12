@@ -23,7 +23,7 @@ app.use(flash());
 // Get routes
 MongoClient.connect("mongodb://localhost:27017/", (err, client) => {
 
-    if(err || true)
+    if(err)
         require('./routes.js')(app, passport);
     else
         require('./routes.js')(app, passport, client.db('arco'));

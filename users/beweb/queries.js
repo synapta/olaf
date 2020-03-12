@@ -281,7 +281,7 @@ function authorOptions(name, surname){
 
 }
 
-function authorLink(body) {
+function authorLink(body, driver) {
 
     // Parse query
     let hash = crypto.createHash('md5').update(SECRET_KEY + body.Idrecord + 'updEntita').digest("hex");
