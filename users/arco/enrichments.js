@@ -31,12 +31,12 @@ function feedEnrichments(driver, callback, limit = 3) {
     })
 }
 
-function getAndlockAgent(driver, user, uri, callback) {
+function getAndlockAgent(driver, user, agent, callback) {
 
     if(driver) {
 
         // Change behavior on uri existance
-        let filter = uri ? {_id: uri} : {enriched: true};
+        let filter = agent ? {_id: agent} : {enriched: true};
         filter.lock = null;
         filter.matchedBy = {$nin: [user]};
 
@@ -62,7 +62,18 @@ function resetLocks(driver, callback) {
     });
 }
 
+function storeMatching(driver, user, agent, callback) {
+    // Store document of with do the upsert
+    let document = {user: user, agent: agent};
+    // Upsert document and store matching
+    driver.collection('matchings').update(document, document, {upsert: true}, (err, res) => {
+        if(err) throw err;
+        driver.collection('enrichments').update({_id: agent}, {$addToSet: {matchedBy: [user]}}, callback)
+    });
+}
+
 exports.storeEnrichment = storeEnrichment;
 exports.feedEnrichments = feedEnrichments;
 exports.getAndLockAgent = getAndlockAgent;
 exports.resetLocks      = resetLocks;
+exports.storeMatching   = storeMatching;
