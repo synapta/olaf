@@ -30,24 +30,25 @@ function feedEnrichments(driver, callback, limit = 3) {
     })
 }
 
-function getAndlockAgent(driver, user, agent, callback) {
+function getAndlockAgent(driver, user, agent, lock, callback) {
 
     if(driver) {
 
-        // Change behavior on uri existance
+        // Change behavior on uri existence
         let filter = agent ? {_id: agent} : {enriched: true};
-        //filter.lock = null;
+        filter.lock = null;
         filter.matchedBy = {$nin: [user]};
 
         // Take the lock on the selected document
         driver.collection('enrichments').findOneAndUpdate(
             filter,
-            {$set: {lock: new Date()}},
+            {$set: {lock: lock ? new Date() : null}},
             {returnOriginal: true},
             (err, res) => {
                 if (err) throw err;
                 callback(res.value);
-            });
+            }
+        );
 
     } else
         callback(null);

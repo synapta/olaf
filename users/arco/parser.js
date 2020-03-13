@@ -19,8 +19,6 @@ function configInit(configObj) {
  * **/
 function parseAuthor(body){
 
-    console.log(body);
-
     // Map Cobis result to standard format
     let binding = body.results.bindings[0];
     let parsedBody = {};
@@ -118,8 +116,6 @@ function parseAuthorOptions(author, bodies, callback) {
     // Enrich all options with VIAF and return them
     Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
         options.map(el => el.getString());
-        console.log(options);
-        //callback(options);
         getAuthorSimilarOptions(author, options, function(options) {
             callback(options);
         });
