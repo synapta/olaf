@@ -18,6 +18,9 @@ function flattenSparqlResponse(res) {
     let cleanObj = {};
     Object.keys(res).forEach(key => {
         cleanObj[key] = res[key].value;
+        if (typeof  cleanObj[key] === 'string' && cleanObj[key].includes('###')) {
+          cleanObj[key] = cleanObj[key].split('###').join(', ');
+        }
     });
     return cleanObj;
 }
@@ -406,7 +409,7 @@ function pgStoreQuery(id_beweb, nome, data, data_ultima_modifica_su_beweb) {
     let argListParams = [];
     let params = [];
     let argListCols = [];
-    let columns = []
+    let columns = [];
     let i = 4;
 
     Object.keys(data).forEach(key => {
@@ -512,21 +515,25 @@ function checkWikidataModification (db, id_beweb, cb) {
       // Query wikidata
       db.one(pgGetRecordQuery(), [id_beweb]).then((data)=> {
           nodeRequest( composeQueryWikidata([data.wikidata.replace("http://www.wikidata.org/entity/", "wd:")]), function (err, res, body) {
-
               let results = JSON.parse(body).results.bindings;
+
               let cleanObj = flattenSparqlResponse(results[0]);
               delete cleanObj.descrizione;
+              delete cleanObj.titles;
+
               let diff = 0
               let differenzeObj = [];
 
               Object.keys(cleanObj).forEach(key => {
                   if (cleanObj[key] !== data[key.toLowerCase()]) {
                       diff++;
-                      differenzeObj.push({
-                          nome: wikidata2bewebLabel(key),
-                          originale: data[key.toLowerCase()],
-                          modificato: cleanObj[key]
-                      });
+                      if (wikidata2bewebLabel(key)) {
+                        differenzeObj.push({
+                            nome: wikidata2bewebLabel(key),
+                            originale: data[key.toLowerCase()],
+                            modificato: cleanObj[key]
+                        });
+                      }
                   }
               });
               if (diff > 0) {
@@ -566,10 +573,11 @@ function storeWikidataInfo(db, data, cb) {
             
             let cleanObj = flattenSparqlResponse(results[0]);
             delete cleanObj.descrizione;
+            delete cleanObj.titles;
 
             //salvo risposta su db. 
             let { pgQuery, params } = pgStoreQuery(data.Idrecord, data.Visualizzazione_su_BEWEB, cleanObj, data_ultima_modifica_su_beweb)
-            console.log(data)
+
             db.none(deleteRecordQuery(), [data.Idrecord]).then(()=> {
                 db.none(pgQuery, params).then(()=> {
                     if (typeof cb === 'function') {
