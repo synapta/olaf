@@ -75,11 +75,11 @@ function getAuthorSimilarOptions(author, options, callback){
                 // Highlight similar titles
                 option.titles.forEach((title, index) => {
                     if(similarTitles[index])
-                        option.titles[index] = '<b>' + title + '</b>';
+                        option.titles[index] = '⟹' + title;
                 });
 
                 // Order title by highlighting
-                option.titles = option.titles.sort((a, b) => b.includes('<b>') - a.includes('<b>'));
+                option.titles = option.titles.sort((a, b) => b.includes('⟹') - a.includes('⟹'));
 
             }
 
