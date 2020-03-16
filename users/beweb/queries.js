@@ -536,7 +536,7 @@ function checkWikidataModification (db, id_beweb, cb) {
             } else {
                 console.log("nessuna modifica per " + id_beweb);
                 cb();
-            };
+            }
         });
     }).catch((err)=>{
         console.error(err)

@@ -11,7 +11,7 @@ function storeEnrichment(driver, enrichment) {
     })
 }
 
-function feedEnrichments(driver, callback, limit = 3) {
+function feedEnrichments(driver, callback, limit = 5) {
     driver.collection('enrichments').find({enriched: false}, {fields: {_id: 1}, limit: limit}).toArray((err, res) => {
 
         // Generate requests for each enrichment uri

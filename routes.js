@@ -191,13 +191,6 @@ module.exports = function(app, passport = null, driver = null) {
         });
     });
 
-    /*app.get('/api/v1/:token/blank-documents', (request, response) => {
-        driver.collection('enrichments').update({}, {$set: {author: null, options: null, enriched: false, lock: null, matchedBy: []}}, {multi: true}, (err, res) => {
-            if(err) throw err;
-            response.json({blanked: true});
-        })
-    });*/
-
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
 
@@ -221,6 +214,8 @@ module.exports = function(app, passport = null, driver = null) {
                     let author = parser.parseAuthor(JSON.parse(body));
                     // Query options
                     let requests = queries.authorOptions((author.name || '').trim(), '');
+
+                    //console.log(author);
 
                     // Make options queries
                     Promise.all(requests).then((bodies) => {
@@ -248,7 +243,7 @@ module.exports = function(app, passport = null, driver = null) {
 
                         });
 
-                    }).catch((error) => console.log(error));
+                    }).catch((error) => console.error(error));
 
                 });
 
@@ -287,9 +282,6 @@ module.exports = function(app, passport = null, driver = null) {
     app.post('/api/v1/:token/enrich-author/', (request, response) => {
 
         // Get requests
-        /*if(configToken === 'arco')
-            let requests = queries.authorLink(request, driver).map(req => promiseRequest(req));
-        else*/
         let requests = queries.authorLink(request, driver);
         if(configToken !== 'arco')
             requests = requests.map(req => promiseRequest(req));

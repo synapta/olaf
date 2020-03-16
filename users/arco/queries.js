@@ -2,24 +2,22 @@ const nodeRequest   = require('request');
 const enrichments   = require('./enrichments');
 const Combinatorics = require('js-combinatorics');
 
-let authorSearch = (nameCombinations) => {
+let authorSearch = (name, surname) => {
 
-    return `
-    SELECT DISTINCT ?item WHERE {
-  
-        VALUES ?names {
-            ${nameCombinations.join(' ')}
-        }
-          
-        SERVICE wikibase:mwapi {
-            bd:serviceParam wikibase:api "EntitySearch" .
-            bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-            bd:serviceParam mwapi:search ?names .
-            bd:serviceParam mwapi:language "it" .
-            ?item wikibase:apiOutputItem mwapi:item .
-        }
-      
-    }`;
+    // Compose query
+    return {
+        method: 'GET',
+        uri: 'https://www.wikidata.org/w/api.php',
+        qs: {
+            action: "query",
+            list: "search",
+            srsearch: (name + " " + surname).trim(),
+            //language: "it",
+            //limit: 30,
+            format: "json"
+        },
+        json: true
+    }
 
 };
 
@@ -201,7 +199,7 @@ let wikidataQuery = (options) => {
 function authorOptions(name, surname){
 
     // Compose queries
-    return [makeWikidataQuery(name, surname), makeViafQuery(name, surname)];
+    return [makeWikidataQuery(name, surname)];
 
 }
 
@@ -279,28 +277,30 @@ function composeQueryWikidata(query){
 function makeWikidataQuery(name, surname) {
 
     // Split name
-    let nameTokens = (name + ' ' + surname).trim().split(' ');
+    /*let nameTokens = (name + ' ' + surname).trim().split(' ');
     let permutations = [nameTokens];
 
     // Generate name permutations
     if(nameTokens.length > 1)
         permutations = Combinatorics.permutation(nameTokens, nameTokens.length).toArray();
 
-    let namePermutations = permutations.map(el => '"' + el.join(' ') + '"');
+    let namePermutations = permutations.map(el => '"' + el.join(' ') + '"');*/
 
     // Find the author on wikidata
     return new Promise((resolve, reject) => {
-        nodeRequest(composeQueryWikidata(authorSearch(namePermutations)), (err, res, body) => {
+        nodeRequest(authorSearch(name, surname), (err, res, body) => {
 
+            // Handle error
             if (err) {
                 console.error(err);
-                reject();
+                reject(err);
             }
 
             try{
 
-                // Store Agents
-                let agents = JSON.parse(body).results.bindings.map(binding => binding.item.value.replace('http://www.wikidata.org/entity/', 'wd:'));
+                // Extract agents ID
+                let agents = body.query.search.map(result => 'wd:' + result.title);
+
                 if(agents) {
                     nodeRequest(composeQueryWikidata(wikidataQuery(agents)), (err, res, body) => {
                         if (err) {
@@ -312,8 +312,8 @@ function makeWikidataQuery(name, surname) {
                 } else
                     resolve(JSON.stringify({results: {bindings: []}}))
 
-            } catch {
-                reject();
+            } catch(err) {
+                reject(err);
             }
 
         })
@@ -321,83 +321,8 @@ function makeWikidataQuery(name, surname) {
 
 }
 
-function composeQueryVIAF(name, surname){
-    // Compose query
-    return {
-        method: 'GET',
-        uri: 'https://www.viaf.org/viaf/AutoSuggest',
-        qs: {
-            query: (name + " " + surname).trim(),
-        },
-        headers: {
-            'cache-control': 'no-cache',
-            'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
-            'user-agent': 'pippo',
-        }
-    }
-
-}
-
-function makeViafQuery(name, surname) {
-    return new Promise ( function(resolve, reject) {
-        nodeRequest(composeQueryVIAF(name, surname), function (error, response, body) {
-            if (error) {
-                console.error(error);
-                reject();
-            }
-            resolve(body);
-        });
-    });
-}
-
-function parseViafOptions(body, viafUris) {
-
-    // Invalid fields
-    let invalidFields = ['uniformtitleexpression', 'uniformtitlework'];
-
-    // Parse results
-    let results = (body.result || []).slice(0, 4);
-    // Filter current results removing known authors and options with invalid fields
-    results = results.filter(el => !viafUris.includes(el['viafid']) && !invalidFields.includes(el['nametype']));
-
-    // Construct options from query results
-    return results.map(el => new Option(el, 'viaf', config));
-
-}
-
-function parseWikidataOptions(body) {
-
-    // Parse results
-    let results = body.results.bindings;
-
-    // Construct options from query results
-    return results.map(el => new Option(el, 'wikidata', config));
-
-}
-
-function parseAuthorOptions(author, bodies, callback) {
-    console.log('pippo');
-
-    // Store bodies
-    let wikidataBody = bodies[0];
-    let viafBody = bodies[1];
-
-    // Get wikidata options
-    let wikidataOptions = parseWikidataOptions(wikidataBody);
-    let viafOptions = parseViafOptions(viafBody, wikidataOptions.filter(el => el.viaf).map(el => el.getViafId()));
-    let options = wikidataOptions.concat(viafOptions);
-
-    // Enrich all options with VIAF and return them
-    Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
-        options.map(el => el.getString());
-        callback(options);
-    });
-
-}
-
 // Exports
 exports.authorSelect = (params) => composeQuery(authorSelect(params));
 exports.authorOptions = authorOptions;
-exports.parseAuthorOptions = parseAuthorOptions;
 exports.authorSkip = authorSkip;
 exports.authorLink = authorLink;
