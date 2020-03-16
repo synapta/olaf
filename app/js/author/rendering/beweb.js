@@ -4,7 +4,9 @@ function renderNavbar(selection=true, callback) {
                     .promise()
                     .done(() => {
                         showUserToken(params.userToken);
-                        callback();
+                        if (typeof callback === 'function') {
+                            callback();
+                        }
                     });
     })
 }
@@ -89,7 +91,7 @@ function renderAuthorMatches(){
             // Clear list
             let fieldBox = $('#' + key);
             fieldBox.find('.selection_list').html('');
-
+            
             // Populate list
             selectedFields[key].forEach((item) => {
                 fieldBox.find('.selection_list').append(Mustache.render(template, {'value': item, 'key': key}));
