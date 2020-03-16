@@ -577,8 +577,8 @@ exports.authorOptions = (name, surname) => {
     return authorOptions(name, surname);
 };
 
-exports.authorSkip = (body) => {
-    return authorSkip(body);
+exports.authorSkip = (request, driver) => {
+    return authorSkip(request, driver);
 };
 
 exports.authorLink = (body) => {

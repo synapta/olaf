@@ -329,7 +329,7 @@ module.exports = function(app, passport = null, driver = null) {
     app.post('/api/v1/:token/author-skip/', (request, response) => {
 
         // Compose query
-        let requests = queries.authorSkip(request.body);
+        let requests = queries.authorSkip(request, driver);
 
         // Send requests
         nodeRequest(requests, (err, res, body) => {

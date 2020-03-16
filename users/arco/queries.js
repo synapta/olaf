@@ -216,12 +216,14 @@ function authorLink(request, driver) {
 
 }
 
-function authorSkip(body) {
+function authorSkip(request, driver) {
 
     // Get body params
-    let authorUri = body.authorId;
+    let agent = request.body.authorId;
+    let user = request.user ? request.user.username : null;
+
     // Return query
-    return composeQuery(cobisInsertSkip(authorUri));
+    return enrichments.skipAgent(driver, user, agent);
 
 }
 

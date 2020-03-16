@@ -36,8 +36,9 @@ function getAndlockAgent(driver, user, agent, lock, callback) {
 
         // Change behavior on uri existence
         let filter = agent ? {_id: agent} : {enriched: true};
-        filter.lock = null;
         filter.matchedBy = {$nin: [user]};
+        filter.skippedBy = {$nin: [user]};
+        filter.lock = null;
 
         // Take the lock on the selected document
         driver.collection('enrichments').findOneAndUpdate(
@@ -56,7 +57,7 @@ function getAndlockAgent(driver, user, agent, lock, callback) {
 }
 
 function resetLocks(driver, callback) {
-    driver.collection('enrichments').update({}, {$set: {lock: null}}, {multi: true}, (err, res) => {
+    driver.collection('enrichments').updateMany({}, {$set: {lock: null}}, (err, res) => {
         if(err) throw err;
         callback();
     });
@@ -68,11 +69,15 @@ function storeMatching(driver, user, option, agent) {
     let document = {user: user, option: option, timestamp: new Date()};
 
     // Upsert document and store matching
-    return driver.collection('matchings').update(document, document, {upsert: true}, (err, res) => {
+    return driver.collection('matchings').updateOne(document, document, {upsert: true}, (err, res) => {
         if(err) throw err;
-        driver.collection('enrichments').update({_id: agent}, {$addToSet: {matchedBy: user}});
+        driver.collection('enrichments').updateOne({_id: agent}, {$addToSet: {matchedBy: user}});
     });
 
+}
+
+function skipAgent(driver, user, agent) {
+    return driver.collection('enrichments').updateOne({_id: agent}, {$addToSet: {skippedBy: user}});
 }
 
 exports.storeEnrichment = storeEnrichment;
@@ -80,3 +85,4 @@ exports.feedEnrichments = feedEnrichments;
 exports.getAndLockAgent = getAndlockAgent;
 exports.resetLocks      = resetLocks;
 exports.storeMatching   = storeMatching;
+exports.skipAgent       = skipAgent;

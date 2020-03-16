@@ -282,10 +282,10 @@ function authorLink(request, driver) {
 
 }
 
-function authorSkip(body) {
+function authorSkip(request, driver) {
 
     // Get body params
-    let authorUri = body.authorId;
+    let authorUri = request.body.authorId;
     // Return query
     return composeQuery(cobisInsertSkip(authorUri));
 
