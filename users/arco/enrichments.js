@@ -35,16 +35,18 @@ function getAndlockAgent(driver, user, agent, lock, callback) {
     if(driver) {
 
         // Change behavior on uri existence
-        let filter = agent ? {_id: agent} : {enriched: true};
-        filter.matchedBy = {$nin: [user]};
-        filter.skippedBy = {$nin: [user]};
-        filter.lock = null;
+        //let filter = agent ? {_id: agent} : {enriched: true};
+        let filter = {
+            matchedBy: {$nin: [user]},
+            skippedBy: {$nin: [user]},
+            lock: null
+        };
 
         // Take the lock on the selected document
         driver.collection('enrichments').findOneAndUpdate(
             filter,
             {$set: {lock: lock ? new Date() : null}},
-            {returnOriginal: true},
+            {returnOriginal: true, sort: {enriched: -1}},
             (err, res) => {
                 if (err) throw err;
                 callback(res.value);

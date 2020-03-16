@@ -199,13 +199,15 @@ module.exports = function(app, passport = null, driver = null) {
 
         enrichments.getAndLockAgent(driver, user, agent, !request.query.enrichment, (result) => {
 
-            if(result && !request.query.enrichment) {
+            console.log(result);
+
+            if(result && !request.query.enrichment && result.enriched) {
                 // Send stored options and author
                 response.json({author: result.author, options: result.options});
             } else {
 
                 // Compose author query
-                let queryAuthor = queries.authorSelect(request.params.authorId);
+                let queryAuthor = queries.authorSelect(request.params.authorId ? request.params.authorId : result._id);
 
                 // Make request
                 nodeRequest(queryAuthor, (err, res, body) => {
