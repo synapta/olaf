@@ -70,7 +70,7 @@ function storeMatching(driver, user, option, agent) {
     let document = {agent: agent, user: user, option: option, timestamp: new Date()};
 
     // Upsert document and store matching
-    return driver.collection('matchings').updateOne(document, {$set: document}, {upsert: true}, (err, res) => {
+    return driver.collection('matches').updateOne(document, {$set: document}, {upsert: true}, (err, res) => {
         if(err) throw err;
         driver.collection('enrichments').updateOne({_id: agent}, {$addToSet: {matchedBy: user}});
     });
@@ -81,10 +81,27 @@ function skipAgent(driver, user, agent) {
     return driver.collection('enrichments').updateOne({_id: agent}, {$addToSet: {skippedBy: user}});
 }
 
+function getMatchingToValidate(driver, agent, callback) {
+    // Get matches for the given agent
+    driver.collection('enrichments').findOne({validated: false, matchedBy: {$not: {$size: 0}}}, (err, enrichment) => {
+        if(err) throw err;
+        if(!enrichment) callback(null);
+        driver.collection('matches').find({agent: enrichment._id}).project({option: 1}).toArray((err, matches) => {
+            if(err) throw err;
+            callback({
+                author: enrichment.author,
+                options: enrichment.options,
+                matches: matches
+            });
+        })
+    })
+}
+
 // Exports
-exports.storeEnrichment = storeEnrichment;
-exports.feedEnrichments = feedEnrichments;
-exports.getAndLockAgent = getAndlockAgent;
-exports.resetLocks      = resetLocks;
-exports.storeMatching   = storeMatching;
-exports.skipAgent       = skipAgent;
+exports.storeEnrichment         = storeEnrichment;
+exports.feedEnrichments         = feedEnrichments;
+exports.getAndLockAgent         = getAndlockAgent;
+exports.resetLocks              = resetLocks;
+exports.storeMatching           = storeMatching;
+exports.skipAgent               = skipAgent;
+exports.getMatchingToValidate   = getMatchingToValidate;

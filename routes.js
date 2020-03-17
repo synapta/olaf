@@ -197,59 +197,72 @@ module.exports = function(app, passport = null, driver = null) {
         let user = (!request.query.enrichment && request.user) ? request.user.username : null;
         let agent = request.params.authorId;
 
-        enrichments.getAndLockAgent(driver, user, agent, !request.query.enrichment, (result) => {
+        if(request.user && request.user.role === 'user') {
+            enrichments.getAndLockAgent(driver, user, agent, !request.query.enrichment, (result) => {
 
-            if(result && !request.query.enrichment && result.enriched) {
-                // Send stored options and author
-                response.json({author: result.author, options: result.options});
-            } else {
+                if (result && !request.query.enrichment && result.enriched) {
+                    // Send stored options and author
+                    response.json({author: result.author, options: result.options});
+                } else {
 
-                // Compose author query
-                let queryAuthor = queries.authorSelect(request.params.authorId ? request.params.authorId : result._id);
+                    // Compose author query
+                    let queryAuthor = queries.authorSelect(request.params.authorId ? request.params.authorId : result._id);
 
-                // Make request
-                nodeRequest(queryAuthor, (err, res, body) => {
+                    // Make request
+                    nodeRequest(queryAuthor, (err, res, body) => {
 
-                    // Handle and send author
-                    let author = parser.parseAuthor(JSON.parse(body));
-                    // Query options
-                    let requests = queries.authorOptions((author.name || '').trim(), '');
+                        // Handle and send author
+                        let author = parser.parseAuthor(JSON.parse(body));
+                        // Query options
+                        let requests = queries.authorOptions((author.name || '').trim(), '');
 
-                    //console.log(author);
+                        //console.log(author);
 
-                    // Make options queries
-                    Promise.all(requests).then((bodies) => {
+                        // Make options queries
+                        Promise.all(requests).then((bodies) => {
 
-                        bodies = bodies.map(body => {
-                            try {JSON.parse(body)}
-                            catch {return {}}
-                            return JSON.parse(body);
-                        });
+                            bodies = bodies.map(body => {
+                                try {
+                                    JSON.parse(body)
+                                } catch {
+                                    return {}
+                                }
+                                return JSON.parse(body);
+                            });
 
-                        // Parse result
-                        parser.parseAuthorOptions(author, bodies, (options) => {
+                            // Parse result
+                            parser.parseAuthorOptions(author, bodies, (options) => {
 
-                            let responseObject = {
-                                author: author,
-                                options: options
-                            };
+                                let responseObject = {
+                                    author: author,
+                                    options: options
+                                };
 
-                            if(driver)
-                                // Store current result
-                                enrichments.storeEnrichment(driver, responseObject).then(response.json(responseObject));
-                            else
-                                // Send back options and author response
-                                response.json(responseObject);
+                                if (driver)
+                                    // Store current result
+                                    enrichments.storeEnrichment(driver, responseObject).then(response.json(responseObject));
+                                else
+                                    // Send back options and author response
+                                    response.json(responseObject);
 
-                        });
+                            });
 
-                    }).catch((error) => console.error(error));
+                        }).catch((error) => console.error(error));
 
-                });
+                    });
 
-            }
+                }
 
-        });
+            });
+        } else if(request.user && request.user.role === 'admin') {
+            enrichments.getMatchingToValidate(driver, agent, (validationFields) => {
+                if(!validationFields) response.json('qualcosa che non va bene');
+                parser.mergeOptionsAndMatches(validationFields.options, validationFields.matches);
+                response.json({author: validationFields.author, options: validationFields.options})
+            });
+        }
+
+
     });
 
     app.get('/api/v1/:token/config/', (request, response) => {

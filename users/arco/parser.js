@@ -108,8 +108,6 @@ function parseAuthorOptions(author, bodies, callback) {
     // Get wikidata options
     if('results' in wikidataBody)
         wikidataOptions = parseWikidataOptions(wikidataBody);
-    if(viafBody)
-        viafOptions = parseViafOptions(viafBody, wikidataOptions.filter(el => el.viaf).map(el => el.getViafId()));
 
     let options = wikidataOptions.concat(viafOptions);
 
@@ -133,38 +131,23 @@ function parseWikidataOptions(body) {
 
 }
 
-function parseViafOptions(body, viafUris) {
+function mergeOptionsAndMatches(options, matches) {
 
-    // Invalid fields
-    let invalidFields = ['uniformtitleexpression', 'uniformtitlework'];
+    let hashOptionMap = {};
 
-    // Parse results
-    let results = body.result || [];
-    // Filter current results removing known authors and options with invalid fields
-    results = results.filter((object, index, array) => array.map((el) => el.viafid).indexOf(object.viafid) === index);
-    results = results.filter(el => !viafUris.includes(el['viafid']) && !invalidFields.includes(el['nametype']));
+    // Count each option match
+    options.map((option) => {
+        option.matches = 0;
+        hashOptionMap[option.hash] = option
+    });
 
-    // Construct options from query results
-    return results.map(el => new Option(el, 'viaf', config));
+    matches.map((match) => hashOptionMap[match.option].matches++);
 
 }
 
-
 // Exports
-exports.parseAuthor = (body) => {
-    return parseAuthor(body);
-};
-
-exports.parseAuthorOptions = (author, bodies, callback) => {
-    parseAuthorOptions(author, bodies, callback);
-};
-
-exports.parseOutput = (data) => {
-    return parseOutput(data);
-};
-
-exports.configInit = (configObj) => {
-    configInit(configObj);
-};
-
-exports.config = config;
+exports.parseAuthor             = parseAuthor;
+exports.parseAuthorOptions      = parseAuthorOptions;
+exports.configInit              = configInit;
+exports.mergeOptionsAndMatches  = mergeOptionsAndMatches;
+exports.config                  = config;
