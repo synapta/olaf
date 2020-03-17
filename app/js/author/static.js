@@ -61,7 +61,7 @@ function authorSelect(el){
     let selected = null;
 
     // Toggle option selection
-    if(optionString in selectedOptions){
+    if(optionHash in selectedOptions){
 
         // Toggle selection flag
         selected = true;

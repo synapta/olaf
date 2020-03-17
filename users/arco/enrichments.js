@@ -71,7 +71,7 @@ function storeMatching(driver, user, option, agent) {
     let document = {user: user, option: option, timestamp: new Date()};
 
     // Upsert document and store matching
-    return driver.collection('matchings').updateOne(document, document, {upsert: true}, (err, res) => {
+    return driver.collection('matchings').updateOne(document, {$set: document}, {upsert: true}, (err, res) => {
         if(err) throw err;
         driver.collection('enrichments').updateOne({_id: agent}, {$addToSet: {matchedBy: user}});
     });

@@ -199,8 +199,6 @@ module.exports = function(app, passport = null, driver = null) {
 
         enrichments.getAndLockAgent(driver, user, agent, !request.query.enrichment, (result) => {
 
-            console.log(result);
-
             if(result && !request.query.enrichment && result.enriched) {
                 // Send stored options and author
                 response.json({author: result.author, options: result.options});
