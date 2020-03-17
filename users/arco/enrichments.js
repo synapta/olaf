@@ -35,7 +35,6 @@ function getAndlockAgent(driver, user, agent, lock, callback) {
     if(driver) {
 
         // Change behavior on uri existence
-        //let filter = agent ? {_id: agent} : {enriched: true};
         let filter = {
             matchedBy: {$nin: [user]},
             skippedBy: {$nin: [user]},
@@ -68,7 +67,7 @@ function resetLocks(driver, callback) {
 function storeMatching(driver, user, option, agent) {
 
     // Store document of with do the upsert
-    let document = {user: user, option: option, timestamp: new Date()};
+    let document = {agent: agent, user: user, option: option, timestamp: new Date()};
 
     // Upsert document and store matching
     return driver.collection('matchings').updateOne(document, {$set: document}, {upsert: true}, (err, res) => {
