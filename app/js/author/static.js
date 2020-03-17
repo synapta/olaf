@@ -342,53 +342,57 @@ function authorSend(){
 // Get author, render author card, options and author labels
 $(document).ready(() => {
 
-    // Load alternative scripts
-    _loadAlternativeScripts(() => {
-        $.get('/api/v1/' + params.userToken + '/logged-user', (loggedUser) => {
+    let href = window.location.href;
+    if(!(href.includes('login') || href.includes('user'))) {
+        // Load alternative scripts
+        _loadAlternativeScripts(() => {
+            $.get('/api/v1/' + params.userToken + '/logged-user', (loggedUser) => {
 
-            // Store logged user
-            if(loggedUser)
-                user = loggedUser.user;
+                // Store logged user
+                if (loggedUser)
+                    user = loggedUser.user;
 
-            // Render navbar
-            renderNavbar();
-            renderVerificationMessage();
+                // Render navbar
+                renderNavbar();
+                renderVerificationMessage();
 
-            // Load configuration
-            $.get(`/api/v1/${params.userToken}/config/`, (json) => {
+                // Load configuration
+                $.get(`/api/v1/${params.userToken}/config/`, (json) => {
 
-                // Store config
-                config = json;
+                    // Store config
+                    config = json;
 
-                // Get current author and its options
-                $.ajax({
+                    // Get current author and its options
+                    $.ajax({
 
-                    url: '/api/v1/' + params.userToken + '/author/' + (params.authorId ? params.authorId : ''),
-                    method: 'GET',
-                    dataType: 'json',
+                        url: '/api/v1/' + params.userToken + '/author/' + (params.authorId ? params.authorId : ''),
+                        method: 'GET',
+                        dataType: 'json',
 
-                    success: response => {
+                        success: response => {
 
-                        // Store author response
-                        author = response.author;
-                        options = response.options;
+                            // Store author response
+                            author = response.author;
+                            options = response.options;
 
-                        // Render author card
-                        renderAuthorCard(author);
-                        // Render author options
-                        renderAuthorOptions({'options': options});
+                            // Render author card
+                            renderAuthorCard(author);
+                            // Render author options
+                            renderAuthorOptions({'options': options});
 
-                        // Check empty response
-                        if (options.length === 0) {
-                            alert('Non sono presenti match per questo autore.');
-                            authorSkip(author.uri);
+                            // Check empty response
+                            if (options.length === 0) {
+                                alert('Non sono presenti match per questo autore.');
+                                authorSkip(author.uri);
+                            }
+
                         }
-
-                    }
+                    });
                 });
+
             });
 
         });
-
-    });
+    }
+    
 });
