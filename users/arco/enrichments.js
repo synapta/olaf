@@ -81,6 +81,7 @@ function skipAgent(driver, user, agent) {
     return driver.collection('enrichments').updateOne({_id: agent}, {$addToSet: {skippedBy: user}});
 }
 
+// Exports
 exports.storeEnrichment = storeEnrichment;
 exports.feedEnrichments = feedEnrichments;
 exports.getAndLockAgent = getAndlockAgent;
