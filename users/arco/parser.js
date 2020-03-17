@@ -143,7 +143,7 @@ function mergeOptionsAndMatches(options, matches) {
     matches.map((match) => hashOptionMap[match.option].matches++);
 
     // Sort options by match
-    options.sort((a, b) => b.matches.order - a.matches.order);
+    options.sort((a, b) => b.matches - a.matches);
 
 }
 
