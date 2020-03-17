@@ -1,5 +1,5 @@
 {
-  "limit" : null,
+  "limit" : 1,
   "selection": "right",
   "matching": "toggle",
   "interlinking": true,
