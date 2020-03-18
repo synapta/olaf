@@ -66,7 +66,7 @@ function resetLocks(driver, callback) {
 
 function storeMatching(driver, user, option, agent) {
 
-    // Store document of with do the upsert
+    // Store document
     let document = {agent: agent, user: user, option: option};
 
     // Upsert document and store matching
@@ -78,7 +78,16 @@ function storeMatching(driver, user, option, agent) {
 }
 
 function skipAgent(driver, user, agent) {
-    return driver.collection('enrichments').updateOne({_id: agent}, {$addToSet: {skippedBy: user}});
+
+    // Store document
+    let document = {agent: agent, user: user};
+
+    // Upsert document and store skip
+    return driver.collection('skipped').updateOne(document, {$set: Object.assign(document, {timestamp: new Date()})}, {upsert: true}, (err, res) => {
+        if(err) throw err;
+        driver.collection('enrichments').updateOne({_id: agent}, {$addToSet: {skippedBy: user}});
+    });
+
 }
 
 function getMatchingToValidate(driver, agent, callback) {
