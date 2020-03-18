@@ -344,6 +344,13 @@ module.exports = function(app, passport = null, driver = null) {
 
     });
 
+    app.post('/api/v1/:token/validate-matching/:agent', (request, response) => {
+        enrichments.validateMatching(driver, request.params.agent, () => {
+            let option = JSON.parse(request.body.option);
+            response.json(option);
+        })
+    });
+
     app.post('/api/v1/:token/add-author-again', (request, response) => {
         // Send requests
         let data = request.body;

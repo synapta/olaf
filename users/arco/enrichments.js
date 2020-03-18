@@ -97,6 +97,14 @@ function getMatchingToValidate(driver, agent, callback) {
     })
 }
 
+function validateMatching(driver, agent, callback) {
+    // Set an agent as validate
+    driver.collection('enrichments').findOneAndUpdate({_id: agent}, {$set: {validated: true}}, (err, res) => {
+        if(err) throw err;
+        callback();
+    })
+}
+
 // Exports
 exports.storeEnrichment         = storeEnrichment;
 exports.feedEnrichments         = feedEnrichments;
@@ -105,3 +113,4 @@ exports.resetLocks              = resetLocks;
 exports.storeMatching           = storeMatching;
 exports.skipAgent               = skipAgent;
 exports.getMatchingToValidate   = getMatchingToValidate;
+exports.validateMatching        = validateMatching;
