@@ -167,10 +167,10 @@ let wikidataQuery = (options) => {
       }
     
       OPTIONAL {
-        ?i wdt:P1986 ?treciRaw .
-        BIND(concat('http://www.treccani.it/enciclopedia/', ?trecRaw, "_(Dizionario_Biografico)") as ?treccani)
+        ?i wdt:P3365  ?trecRaw .
+        BIND(concat('http://www.treccani.it/enciclopedia/', ?trecRaw ) as ?treccani)
       }
-    
+
       OPTIONAL {
         ?itwikipedia schema:about ?i .
         FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
