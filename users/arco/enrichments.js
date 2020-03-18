@@ -86,14 +86,16 @@ function getMatchingToValidate(driver, agent, callback) {
     driver.collection('enrichments').findOne({validated: false, matchedBy: {$not: {$size: 0}}}, (err, enrichment) => {
         if(err) throw err;
         if(!enrichment) callback(null);
-        driver.collection('matches').find({agent: enrichment._id}).project({option: 1}).toArray((err, matches) => {
-            if(err) throw err;
-            callback({
-                author: enrichment.author,
-                options: enrichment.options,
-                matches: matches
-            });
-        })
+        else {
+            driver.collection('matches').find({agent: enrichment._id}).project({option: 1}).toArray((err, matches) => {
+                if (err) throw err;
+                callback({
+                    author: enrichment.author,
+                    options: enrichment.options,
+                    matches: matches
+                });
+            })
+        }
     })
 }
 

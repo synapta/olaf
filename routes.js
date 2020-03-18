@@ -257,8 +257,10 @@ module.exports = function(app, passport = null, driver = null) {
         } else if(request.user && request.user.role === 'admin') {
             enrichments.getMatchingToValidate(driver, agent, (validationFields) => {
                 if(!validationFields) response.json('qualcosa che non va bene');
-                parser.mergeOptionsAndMatches(validationFields.options, validationFields.matches);
-                response.json({author: validationFields.author, options: validationFields.options})
+                else {
+                    parser.mergeOptionsAndMatches(validationFields.options, validationFields.matches);
+                    response.json({author: validationFields.author, options: validationFields.options});
+                }
             });
         }
 
