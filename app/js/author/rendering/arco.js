@@ -35,3 +35,9 @@ function renderAuthorOptions(options){
         });
     });
 }
+
+function renderNoMoreValidations() {
+    $.get('/views/template/arco/no-more-validations.html', (template) => {
+        $('.container').html(template); 
+    });
+}

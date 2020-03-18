@@ -89,11 +89,7 @@ function authorSelect(el){
 }
 
 function authorMatch(){
-
     if(config.interlinking){
-
-        //console.log(Object.keys(selectedOptions));
-        console.log(Object.values(selectedOptions));
 
         // Store matching
         $.ajax({
@@ -156,7 +152,6 @@ function authorMatch(){
         });
 
     }
-
 }
 
 function groupSelectionLabels(){
@@ -370,22 +365,28 @@ $(document).ready(() => {
                         dataType: 'json',
 
                         success: response => {
+                            if(!response.author && !response.options){
+                                if(user.role === 'admin')
+                                    renderNoMoreValidations();
+                                else
+                                    console.log('Niente');
+                            } else {
 
-                            // Store author response
-                            author = response.author;
-                            options = response.options;
+                                // Store author response
+                                author = response.author;
+                                options = response.options;
 
-                            // Render author card
-                            renderAuthorCard(author);
-                            // Render author options
-                            renderAuthorOptions({'options': options});
+                                // Render author card
+                                renderAuthorCard(author);
+                                // Render author options
+                                renderAuthorOptions({'options': options});
 
-                            // Check empty response
-                            if (options.length === 0) {
-                                alert('Non sono presenti match per questo autore.');
-                                authorSkip(author.uri);
+                                // Check empty response
+                                if (options.length === 0) {
+                                    alert('Non sono presenti match per questo autore.');
+                                    authorSkip(author.uri);
+                                }
                             }
-
                         }
                     });
                 });
