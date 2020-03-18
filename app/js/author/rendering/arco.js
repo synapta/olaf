@@ -38,6 +38,12 @@ function renderAuthorOptions(options){
 
 function renderNoMoreValidations() {
     $.get('/views/template/arco/no-more-validations.html', (template) => {
-        $('.container').html(template); 
+        $('.container').html(template);
+    });
+}
+
+function renderNoMoreAgents() {
+    $.get('/views/template/arco/no-more-agents.html', (template) => {
+        $('.container').html(template);
     });
 }

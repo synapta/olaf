@@ -366,10 +366,8 @@ $(document).ready(() => {
 
                         success: response => {
                             if(!response.author && !response.options){
-                                if(user.role === 'admin')
-                                    renderNoMoreValidations();
-                                else
-                                    console.log('Niente');
+                                if(user.role === 'admin') renderNoMoreValidations();
+                                else renderNoMoreAgents();
                             } else {
 
                                 // Store author response
