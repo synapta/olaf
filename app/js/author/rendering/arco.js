@@ -10,8 +10,10 @@ function renderAuthorCard(author){
         $('#author-card').html(output).promise().done(() => {
             $('.ui.accordion').accordion({exclusive:false});
             // Load alternative actions for admin user
-            if(user.role === 'admin')
+            if(user.role === 'admin') {
                 $('#send-button').remove();
+                $('#skip-author').attr('onclick', 'validateAgent(this, false)')
+            }
         });
 
     });

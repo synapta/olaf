@@ -1,13 +1,11 @@
 // Validate agent
-function validateAgent(el) {
+function validateAgent(el, matching = true) {
 
-    // Store option dataset
-    let dataset = $(el).closest('.author-option').data();
     $.ajax({
         type: 'POST',
         url: '/api/v1/' + params.userToken + '/validate-matching/' + encodeURIComponent(author.uri),
         data: {
-            option: JSON.stringify(dataset.item)
+            option: JSON.stringify(matching ? $(el).closest('.author-option').data().item : null)
         },
         async: true,
         success: (data) => {

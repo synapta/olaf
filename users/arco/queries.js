@@ -224,7 +224,7 @@ function authorSkip(request, driver) {
     let user = request.user ? request.user.username : null;
 
     // Return query
-    return enrichments.skipAgent(driver, user, agent);
+    return [enrichments.skipAgent(driver, user, agent)];
 
 }
 
@@ -278,16 +278,6 @@ function composeQueryWikidata(query){
 }
 
 function makeWikidataQuery(name, surname) {
-
-    // Split name
-    /*let nameTokens = (name + ' ' + surname).trim().split(' ');
-    let permutations = [nameTokens];
-
-    // Generate name permutations
-    if(nameTokens.length > 1)
-        permutations = Combinatorics.permutation(nameTokens, nameTokens.length).toArray();
-
-    let namePermutations = permutations.map(el => '"' + el.join(' ') + '"');*/
 
     // Find the author on wikidata
     return new Promise((resolve, reject) => {

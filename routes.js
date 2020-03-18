@@ -197,7 +197,7 @@ module.exports = function(app, passport = null, driver = null) {
         let user = (!request.query.enrichment && request.user) ? request.user.username : null;
         let agent = request.params.authorId;
 
-        if(request.user && request.user.role === 'user') {
+        if((request.user && request.user.role === 'user') || !request.user) {
             enrichments.getAndLockAgent(driver, user, agent, !request.query.enrichment, (result) => {
 
                 if (result && !request.query.enrichment && result.enriched) {
@@ -337,6 +337,8 @@ module.exports = function(app, passport = null, driver = null) {
 
         // Compose query
         let requests = queries.authorSkip(request, driver);
+        if(configToken !== 'arco')
+            requests = requests.map(req => promiseRequest(req));
 
         // Send requests
         nodeRequest(requests, (err, res, body) => {
@@ -348,8 +350,14 @@ module.exports = function(app, passport = null, driver = null) {
 
     app.post('/api/v1/:token/validate-matching/:agent', (request, response) => {
         enrichments.validateMatching(driver, request.params.agent, () => {
-            let option = JSON.parse(request.body.option);
-            response.json(option);
+            request.body.option = request.body.option === 'null' ? null : request.body.option;
+            if(request.body.option) {
+                let option = JSON.parse(request.body.option);
+                response.json(option);
+            } else {
+                console.log('skipped');
+                response.json({skipped: true});
+            }
         })
     });
 
