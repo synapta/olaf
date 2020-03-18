@@ -131,6 +131,9 @@ let wikidataQuery = (options) => {
         ${options.join(' ')}
       }
       
+      # Get only people as Agent
+      ?id wdt:P31 wd:Q5 .
+      
       # Get see also for creator property
       wd:P170 wdt:P1659 ?seeAlsoCreator .
       BIND(URI(REPLACE(STR(?seeAlsoCreator), "entity", "prop/direct")) AS ?creatorBinded)
