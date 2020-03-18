@@ -67,10 +67,10 @@ function resetLocks(driver, callback) {
 function storeMatching(driver, user, option, agent) {
 
     // Store document of with do the upsert
-    let document = {agent: agent, user: user, option: option, timestamp: new Date()};
+    let document = {agent: agent, user: user, option: option};
 
     // Upsert document and store matching
-    return driver.collection('matches').updateOne(document, {$set: document}, {upsert: true}, (err, res) => {
+    return driver.collection('matches').updateOne(document, {$set: Object.assign(document, {timestamp: new Date()})}, {upsert: true}, (err, res) => {
         if(err) throw err;
         driver.collection('enrichments').updateOne({_id: agent}, {$addToSet: {matchedBy: user}});
     });
@@ -98,10 +98,17 @@ function getMatchingToValidate(driver, agent, callback) {
 }
 
 function validateMatching(driver, agent, callback) {
+
+    // Store document and do upsert
+    let document = {agent: agent};
+
     // Set an agent as validate
     driver.collection('enrichments').findOneAndUpdate({_id: agent}, {$set: {validated: true}}, (err, res) => {
         if(err) throw err;
-        callback();
+        driver.collection('validations').updateOne(document, {$set: Object.assign(document, {timestamp: new Date()})}, {upsert: true}, (err, res) => {
+            if(err) throw err;
+            callback();
+        });
     })
 }
 
