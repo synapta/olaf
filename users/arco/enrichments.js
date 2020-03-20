@@ -40,6 +40,7 @@ function getAndlockAgent(driver, user, agent, lock, callback) {
             skippedBy: {$nin: [user]},
             lock: null
         };
+        if(agent) filter._id = agent;
 
         // Take the lock on the selected document
         driver.collection('enrichments').findOneAndUpdate(
