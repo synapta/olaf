@@ -54,7 +54,8 @@ function loggingFlow(url) {
         '/api/v1/:token/get-agents',
         '/api/v1/:token/update-documents',
         '/api/v1/:token/logged-user',
-        '/api/v1/:token/blank-documents'
+        '/api/v1/:token/blank-documents',
+        '/api/v1/:token/store-things'
     ];
 
     // Replace placeholder with current token
@@ -189,6 +190,20 @@ module.exports = function(app, passport = null, driver = null) {
         enrichments.feedEnrichments(driver, () => {
             response.json({status: 'enriched'});
         });
+    });
+
+    app.get('/api/v1/:token/store-things', (request, response) => {
+        nodeRequest(queries.getThings, (err, res, body) => {
+
+            // Store uris
+            body = JSON.parse(body);
+            let uris = body.results.bindings.map(el => el.thing.value);
+
+            enrichments.insertThings(driver, uris, () => {
+                response.json({stored: true});
+            })
+
+        })
     });
 
     // API

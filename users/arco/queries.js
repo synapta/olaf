@@ -12,14 +12,21 @@ let authorSearch = (name, surname) => {
             action: "query",
             list: "search",
             srsearch: (name + " " + surname).trim(),
-            //language: "it",
-            //limit: 30,
             format: "json"
         },
         json: true
     }
 
 };
+
+let getThings = `
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    SELECT ?thing WHERE {
+        ?thing a ?subclass .
+        ?subclass rdfs:subClassOf <https://w3id.org/arco/ontology/arco/TangibleCulturalProperty> .
+    } GROUP BY ?thing
+`;
 
 let authorSelect = (authorId) => {
 
@@ -316,6 +323,7 @@ function makeWikidataQuery(name, surname) {
 
 // Exports
 exports.authorSelect = (params) => composeQuery(authorSelect(params));
+exports.getThings = composeQuery(getThings);
 exports.authorOptions = authorOptions;
 exports.authorSkip = authorSkip;
 exports.authorLink = authorLink;
