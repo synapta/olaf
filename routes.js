@@ -12,7 +12,7 @@ let auth             = null;
 let config           = null;
 let configToken      = null;
 let mailer           = null;
-let enrichments      = require('./users/arco/enrichments');
+let enrichments      = null;
 
 // Token validation
 function validateToken(token) {
@@ -20,7 +20,7 @@ function validateToken(token) {
     // Get valid tokens
     let validTokens = ['cobis', 'aaso', 'amt', 'cai', 'cmus', 'dssp',
                        'fga', 'ibmp', 'inaf', 'inrim', 'oato', 'plev',
-                       'slvm', 'toas', 'beweb', 'arco'];
+                       'slvm', 'toas', 'beweb', 'arco', 'arco-things'];
 
     // Check if token is valid
     return validTokens.includes(token);
@@ -97,6 +97,7 @@ module.exports = function(app, passport = null, driver = null) {
                 require('./users/' + token + '/passport')(passport, driver);
                 auth = require('./users/' + token + '/users');
                 mailer = require('./users/' + token + '/mailer');
+                enrichments = require('./users/' + token + '/enrichments');
             }
 
             // Initialize configuration
@@ -138,18 +139,18 @@ module.exports = function(app, passport = null, driver = null) {
     });
 
     // Arco users
-    app.post('/api/v1/arco/signup', (request, response) => {
+    app.post('/api/v1/:token/signup', (request, response) => {
         auth.insertUser(driver, request.body.email, request.body.password, request.body.username, (email, token, err) => {
             if(!err)
                 mailer.sendVerificationEmail(email, token, request.body.redirect, () => {
-                    response.redirect('/get/arco/user-verification')
+                    response.redirect('/get/' + configToken + '/user-verification')
                 });
             else
-                response.redirect('/get/arco/login?message=genericError');
+                response.redirect('/get/' + configToken + '/login?message=genericError');
         });
     });
 
-    app.post('/api/v1/arco/login', (request, response, next) => {
+    app.post('/api/v1/:token/login', (request, response, next) => {
         passport.authenticate('local', (err, user, info) => {
 
             if (err)
@@ -159,23 +160,23 @@ module.exports = function(app, passport = null, driver = null) {
 
             request.logIn(user, (err) => {
                 if (err) return next(err);
-                return response.redirect(request.body.redirect ? request.body.redirect : '/get/arco/author');
+                return response.redirect(request.body.redirect ? request.body.redirect : '/get/'+ configToken + '/author');
             });
 
         })(request, response, next);
     });
 
-    app.get('/api/v1/arco/verify-user/:token', passport.authenticate('authtoken', {params: 'token'}), (request, response) => {
+    app.get('/api/v1/:token/verify-user/:token', passport.authenticate('authtoken', {params: 'token'}), (request, response) => {
         response.redirect(request.query.redirect ? request.query.redirect + '?verified=true' : '/get/' + configToken + '/author?verified=true');
     });
 
-    app.get('/api/v1/arco/email-existence/:email', (request, response) => {
+    app.get('/api/v1/:token/email-existence/:email', (request, response) => {
         auth.findUserById(driver, request.params.email, (err, res) => {
             response.json({'exists': !!(!err && res)});
         })
     });
 
-    app.get('/api/v1/arco/username-existence/:username', (request, response) => {
+    app.get('/api/v1/:token/username-existence/:username', (request, response) => {
        auth.findUserByUsername(driver, request.params.username, (err, res) => {
            response.json({'exists': !!(!err && res)});
        })
