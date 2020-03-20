@@ -1,0 +1,71 @@
+{
+  "limit" : 1,
+  "selection": "right",
+  "matching": "toggle",
+  "interlinking": true,
+  "fields": {
+    "uri": {
+      "input": "person",
+      "wikidata": null,
+      "viaf": null,
+      "group": null,
+      "limit": 1,
+      "label": "URI",
+      "select": false
+    },
+    "name": {
+      "input": "agentNames",
+      "wikidata": "author",
+      "viaf": "term",
+      "group": null,
+      "limit": 1,
+      "label": "Nome autore",
+      "select": false
+    },
+    "titles": {
+      "input": "producedThings",
+      "wikidata": "works",
+      "viaf": null,
+      "group": null,
+      "limit": null,
+      "label": "Titoli",
+      "select": false
+    },
+    "roles": {
+      "input": "agentRoles",
+      "wikidata": "positionHeld",
+      "viaf": null,
+      "group": null,
+      "limit": null,
+      "label": "Qualifica",
+      "select": false
+    },
+    "image": {
+      "input": null,
+      "wikidata": "immagine",
+      "viaf": null,
+      "group": "Nome",
+      "limit": 1,
+      "label": "Immagine",
+      "select": false
+    },
+    "wikipediaIt": {
+      "input": null,
+      "wikidata": "itwikipedia",
+      "viaf": null,
+      "group": "Identificativi",
+      "limit": 1,
+      "label": "Wikipedia",
+      "select": false
+    },
+    "viaf": {
+      "input": null,
+      "wikidata": "viafurl",
+      "viaf": "viafid",
+      "group": "Identificativi",
+      "limit": null,
+      "label": "Codice VIAF",
+      "select": true
+    }
+  }
+}
