@@ -65,15 +65,17 @@ function loggingFlow(url) {
 
 }
 
-module.exports = function(app, passport = null, driver = null) {
-
+function setupRoutines(driver) {
     if(driver) {
-        schedule.scheduleJob('*/5 * * * *', (fireDate) => {
+        schedule.scheduleJob('* * * * *', (fireDate) => {
             enrichments.resetLocks(driver, () => {
                 console.log(fireDate, "Reset locks");
             });
         });
     }
+}
+
+module.exports = function(app, passport = null, driver = null) {
 
     // Token middleware
     app.all(['/api/v1/:token/*', '/get/:token/*'], (request, response, next) => {
@@ -84,10 +86,11 @@ module.exports = function(app, passport = null, driver = null) {
         // Validate token
         if (validateToken(token)) {
 
-            // Load user config
+            // Load user config and routines once
             if(!config || token !== configToken) {
                 config = new Config(JSON.parse(fs.readFileSync(`./app/js/config/${token}.json`)));
                 configToken = token;
+                setupRoutines(driver);
             }
 
             // Load modules
