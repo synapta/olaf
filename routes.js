@@ -30,7 +30,7 @@ function validateToken(token) {
 function loginToken(token) {
 
     // Get tokens that need login
-    let loginTokens = ['arco'];
+    let loginTokens = ['arco', 'arco-things'];
 
     // Check if current token need login
     return loginTokens.includes(token);
