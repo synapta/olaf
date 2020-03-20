@@ -2,7 +2,7 @@ const nodeRequest = require('request-promise');
 
 // Enrich not enriched authors
 function storeEnrichment(driver, enrichment) {
-    return driver.collection('agents').findOneAndUpdate({_id: enrichment.author.uri, enriched: false}, {
+    return driver.collection('thing').findOneAndUpdate({_id: enrichment.author.uri, enriched: false}, {
         $set: {
             author: enrichment.author,
             options: enrichment.options,
@@ -12,7 +12,7 @@ function storeEnrichment(driver, enrichment) {
 }
 
 function feedEnrichments(driver, callback, limit = 5) {
-    driver.collection('agents').find({enriched: false}, {fields: {_id: 1}, limit: limit}).toArray((err, res) => {
+    driver.collection('thing').find({enriched: false}, {fields: {_id: 1}, limit: limit}).toArray((err, res) => {
 
         // Generate requests for each enrichment uri
         let requests = res.map(el => nodeRequest('http://localhost:3646/api/v1/arco/author/' + encodeURIComponent(el._id) + '/?enrichment=true'));
@@ -42,7 +42,7 @@ function getAndlockAgent(driver, user, agent, lock, callback) {
         };
 
         // Take the lock on the selected document
-        driver.collection('agents').findOneAndUpdate(
+        driver.collection('thing').findOneAndUpdate(
             filter,
             {$set: {lock: lock ? new Date() : null}},
             {returnOriginal: true, sort: {enriched: -1}},
@@ -58,7 +58,7 @@ function getAndlockAgent(driver, user, agent, lock, callback) {
 }
 
 function resetLocks(driver, callback) {
-    driver.collection('agents').updateMany({}, {$set: {lock: null}}, (err, res) => {
+    driver.collection('thing').updateMany({}, {$set: {lock: null}}, (err, res) => {
         if(err) throw err;
         callback();
     });
@@ -72,7 +72,7 @@ function storeMatching(driver, user, option, agent) {
     // Upsert document and store matching
     return driver.collection('matches').updateOne(document, {$set: Object.assign(document, {timestamp: new Date()})}, {upsert: true}, (err, res) => {
         if(err) throw err;
-        driver.collection('agents').updateOne({_id: agent}, {$addToSet: {matchedBy: user}});
+        driver.collection('thing').updateOne({_id: agent}, {$addToSet: {matchedBy: user}});
     });
 
 }
@@ -85,14 +85,14 @@ function skipAgent(driver, user, agent) {
     // Upsert document and store skip
     return driver.collection('skipped').updateOne(document, {$set: Object.assign(document, {timestamp: new Date()})}, {upsert: true}, (err, res) => {
         if(err) throw err;
-        driver.collection('agents').updateOne({_id: agent}, {$addToSet: {skippedBy: user}});
+        driver.collection('thing').updateOne({_id: agent}, {$addToSet: {skippedBy: user}});
     });
 
 }
 
 function getMatchingToValidate(driver, agent, callback) {
     // Get matches for the given agent
-    driver.collection('agents').findOne({validated: false, matchedBy: {$not: {$size: 0}}}, (err, enrichment) => {
+    driver.collection('thing').findOne({validated: false, matchedBy: {$not: {$size: 0}}}, (err, enrichment) => {
         if(err) throw err;
         if(!enrichment) callback(null);
         else {
@@ -114,7 +114,7 @@ function validateMatching(driver, agent, callback) {
     let document = {agent: agent};
 
     // Set an agent as validate
-    driver.collection('agents').findOneAndUpdate({_id: agent}, {$set: {validated: true}}, (err, res) => {
+    driver.collection('thing').findOneAndUpdate({_id: agent}, {$set: {validated: true}}, (err, res) => {
         if(err) throw err;
         driver.collection('validations').updateOne(document, {$set: Object.assign(document, {timestamp: new Date()})}, {upsert: true}, (err, res) => {
             if(err) throw err;

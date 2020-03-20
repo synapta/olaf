@@ -67,7 +67,7 @@ function loggingFlow(url) {
 
 function setupRoutines(driver) {
     if(driver) {
-        schedule.scheduleJob('* * * * *', (fireDate) => {
+        schedule.scheduleJob('*/5 * * * *', (fireDate) => {
             enrichments.resetLocks(driver, () => {
                 console.log(fireDate, "Reset locks");
             });

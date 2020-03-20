@@ -124,28 +124,6 @@ function validateMatching(driver, agent, callback) {
 
 }
 
-function insertThings(driver, uris, callback) {
-
-    let documents = uris.map(uri => {
-        return {
-            _id: uri,
-            thing: null,
-            options: null,
-            enriched: false,
-            lock: null,
-            matchedBy: [],
-            skippedBy: [],
-            validated: false
-        }
-    });
-
-    driver.collection('things').insertMany(documents, (err, res) => {
-        if(err) throw err;
-        callback();
-    })
-
-}
-
 // Exports
 exports.storeEnrichment         = storeEnrichment;
 exports.feedEnrichments         = feedEnrichments;
@@ -155,4 +133,3 @@ exports.storeMatching           = storeMatching;
 exports.skipAgent               = skipAgent;
 exports.getMatchingToValidate   = getMatchingToValidate;
 exports.validateMatching        = validateMatching;
-exports.insertThings            = insertThings;
