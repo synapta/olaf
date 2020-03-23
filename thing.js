@@ -118,4 +118,4 @@ class Thing {
 }
 
 // Exports
-exports.Author = Author;
+exports.Thing = Thing;

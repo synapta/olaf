@@ -14,6 +14,8 @@ function storeEnrichment(driver, enrichment) {
 function feedEnrichments(driver, callback, limit = 5) {
     driver.collection('things').find({enriched: false}, {fields: {_id: 1}, limit: limit}).toArray((err, res) => {
 
+        console.log(err);
+
         // Generate requests for each enrichment uri
         let requests = res.map(el => nodeRequest('http://localhost:3646/api/v1/arco/author/' + encodeURIComponent(el._id) + '/?enrichment=true'));
         Promise.all(requests).then((results) => {

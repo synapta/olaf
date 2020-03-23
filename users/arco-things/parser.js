@@ -2,7 +2,7 @@
 const fuzz           = require('fuzzball');
 
 const Option         = require('../../option').Option;
-const Author         = require('../../thing').Thing;
+const Thing         = require('../../thing').Thing;
 
 // Configuration
 let config           = null;
