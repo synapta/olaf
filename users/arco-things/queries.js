@@ -37,14 +37,14 @@ let authorSelect = (authorId) => {
     ?thing
     (GROUP_CONCAT(DISTINCT(?classLabel); separator="$$$") as ?classLabels)
     (GROUP_CONCAT(DISTINCT(?agentName); separator="$$$") as ?agentNames)
-    (SAMPLE(?thingName) as ?thingName)
+    (GROUP_CONCAT(DISTINCT(?thingName); separator="$$$") as ?thingNames)
     (GROUP_CONCAT(DISTINCT(?thingStartingDate); separator="$$$") as ?startingDates)
     (GROUP_CONCAT(DISTINCT(?thingEndingDate); separator="$$$") as ?endingDates)
     (GROUP_CONCAT(DISTINCT(?role); separator="$$$") as ?agentRoles)
     
     WHERE {
     
-        ${authorId ? `VALUES ?person {<${authorId}>}` : ''}
+        ${authorId ? `VALUES ?thing {<${authorId}>}` : ''}
       
         ?thing a ?subclass .
         ?subclass rdfs:subClassOf <https://w3id.org/arco/ontology/arco/TangibleCulturalProperty> .
@@ -240,7 +240,7 @@ function authorSkip(request, driver) {
 function composeQuery(query) {
 
     // Query parameters
-    let queryUrl = 'http://wit.istc.cnr.it/arco/virtuoso/sparql?default-graph-uri=&query=';
+    let queryUrl = 'https://arco.datipubblici.org/sparql?query=';
     let queryFormat = '&format=json';
 
     return queryUrl + encodeURIComponent(query) + queryFormat;
