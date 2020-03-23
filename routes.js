@@ -224,22 +224,16 @@ module.exports = function(app, passport = null, driver = null) {
                     response.json({author: result.author, options: result.options});
                 } else {
 
-                    console.log(result);
-
                     // Compose author query
                     let queryAuthor = queries.authorSelect(request.params.authorId ? request.params.authorId : result._id);
 
                     // Make request
                     nodeRequest(queryAuthor, (err, res, body) => {
 
-                        console.log(body);
-
                         // Handle and send author
                         let author = parser.parseAuthor(JSON.parse(body));
                         // Query options
                         let requests = queries.authorOptions((author.name || '').trim(), '');
-
-                        //console.log(author);
 
                         // Make options queries
                         Promise.all(requests).then((bodies) => {

@@ -5,7 +5,7 @@
   "interlinking": true,
   "fields": {
     "uri": {
-      "input": "person",
+      "input": "thing",
       "wikidata": null,
       "viaf": null,
       "group": null,
@@ -14,30 +14,12 @@
       "select": false
     },
     "name": {
-      "input": "agentNames",
+      "input": "thingNames",
       "wikidata": "author",
       "viaf": "term",
       "group": null,
       "limit": 1,
       "label": "Nome autore",
-      "select": false
-    },
-    "titles": {
-      "input": "producedThings",
-      "wikidata": "works",
-      "viaf": null,
-      "group": null,
-      "limit": null,
-      "label": "Titoli",
-      "select": false
-    },
-    "roles": {
-      "input": "agentRoles",
-      "wikidata": "positionHeld",
-      "viaf": null,
-      "group": null,
-      "limit": null,
-      "label": "Qualifica",
       "select": false
     },
     "image": {
@@ -57,15 +39,6 @@
       "limit": 1,
       "label": "Wikipedia",
       "select": false
-    },
-    "viaf": {
-      "input": null,
-      "wikidata": "viafurl",
-      "viaf": "viafid",
-      "group": "Identificativi",
-      "limit": null,
-      "label": "Codice VIAF",
-      "select": true
     }
   }
 }
