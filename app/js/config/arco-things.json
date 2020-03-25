@@ -15,29 +15,11 @@
     },
     "name": {
       "input": "thingNames",
-      "wikidata": "author",
-      "viaf": "term",
+      "wikidata": "thing",
+      "viaf": null,
       "group": null,
       "limit": 1,
       "label": "Nome autore",
-      "select": false
-    },
-    "image": {
-      "input": null,
-      "wikidata": "immagine",
-      "viaf": null,
-      "group": "Nome",
-      "limit": 1,
-      "label": "Immagine",
-      "select": false
-    },
-    "wikipediaIt": {
-      "input": null,
-      "wikidata": "itwikipedia",
-      "viaf": null,
-      "group": "Identificativi",
-      "limit": 1,
-      "label": "Wikipedia",
       "select": false
     }
   }

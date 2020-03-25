@@ -110,37 +110,32 @@ let authorSelect = (authorId) => {
 let wikidataQuery = (options) => {
 
     return `
-    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
     SELECT ?id 
-           ?author
+           ?thing
            ?description
-           (GROUP_CONCAT(DISTINCT ?work; separator="###") AS ?works)
-           (SAMPLE(?birthDate) AS ?birthDate)
-           (SAMPLE(?deathDate) AS ?deathDate)
-           (GROUP_CONCAT(DISTINCT ?workStartingDate; separator="###") AS ?workStartingDates)
-           (GROUP_CONCAT(DISTINCT ?workEndingDate; separator="###") AS ?workEndingDates)
-           (GROUP_CONCAT(DISTINCT ?occupation; separator="###") AS ?occupations)
-           (SAMPLE(?immagine) as ?immagine) 
-           (SAMPLE(?itwikipedia) as ?itwikipedia) 
-           (SAMPLE(?viafurl) as ?viafurl)
+           ?classLabel
+           (GROUP_CONCAT(DISTINCT ?thingStartingDate; separator="###") AS ?thingStartingDates)
+           (GROUP_CONCAT(DISTINCT ?thingEndingDate; separator="###") AS ?thingEndingDates)
+           (GROUP_CONCAT(DISTINCT ?agentLabel; separator="###") AS ?agents)
     WHERE {
       
       # Setting up services
       SERVICE wikibase:label {
         bd:serviceParam wikibase:language "it,en".
-        ?id rdfs:label ?author .
+        ?id rdfs:label ?thing .
         ?id schema:description ?description .
-        ?workID rdfs:label ?work .
-        ?occupationID rdfs:label ?occupation
+        ?class rdfs:label ?classLabel .
+        ?agent rdfs:label ?agentLabel .
       }
-      
-      # Select a single agent
+     
       VALUES ?id {
         ${options.join(' ')}
       }
       
-      # Get only people as Agent
-      ?id wdt:P31 wd:Q5 .
+      # Get thing class
+      OPTIONAL {
+        ?id wdt:P31 ?class
+      }
       
       # Get see also for creator property
       wd:P170 wdt:P1659 ?seeAlsoCreator .
@@ -148,62 +143,35 @@ let wikidataQuery = (options) => {
       
       # Select all types of works produced by the given author
       OPTIONAL {
-      
-        {?workID ?creatorBinded ?id}
+    
+        {?id ?creatorBinded ?agent}
         UNION
-        {?workID wdt:P170 ?id}
-        
+        {?id wdt:P170 ?agent}
+    
         # Get see also for inception property
         wd:P571 wdt:P1659 ?seeAlsoInception .
         BIND(URI(REPLACE(STR(?seeAlsoInception), "entity", "prop/direct")) AS ?inceptionBinded)
         # Get work inception
         OPTIONAL {
-          {?workID ?inceptionBinded ?workStartingDate}
+          {?id ?inceptionBinded ?thingStartingDate}
           UNION
-          {?workID wdt:P571 ?workStartingDate}
+          {?id wdt:P571 ?thingStartingDate}
         }
-      
+    
         # Get see also for dissolved property
         wd:P576 wdt:P1659 ?seeAlsoDissolved .
         BIND(URI(REPLACE(STR(?seeAlsoDissolved), "entity", "prop/direct")) AS ?dissolvedBinded)
         # Get work inception
         OPTIONAL {
-          {?workID ?dissolvedBinded ?workEndingDate}
+          {?id ?dissolvedBinded ?thingEndingDate}
           UNION
-          {?workID wdt:P576 ?workEndingDate}
+          {?id wdt:P576 ?thingEndingDate}
         }
-        
-      }
-      
-      # Get agent dates
-      OPTIONAL {
-        ?id wdt:P569 ?birthDate
-      }
-      OPTIONAL {
-        ?id wdt:P570 ?deathDate
-      }
-      
-      # Get agent occupations
-      OPTIONAL {
-        ?id wdt:P106 ?occupationID
-      }
-      
-      OPTIONAL {
-        ?id wdt:P18 ?immagine .
-      }
     
-      OPTIONAL {
-        ?itwikipedia schema:about ?id .
-        FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
-      }
-    
-      OPTIONAL {
-        ?id wdt:P214 ?viaf
-        BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
       }
       
-    }
-    GROUP BY ?id ?author ?description`
+    } GROUP BY ?id ?thing ?description ?classLabel`;
+
 };
 
 // Functions
