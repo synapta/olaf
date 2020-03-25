@@ -35,16 +35,31 @@ let authorSelect = (authorId) => {
 
     SELECT 
     ?thing
+    (SAMPLE(DISTINCT ?typeLabel) as ?type)
+    (SAMPLE(DISTINCT ?materialLabel) as ?material)
     (GROUP_CONCAT(DISTINCT(?classLabel); separator="$$$") as ?classLabels)
     (GROUP_CONCAT(DISTINCT(?agentName); separator="$$$") as ?agentNames)
-    (GROUP_CONCAT(DISTINCT(?thingName); separator="$$$") as ?thingNames)
+    (GROUP_CONCAT(DISTINCT(?thingName); separator="$$$") as ?thingName)
     (GROUP_CONCAT(DISTINCT(?thingStartingDate); separator="$$$") as ?startingDates)
     (GROUP_CONCAT(DISTINCT(?thingEndingDate); separator="$$$") as ?endingDates)
     (GROUP_CONCAT(DISTINCT(?role); separator="$$$") as ?agentRoles)
     
     WHERE {
-    
-        ${authorId ? `VALUES ?thing {<${authorId}>}` : ''}
+      
+        VALUES ?thing {
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1600005788>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200250140>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1100115352>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200559663>
+            <https://w3id.org/arco/resource/DemoEthnoAnthropologicalHeritage/1100192606>
+            <https://w3id.org/arco/resource/DemoEthnoAnthropologicalHeritage/1100194001>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200217912A>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200864010>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200864018-2>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/0900404403>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/0900593126>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/0500153214>
+        }
       
         ?thing a ?subclass .
         ?subclass rdfs:subClassOf <https://w3id.org/arco/ontology/arco/TangibleCulturalProperty> .
@@ -57,28 +72,37 @@ let authorSelect = (authorId) => {
         
             # Get start date for a certain produced thing
             ?thing <https://w3id.org/arco/ontology/context-description/hasDating>/<https://w3id.org/arco/ontology/context-description/hasDatingEvent> ?thingTiming .
-    
+            
             # Get thing starting date
             OPTIONAL {
                 {?thingTiming <https://w3id.org/italia/onto/TI/atTime>/<https://w3id.org/arco/ontology/arco/startTime> ?thingStartingDate .}
                 UNION 
                 {?thingTiming <https://w3id.org/arco/ontology/context-description/specificTime>/<https://w3id.org/arco/ontology/arco/startTime> ?thingStartingDate .}
             }
-    
+            
             # Get thing ending date
             OPTIONAL {
                 {?thingTiming <https://w3id.org/italia/onto/TI/atTime>/<https://w3id.org/arco/ontology/arco/endTime> ?thingEndingDate .}
                 UNION 
                 {?thingTiming <https://w3id.org/arco/ontology/context-description/specificTime>/<https://w3id.org/arco/ontology/arco/endTime> ?thingEndingDate .}
             }
-        
+            
             # Try to associate each date to each produced thing
             BIND(COALESCE(?thingStartingDate, "") AS ?thingStartingDateParsed)
             BIND(COALESCE(?thingEndingDate, "") AS ?thingEndingDateParsed)
             BIND(CONCAT(?thingName, "|||", ?thingStartingDateParsed, "|||", ?thingEndingDateParsed) AS ?thingNameWithDates)
-        
+
         }
-        
+
+        OPTIONAL {
+            ?thing <https://w3id.org/arco/ontology/denotative-description/hasCulturalPropertyType> ?type .
+            ?type rdfs:label ?typeLabel .
+        }
+      
+        OPTIONAL {
+            ?thing <https://w3id.org/arco/ontology/denotative-description/hasMaterialOrTechnique> ?material .
+            ?material rdfs:label ?materialLabel .
+        }
     
         OPTIONAL {
         
@@ -95,16 +119,17 @@ let authorSelect = (authorId) => {
                 ?person <https://w3id.org/arco/ontology/context-description/agentDate> ?agentDate
             }
     
-          # Get agent roles
-          OPTIONAL {
-              {?person <https://w3id.org/italia/onto/RO/holdsRoleInTime>/<https://w3id.org/italia/RO/withRole>/rdfs:label ?role}
-              UNION 
-              {?person <https://w3id.org/italia/RO/holdsRoleInTime>/<https://w3id.org/italia/RO/withRole>/rdfs:label ?role}
-          }
-      }
-    }
-    GROUP BY ?thing
-    LIMIT 1`;
+            # Get agent roles
+            OPTIONAL {
+                {?person <https://w3id.org/italia/onto/RO/holdsRoleInTime>/<https://w3id.org/italia/RO/withRole>/rdfs:label ?role}
+                UNION 
+                {?person <https://w3id.org/italia/RO/holdsRoleInTime>/<https://w3id.org/italia/RO/withRole>/rdfs:label ?role}
+            }
+            
+        }
+        
+    } GROUP BY ?thing`;
+    
 };
 
 let wikidataQuery = (options) => {
