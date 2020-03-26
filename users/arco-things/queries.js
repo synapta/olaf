@@ -32,102 +32,113 @@ let authorSelect = (authorId) => {
 
     return `
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
     SELECT 
-    ?thing
-    (SAMPLE(DISTINCT ?typeLabel) as ?type)
-    (SAMPLE(DISTINCT ?materialLabel) as ?material)
-    (GROUP_CONCAT(DISTINCT(?classLabel); separator="$$$") as ?classLabels)
-    (GROUP_CONCAT(DISTINCT(?agentName); separator="$$$") as ?agentNames)
-    (GROUP_CONCAT(DISTINCT(?thingName); separator="$$$") as ?thingName)
-    (GROUP_CONCAT(DISTINCT(?thingStartingDate); separator="$$$") as ?startingDates)
-    (GROUP_CONCAT(DISTINCT(?thingEndingDate); separator="$$$") as ?endingDates)
-    (GROUP_CONCAT(DISTINCT(?role); separator="$$$") as ?agentRoles)
-    
+        ?thing
+        (GROUP_CONCAT(DISTINCT(LCASE(?typeLabel)); separator="$$$") as ?types)
+        (GROUP_CONCAT(DISTINCT(LCASE(?materialLabel)); separator="$$$") as ?materials)
+        (GROUP_CONCAT(DISTINCT(LCASE(?subject)); separator="$$$") as ?subject)
+        (GROUP_CONCAT(DISTINCT(?description); separator="$$$") as ?description)
+        (SAMPLE(?placeLabel) as ?placeLabel)
+        (GROUP_CONCAT(DISTINCT(?classLabel); separator="$$$") as ?classLabels)
+        (GROUP_CONCAT(DISTINCT(LCASE(?contributorName)); separator="$$$") as ?contributorNames)
+        (GROUP_CONCAT(DISTINCT(LCASE(?thingName)); separator="$$$") as ?thingName)
+        (GROUP_CONCAT(DISTINCT(?thingStartingDate); separator="$$$") as ?startingDates)
+        (GROUP_CONCAT(DISTINCT(?thingEndingDate); separator="$$$") as ?endingDates)
+        (GROUP_CONCAT(DISTINCT(?role); separator="$$$") as ?agentRoles)
     WHERE {
       
         VALUES ?thing {
-            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1600005788>
-            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200250140>
-            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1100115352>
-            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200559663>
-            <https://w3id.org/arco/resource/DemoEthnoAnthropologicalHeritage/1100192606>
-            <https://w3id.org/arco/resource/DemoEthnoAnthropologicalHeritage/1100194001>
-            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200217912A>
-            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200864010>
-            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200864018-2>
-            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/0900404403>
-            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/0900593126>
-            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/0500153214>
+            <${authorId}>
         }
-      
+          
         ?thing a ?subclass .
         ?subclass rdfs:subClassOf <https://w3id.org/arco/ontology/arco/TangibleCulturalProperty> .
         ?subclass rdfs:label ?classLabel .
         
         # Get name of the produced things
         ?thing rdfs:label ?thingName .
-      
+          
+        OPTIONAL {
+            ?thing <https://w3id.org/arco/ontology/context-description/hasAuthorshipAttribution>/<https://w3id.org/arco/ontology/context-description/hasCulturalScope>/rdfs:label ?attributionName 
+        }
+          
         OPTIONAL {
         
             # Get start date for a certain produced thing
             ?thing <https://w3id.org/arco/ontology/context-description/hasDating>/<https://w3id.org/arco/ontology/context-description/hasDatingEvent> ?thingTiming .
-            
+    
             # Get thing starting date
             OPTIONAL {
                 {?thingTiming <https://w3id.org/italia/onto/TI/atTime>/<https://w3id.org/arco/ontology/arco/startTime> ?thingStartingDate .}
                 UNION 
                 {?thingTiming <https://w3id.org/arco/ontology/context-description/specificTime>/<https://w3id.org/arco/ontology/arco/startTime> ?thingStartingDate .}
             }
-            
+    
             # Get thing ending date
             OPTIONAL {
                 {?thingTiming <https://w3id.org/italia/onto/TI/atTime>/<https://w3id.org/arco/ontology/arco/endTime> ?thingEndingDate .}
                 UNION 
                 {?thingTiming <https://w3id.org/arco/ontology/context-description/specificTime>/<https://w3id.org/arco/ontology/arco/endTime> ?thingEndingDate .}
             }
-            
+        
             # Try to associate each date to each produced thing
             BIND(COALESCE(?thingStartingDate, "") AS ?thingStartingDateParsed)
             BIND(COALESCE(?thingEndingDate, "") AS ?thingEndingDateParsed)
             BIND(CONCAT(?thingName, "|||", ?thingStartingDateParsed, "|||", ?thingEndingDateParsed) AS ?thingNameWithDates)
-
+            
         }
-
+        
         OPTIONAL {
-            ?thing <https://w3id.org/arco/ontology/denotative-description/hasCulturalPropertyType> ?type .
+            ?thing <https://w3id.org/arco/ontology/denotative-description/hasCulturalPropertyType>/<https://w3id.org/arco/ontology/denotative-description/hasCulturalPropertyDefinition> ?type .
             ?type rdfs:label ?typeLabel .
         }
-      
+          
         OPTIONAL {
             ?thing <https://w3id.org/arco/ontology/denotative-description/hasMaterialOrTechnique> ?material .
             ?material rdfs:label ?materialLabel .
         }
-    
+          
+        OPTIONAL {
+            ?thing <https://w3id.org/arco/ontology/arco/description> ?description .
+        }
+          
+        OPTIONAL {
+            ?thing <https://w3id.org/arco/ontology/context-description/subject> ?subject .
+        }
+          
+        OPTIONAL {
+            ?thing <https://w3id.org/arco/ontology/location/hasCulturalPropertyAddress> ?place .
+            ?place rdfs:label ?placeLabel .
+        }
+          
         OPTIONAL {
         
             # Get producer agent
             ?person <https://w3id.org/arco/ontology/context-description/isAuthorOf> ?thing .
-    
+        
             # Get agent name or names
             OPTIONAL {
                 ?person <https://w3id.org/italia/onto/l0/name> ?agentName .
             }
-    
+        
             # Get agent activity time range or ranges
             OPTIONAL {
                 ?person <https://w3id.org/arco/ontology/context-description/agentDate> ?agentDate
             }
-    
+        
             # Get agent roles
             OPTIONAL {
                 {?person <https://w3id.org/italia/onto/RO/holdsRoleInTime>/<https://w3id.org/italia/RO/withRole>/rdfs:label ?role}
                 UNION 
                 {?person <https://w3id.org/italia/RO/holdsRoleInTime>/<https://w3id.org/italia/RO/withRole>/rdfs:label ?role}
             }
-            
-        }
         
+        }
+          
+        BIND(COALESCE(?agentName, ?attributionName) as ?contributorName)
+        FILTER (lang(?classLabel) = 'it')
+        FILTER (lang(?thingName) = 'it')
+    
     } GROUP BY ?thing`;
     
 };
