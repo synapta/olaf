@@ -12,7 +12,7 @@ let auth             = null;
 let config           = null;
 let configToken      = null;
 let mailer           = null;
-let enrichments      = require('./users/arco/enrichments');
+let enrichments      = null;
 
 // Token validation
 function validateToken(token) {
@@ -20,7 +20,7 @@ function validateToken(token) {
     // Get valid tokens
     let validTokens = ['cobis', 'aaso', 'amt', 'cai', 'cmus', 'dssp',
                        'fga', 'ibmp', 'inaf', 'inrim', 'oato', 'plev',
-                       'slvm', 'toas', 'beweb', 'arco'];
+                       'slvm', 'toas', 'beweb', 'arco', 'arco-things'];
 
     // Check if token is valid
     return validTokens.includes(token);
@@ -30,7 +30,7 @@ function validateToken(token) {
 function loginToken(token) {
 
     // Get tokens that need login
-    let loginTokens = ['arco'];
+    let loginTokens = ['arco', 'arco-things'];
 
     // Check if current token need login
     return loginTokens.includes(token);
@@ -54,7 +54,8 @@ function loggingFlow(url) {
         '/api/v1/:token/get-agents',
         '/api/v1/:token/update-documents',
         '/api/v1/:token/logged-user',
-        '/api/v1/:token/blank-documents'
+        '/api/v1/:token/blank-documents',
+        '/api/v1/:token/store-things'
     ];
 
     // Replace placeholder with current token
@@ -64,8 +65,7 @@ function loggingFlow(url) {
 
 }
 
-module.exports = function(app, passport = null, driver = null) {
-
+function setupRoutines(driver) {
     if(driver) {
         schedule.scheduleJob('*/5 * * * *', (fireDate) => {
             enrichments.resetLocks(driver, () => {
@@ -73,6 +73,9 @@ module.exports = function(app, passport = null, driver = null) {
             });
         });
     }
+}
+
+module.exports = function(app, passport = null, driver = null) {
 
     // Token middleware
     app.all(['/api/v1/:token/*', '/get/:token/*'], (request, response, next) => {
@@ -83,10 +86,11 @@ module.exports = function(app, passport = null, driver = null) {
         // Validate token
         if (validateToken(token)) {
 
-            // Load user config
+            // Load user config and routines once
             if(!config || token !== configToken) {
                 config = new Config(JSON.parse(fs.readFileSync(`./app/js/config/${token}.json`)));
                 configToken = token;
+                setupRoutines(driver);
             }
 
             // Load modules
@@ -96,6 +100,7 @@ module.exports = function(app, passport = null, driver = null) {
                 require('./users/' + token + '/passport')(passport, driver);
                 auth = require('./users/' + token + '/users');
                 mailer = require('./users/' + token + '/mailer');
+                enrichments = require('./users/' + token + '/enrichments');
             }
 
             // Initialize configuration
@@ -137,18 +142,18 @@ module.exports = function(app, passport = null, driver = null) {
     });
 
     // Arco users
-    app.post('/api/v1/arco/signup', (request, response) => {
+    app.post('/api/v1/:token/signup', (request, response) => {
         auth.insertUser(driver, request.body.email, request.body.password, request.body.username, (email, token, err) => {
             if(!err)
                 mailer.sendVerificationEmail(email, token, request.body.redirect, () => {
-                    response.redirect('/get/arco/user-verification')
+                    response.redirect('/get/' + configToken + '/user-verification')
                 });
             else
-                response.redirect('/get/arco/login?message=genericError');
+                response.redirect('/get/' + configToken + '/login?message=genericError');
         });
     });
 
-    app.post('/api/v1/arco/login', (request, response, next) => {
+    app.post('/api/v1/:token/login', (request, response, next) => {
         passport.authenticate('local', (err, user, info) => {
 
             if (err)
@@ -158,23 +163,23 @@ module.exports = function(app, passport = null, driver = null) {
 
             request.logIn(user, (err) => {
                 if (err) return next(err);
-                return response.redirect(request.body.redirect ? request.body.redirect : '/get/arco/author');
+                return response.redirect(request.body.redirect ? request.body.redirect : '/get/'+ configToken + '/author');
             });
 
         })(request, response, next);
     });
 
-    app.get('/api/v1/arco/verify-user/:token', passport.authenticate('authtoken', {params: 'token'}), (request, response) => {
+    app.get('/api/v1/:token/verify-user/:token', passport.authenticate('authtoken', {params: 'token'}), (request, response) => {
         response.redirect(request.query.redirect ? request.query.redirect + '?verified=true' : '/get/' + configToken + '/author?verified=true');
     });
 
-    app.get('/api/v1/arco/email-existence/:email', (request, response) => {
+    app.get('/api/v1/:token/email-existence/:email', (request, response) => {
         auth.findUserById(driver, request.params.email, (err, res) => {
             response.json({'exists': !!(!err && res)});
         })
     });
 
-    app.get('/api/v1/arco/username-existence/:username', (request, response) => {
+    app.get('/api/v1/:token/username-existence/:username', (request, response) => {
        auth.findUserByUsername(driver, request.params.username, (err, res) => {
            response.json({'exists': !!(!err && res)});
        })
@@ -189,6 +194,20 @@ module.exports = function(app, passport = null, driver = null) {
         enrichments.feedEnrichments(driver, () => {
             response.json({status: 'enriched'});
         });
+    });
+
+    app.get('/api/v1/:token/store-things', (request, response) => {
+        nodeRequest(queries.getThings, (err, res, body) => {
+
+            // Store uris
+            body = JSON.parse(body);
+            let uris = body.results.bindings.map(el => el.thing.value);
+
+            enrichments.insertThings(driver, uris, () => {
+                response.json({stored: true});
+            })
+
+        })
     });
 
     // API
@@ -215,8 +234,6 @@ module.exports = function(app, passport = null, driver = null) {
                         let author = parser.parseAuthor(JSON.parse(body));
                         // Query options
                         let requests = queries.authorOptions((author.name || '').trim(), '');
-
-                        //console.log(author);
 
                         // Make options queries
                         Promise.all(requests).then((bodies) => {

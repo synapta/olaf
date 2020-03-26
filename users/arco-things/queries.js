@@ -34,112 +34,133 @@ let authorSelect = (authorId) => {
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
     SELECT 
-        ?person
-        (GROUP_CONCAT(DISTINCT(?localID); separator="$$$") as ?localIDs)
-        (GROUP_CONCAT(DISTINCT(?agentName); separator="$$$") as ?agentNames)
-        (GROUP_CONCAT(DISTINCT(?agentDate); separator="$$$") as ?agentDates)
-        (GROUP_CONCAT(DISTINCT(?thingName); separator="$$$") as ?producedThings)
-        (GROUP_CONCAT(DISTINCT(?thingStartingDate); separator="$$$") as ?startingDates)
-        (GROUP_CONCAT(DISTINCT(?thingEndingDate); separator="$$$") as ?endingDates)
-        (GROUP_CONCAT(DISTINCT(?role); separator="$$$") as ?agentRoles)
+    ?thing
+    (SAMPLE(DISTINCT ?typeLabel) as ?type)
+    (SAMPLE(DISTINCT ?materialLabel) as ?material)
+    (GROUP_CONCAT(DISTINCT(?classLabel); separator="$$$") as ?classLabels)
+    (GROUP_CONCAT(DISTINCT(?agentName); separator="$$$") as ?agentNames)
+    (GROUP_CONCAT(DISTINCT(?thingName); separator="$$$") as ?thingName)
+    (GROUP_CONCAT(DISTINCT(?thingStartingDate); separator="$$$") as ?startingDates)
+    (GROUP_CONCAT(DISTINCT(?thingEndingDate); separator="$$$") as ?endingDates)
+    (GROUP_CONCAT(DISTINCT(?role); separator="$$$") as ?agentRoles)
     
     WHERE {
-    
-        # Get only some agents in order to explore the graph
-        ${authorId ? `VALUES ?person {<${authorId}>}` : ''}
-    
-        # Get only agents that are also people
-        ?person a <https://w3id.org/italia/onto/CPV/Person> .
-    
-        # Get agent name or names
-        OPTIONAL {
-            ?person <https://w3id.org/italia/onto/l0/name> ?agentName .
-        }
-        # Get agent activity time range or ranges
-        OPTIONAL {
-            ?person <https://w3id.org/arco/ontology/context-description/agentDate> ?agentDate
-        }
-        # Get agent local ids
-        OPTIONAL {
-            ?person <https://w3id.org/arco/ontology/context-description/agentLocalIdentifier> ?localID
+      
+        VALUES ?thing {
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1600005788>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200250140>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1100115352>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200559663>
+            <https://w3id.org/arco/resource/DemoEthnoAnthropologicalHeritage/1100192606>
+            <https://w3id.org/arco/resource/DemoEthnoAnthropologicalHeritage/1100194001>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200217912A>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200864010>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/1200864018-2>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/0900404403>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/0900593126>
+            <https://w3id.org/arco/resource/HistoricOrArtisticProperty/0500153214>
         }
       
-        # Get agent production
-        OPTIONAL {
-            
-            # Get produced things
-            ?person <https://w3id.org/arco/ontology/context-description/isAuthorOf> ?thing .
+        ?thing a ?subclass .
+        ?subclass rdfs:subClassOf <https://w3id.org/arco/ontology/arco/TangibleCulturalProperty> .
+        ?subclass rdfs:label ?classLabel .
         
-            # Get name of the produced things
-            ?thing rdfs:label ?thingName .
-            
+        # Get name of the produced things
+        ?thing rdfs:label ?thingName .
+      
+        OPTIONAL {
+        
             # Get start date for a certain produced thing
             ?thing <https://w3id.org/arco/ontology/context-description/hasDating>/<https://w3id.org/arco/ontology/context-description/hasDatingEvent> ?thingTiming .
+            
             # Get thing starting date
             OPTIONAL {
-                {?thingTiming <https://w3id.org/italia/onto/TI/atTime>/<https://w3id.org/arco/ontology/arco/startTime> ?thingStartingDate .} 
+                {?thingTiming <https://w3id.org/italia/onto/TI/atTime>/<https://w3id.org/arco/ontology/arco/startTime> ?thingStartingDate .}
                 UNION 
                 {?thingTiming <https://w3id.org/arco/ontology/context-description/specificTime>/<https://w3id.org/arco/ontology/arco/startTime> ?thingStartingDate .}
             }
+            
             # Get thing ending date
             OPTIONAL {
-                {?thingTiming <https://w3id.org/italia/onto/TI/atTime>/<https://w3id.org/arco/ontology/arco/endTime> ?thingEndingDate .} 
+                {?thingTiming <https://w3id.org/italia/onto/TI/atTime>/<https://w3id.org/arco/ontology/arco/endTime> ?thingEndingDate .}
                 UNION 
                 {?thingTiming <https://w3id.org/arco/ontology/context-description/specificTime>/<https://w3id.org/arco/ontology/arco/endTime> ?thingEndingDate .}
             }
-        
+            
             # Try to associate each date to each produced thing
             BIND(COALESCE(?thingStartingDate, "") AS ?thingStartingDateParsed)
             BIND(COALESCE(?thingEndingDate, "") AS ?thingEndingDateParsed)
             BIND(CONCAT(?thingName, "|||", ?thingStartingDateParsed, "|||", ?thingEndingDateParsed) AS ?thingNameWithDates)
-        
+
+        }
+
+        OPTIONAL {
+            ?thing <https://w3id.org/arco/ontology/denotative-description/hasCulturalPropertyType> ?type .
+            ?type rdfs:label ?typeLabel .
         }
       
-        # Get agent roles
         OPTIONAL {
-            {?person <https://w3id.org/italia/onto/RO/holdsRoleInTime>/<https://w3id.org/italia/RO/withRole>/rdfs:label ?role} 
-            UNION 
-            {?person <https://w3id.org/italia/RO/holdsRoleInTime>/<https://w3id.org/italia/RO/withRole>/rdfs:label ?role}
+            ?thing <https://w3id.org/arco/ontology/denotative-description/hasMaterialOrTechnique> ?material .
+            ?material rdfs:label ?materialLabel .
         }
-    }
-    GROUP BY ?person
-    LIMIT 1`;
+    
+        OPTIONAL {
+        
+            # Get producer agent
+            ?person <https://w3id.org/arco/ontology/context-description/isAuthorOf> ?thing .
+    
+            # Get agent name or names
+            OPTIONAL {
+                ?person <https://w3id.org/italia/onto/l0/name> ?agentName .
+            }
+    
+            # Get agent activity time range or ranges
+            OPTIONAL {
+                ?person <https://w3id.org/arco/ontology/context-description/agentDate> ?agentDate
+            }
+    
+            # Get agent roles
+            OPTIONAL {
+                {?person <https://w3id.org/italia/onto/RO/holdsRoleInTime>/<https://w3id.org/italia/RO/withRole>/rdfs:label ?role}
+                UNION 
+                {?person <https://w3id.org/italia/RO/holdsRoleInTime>/<https://w3id.org/italia/RO/withRole>/rdfs:label ?role}
+            }
+            
+        }
+        
+    } GROUP BY ?thing`;
+    
 };
 
 let wikidataQuery = (options) => {
 
     return `
-    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
     SELECT ?id 
-           ?author
+           ?thing
            ?description
-           (GROUP_CONCAT(DISTINCT ?work; separator="###") AS ?works)
-           (SAMPLE(?birthDate) AS ?birthDate)
-           (SAMPLE(?deathDate) AS ?deathDate)
-           (GROUP_CONCAT(DISTINCT ?workStartingDate; separator="###") AS ?workStartingDates)
-           (GROUP_CONCAT(DISTINCT ?workEndingDate; separator="###") AS ?workEndingDates)
-           (GROUP_CONCAT(DISTINCT ?occupation; separator="###") AS ?occupations)
-           (SAMPLE(?immagine) as ?immagine) 
-           (SAMPLE(?itwikipedia) as ?itwikipedia) 
-           (SAMPLE(?viafurl) as ?viafurl)
+           ?classLabel
+           (GROUP_CONCAT(DISTINCT ?thingStartingDate; separator="###") AS ?thingStartingDates)
+           (GROUP_CONCAT(DISTINCT ?thingEndingDate; separator="###") AS ?thingEndingDates)
+           (GROUP_CONCAT(DISTINCT ?agentLabel; separator="###") AS ?agents)
     WHERE {
       
       # Setting up services
       SERVICE wikibase:label {
         bd:serviceParam wikibase:language "it,en".
-        ?id rdfs:label ?author .
+        ?id rdfs:label ?thing .
         ?id schema:description ?description .
-        ?workID rdfs:label ?work .
-        ?occupationID rdfs:label ?occupation
+        ?class rdfs:label ?classLabel .
+        ?agent rdfs:label ?agentLabel .
       }
-      
-      # Select a single agent
+     
       VALUES ?id {
         ${options.join(' ')}
       }
       
-      # Get only people as Agent
-      ?id wdt:P31 wd:Q5 .
+      # Get thing class
+      OPTIONAL {
+        ?id wdt:P31 ?class
+      }
       
       # Get see also for creator property
       wd:P170 wdt:P1659 ?seeAlsoCreator .
@@ -147,62 +168,35 @@ let wikidataQuery = (options) => {
       
       # Select all types of works produced by the given author
       OPTIONAL {
-      
-        {?workID ?creatorBinded ?id}
+    
+        {?id ?creatorBinded ?agent}
         UNION
-        {?workID wdt:P170 ?id}
-        
+        {?id wdt:P170 ?agent}
+    
         # Get see also for inception property
         wd:P571 wdt:P1659 ?seeAlsoInception .
         BIND(URI(REPLACE(STR(?seeAlsoInception), "entity", "prop/direct")) AS ?inceptionBinded)
         # Get work inception
         OPTIONAL {
-          {?workID ?inceptionBinded ?workStartingDate}
+          {?id ?inceptionBinded ?thingStartingDate}
           UNION
-          {?workID wdt:P571 ?workStartingDate}
+          {?id wdt:P571 ?thingStartingDate}
         }
-      
+    
         # Get see also for dissolved property
         wd:P576 wdt:P1659 ?seeAlsoDissolved .
         BIND(URI(REPLACE(STR(?seeAlsoDissolved), "entity", "prop/direct")) AS ?dissolvedBinded)
         # Get work inception
         OPTIONAL {
-          {?workID ?dissolvedBinded ?workEndingDate}
+          {?id ?dissolvedBinded ?thingEndingDate}
           UNION
-          {?workID wdt:P576 ?workEndingDate}
+          {?id wdt:P576 ?thingEndingDate}
         }
-        
-      }
-      
-      # Get agent dates
-      OPTIONAL {
-        ?id wdt:P569 ?birthDate
-      }
-      OPTIONAL {
-        ?id wdt:P570 ?deathDate
-      }
-      
-      # Get agent occupations
-      OPTIONAL {
-        ?id wdt:P106 ?occupationID
-      }
-      
-      OPTIONAL {
-        ?id wdt:P18 ?immagine .
-      }
     
-      OPTIONAL {
-        ?itwikipedia schema:about ?id .
-        FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
-      }
-    
-      OPTIONAL {
-        ?id wdt:P214 ?viaf
-        BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
       }
       
-    }
-    GROUP BY ?id ?author ?description`
+    } GROUP BY ?id ?thing ?description ?classLabel`;
+
 };
 
 // Functions
@@ -239,7 +233,7 @@ function authorSkip(request, driver) {
 function composeQuery(query) {
 
     // Query parameters
-    let queryUrl = 'http://wit.istc.cnr.it/arco/virtuoso/sparql?default-graph-uri=&query=';
+    let queryUrl = 'https://arco.datipubblici.org/sparql?query=';
     let queryFormat = '&format=json';
 
     return queryUrl + encodeURIComponent(query) + queryFormat;

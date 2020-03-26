@@ -1,0 +1,26 @@
+{
+  "limit" : 1,
+  "selection": "right",
+  "matching": "toggle",
+  "interlinking": true,
+  "fields": {
+    "uri": {
+      "input": "thing",
+      "wikidata": null,
+      "viaf": null,
+      "group": null,
+      "limit": 1,
+      "label": "URI",
+      "select": false
+    },
+    "name": {
+      "input": "thingNames",
+      "wikidata": "thing",
+      "viaf": null,
+      "group": null,
+      "limit": 1,
+      "label": "Nome autore",
+      "select": false
+    }
+  }
+}
