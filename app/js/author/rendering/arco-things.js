@@ -1,6 +1,6 @@
 // Render author card
 function renderAuthorCard(author){
-    $.get('/views/template/author/author-card.html', (template) => {
+    $.get('/views/template/arco-things/thing-card.html', (template) => {
 
         // Generate output
         let output = Mustache.render(template, author);
