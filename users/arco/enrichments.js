@@ -38,6 +38,7 @@ function getAndlockAgent(driver, user, agent, lock, callback) {
         let filter = {
             matchedBy: {$nin: [user]},
             skippedBy: {$nin: [user]},
+            'options.0': {$exists: true},
             lock: null
         };
         if(agent) filter._id = agent;
