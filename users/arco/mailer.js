@@ -19,7 +19,21 @@ let emailConfiguration = (destination, verification, redirect) => {
         from: 'olaf@synapta.io',
         to: destination,
         subject: 'Conferma la tua email',
-        html: `<a href="http://localhost:3646/api/v1/arco/verify-user/${verification}${redirect ? '?redirect=' + redirect : ''}">Verifica il tuo account OLAF</a>`
+        html: `<p>Benvenuto in OLAF,</p>
+        <p>Dopo aver verificato il tuo account potrai iniziare a collegare le entità di ArCo, il Knowledge Graph del patrimonio culturale italiano, con la Linked Data Cloud. Clicca sul bottone sottostante per verificare la mail:</p>
+        <p>
+            <table border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td>
+                        <a href="http://olaf.datipubblici.org/api/v1/arco/verify-user/${verification}${redirect ? '?redirect=' + redirect : ''}" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 3px; background-color: #4285f4; border-top: 12px solid #4285f4; border-bottom: 12px solid #4285f4; border-right: 18px solid #4285f4; border-left: 18px solid #4285f4; display: inline-block;">Clicca QUI</a>
+                    </td>
+                </tr>
+            </table>
+        </p>
+        <p>Collaborare a OLAF è semplice. Controlla cegli il candidato migliore tra le proposte, se non lo trovi clicca su salta.</p>
+        <p>Buon divertimento,</p>
+        <br>
+        <p>Il Team di OLAF</p>`
     }
 };
 
