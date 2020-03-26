@@ -6,21 +6,36 @@
   "fields": {
     "uri": {
       "input": "thing",
-      "wikidata": null,
-      "viaf": null,
-      "group": null,
-      "limit": 1,
-      "label": "URI",
-      "select": false
+      "wikidata": null
     },
     "name": {
       "input": "thingNames",
-      "wikidata": "thing",
-      "viaf": null,
-      "group": null,
-      "limit": 1,
-      "label": "Nome autore",
-      "select": false
+      "wikidata": "thing"
+    },
+    "type": {
+      "input": "types",
+      "wikidata": null
+    },
+    "material": {
+      "input": "materials"
+    },
+    "description": {
+      "input": "description"
+    },
+    "class": {
+      "input": "classes"
+    },
+    "contributor": {
+      "input": "contributorNames"
+    },
+    "startingDates": {
+      "input": "startingDates"
+    },
+    "endingDates": {
+      "input": "endingDates"
+    },
+    "roles": {
+      "input": "agentRoles"
     }
   }
 }
