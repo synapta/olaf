@@ -116,8 +116,8 @@ let wikidataQuery = (options) => {
            (GROUP_CONCAT(DISTINCT ?work; separator="###") AS ?works)
            (SAMPLE(?birthDate) AS ?birthDate)
            (SAMPLE(?deathDate) AS ?deathDate)
-           (GROUP_CONCAT(DISTINCT ?workStartingDate; separator="###") AS ?workStartingDates)
-           (GROUP_CONCAT(DISTINCT ?workEndingDate; separator="###") AS ?workEndingDates)
+           (GROUP_CONCAT(DISTINCT ?workStartingYear; separator="###") AS ?workStartingDates)
+           (GROUP_CONCAT(DISTINCT ?workEndingYear; separator="###") AS ?workEndingDates)
            (GROUP_CONCAT(DISTINCT ?occupation; separator="###") AS ?occupations)
            (SAMPLE(?immagine) as ?immagine) 
            (SAMPLE(?itwikipedia) as ?itwikipedia) 
@@ -160,6 +160,7 @@ let wikidataQuery = (options) => {
           {?workID ?inceptionBinded ?workStartingDate}
           UNION
           {?workID wdt:P571 ?workStartingDate}
+          BIND(year(?workStartingDate) AS ?workStartingYear)
         }
       
         # Get see also for dissolved property
@@ -170,8 +171,9 @@ let wikidataQuery = (options) => {
           {?workID ?dissolvedBinded ?workEndingDate}
           UNION
           {?workID wdt:P576 ?workEndingDate}
+          BIND(year(?workEndingDate) AS ?workEndingYear)
         }
-        
+             
       }
       
       # Get agent dates
