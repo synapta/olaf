@@ -28,7 +28,7 @@ class Option {
 
         // Get Wikidata Map from module
         let map = this.config.getWikidataDictionary();
-        let groupedFields = ['titles', 'roles'];
+        let groupedFields = ['titles', 'roles', 'workStartingDates', 'workEndingDates'];
 
         // Parse rawBody in order to populate current object
         Object.keys(map).forEach((key) => {

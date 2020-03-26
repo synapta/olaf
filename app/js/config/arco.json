@@ -31,6 +31,16 @@
       "label": "Date autore",
       "select": false
     },
+    "workStartingDates": {
+      "input": null,
+      "wikidata": "workStartingDates",
+      "label": "Date inizio opere"
+    },
+    "workEndingDates": {
+      "input": null,
+      "wikidata": "workEndingDates",
+      "label": "Date dismissione opere"
+    },
     "titles": {
       "input": "producedThings",
       "wikidata": "works",
