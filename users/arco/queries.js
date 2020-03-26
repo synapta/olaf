@@ -113,11 +113,11 @@ let wikidataQuery = (options) => {
     SELECT ?id 
            ?author
            ?description
-           (GROUP_CONCAT(DISTINCT ?work; separator="###") AS ?works)
+           (GROUP_CONCAT(DISTINCT ?workWithYears; separator="###") AS ?works)
            (SAMPLE(?birthDate) AS ?birthDate)
            (SAMPLE(?deathDate) AS ?deathDate)
-           (GROUP_CONCAT(DISTINCT ?workStartingYear; separator="###") AS ?workStartingDates)
-           (GROUP_CONCAT(DISTINCT ?workEndingYear; separator="###") AS ?workEndingDates)
+           (min(?workStartingYear) AS ?minThingDate)
+           (max(?workEndingYear) AS ?maxThingDate)
            (GROUP_CONCAT(DISTINCT ?occupation; separator="###") AS ?occupations)
            (SAMPLE(?immagine) as ?immagine) 
            (SAMPLE(?itwikipedia) as ?itwikipedia) 
@@ -129,7 +129,6 @@ let wikidataQuery = (options) => {
         bd:serviceParam wikibase:language "it,en".
         ?id rdfs:label ?author .
         ?id schema:description ?description .
-        ?workID rdfs:label ?work .
         ?occupationID rdfs:label ?occupation
       }
       
@@ -162,7 +161,7 @@ let wikidataQuery = (options) => {
           {?workID wdt:P571 ?workStartingDate}
           BIND(year(?workStartingDate) AS ?workStartingYear)
         }
-      
+
         # Get see also for dissolved property
         wd:P576 wdt:P1659 ?seeAlsoDissolved .
         BIND(URI(REPLACE(STR(?seeAlsoDissolved), "entity", "prop/direct")) AS ?dissolvedBinded)
@@ -173,8 +172,23 @@ let wikidataQuery = (options) => {
           {?workID wdt:P576 ?workEndingDate}
           BIND(year(?workEndingDate) AS ?workEndingYear)
         }
-             
+
+        SERVICE wikibase:label {
+          bd:serviceParam wikibase:language "it,en".
+          ?workID rdfs:label ?work .
+        }      
       }
+      
+      BIND(
+        CONCAT( 
+          IF(BOUND(?workStartingDate), STRBEFORE(STR(?workStartingDate), "-") , ""),
+          IF(BOUND(?workStartingDate) && BOUND(?workEndingDate), " - ", ""),
+          IF(BOUND(?workEndingDate), STRBEFORE(STR(?workEndingDate), "-"), ""),
+          IF(BOUND(?workStartingDate) || BOUND(?workEndingDate), " ~ ", ""),
+          IF(BOUND(?work), ?work, "")
+        ) 
+        as ?workWithYears
+      )
       
       # Get agent dates
       OPTIONAL {
@@ -202,9 +216,10 @@ let wikidataQuery = (options) => {
         ?id wdt:P214 ?viaf
         BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
       }
-      
+
     }
-    GROUP BY ?id ?author ?description`
+    GROUP BY ?id ?author ?description`;
+
 };
 
 // Functions
