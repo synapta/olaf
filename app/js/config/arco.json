@@ -58,6 +58,11 @@
       "label": "Immagine",
       "select": false
     },
+    "wikidata": {
+      "input": null,
+      "wikidata": "id",
+      "label": "Wikidata"
+    },
     "wikipediaIt": {
       "input": null,
       "wikidata": "itwikipedia",
