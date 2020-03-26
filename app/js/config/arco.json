@@ -22,6 +22,15 @@
       "label": "Nome autore",
       "select": false
     },
+    "dates": {
+      "input": "agentDates",
+      "wikidata": null,
+      "viaf": null,
+      "group": null,
+      "limit": 1,
+      "label": "Date autore",
+      "select": false
+    },
     "titles": {
       "input": "producedThings",
       "wikidata": "works",

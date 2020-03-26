@@ -38,7 +38,7 @@ let authorSelect = (authorId) => {
         (GROUP_CONCAT(DISTINCT(?localID); separator="$$$") as ?localIDs)
         (GROUP_CONCAT(DISTINCT(?agentName); separator="$$$") as ?agentNames)
         (GROUP_CONCAT(DISTINCT(?agentDate); separator="$$$") as ?agentDates)
-        (GROUP_CONCAT(DISTINCT(?thingName); separator="$$$") as ?producedThings)
+        (GROUP_CONCAT(DISTINCT(?thingNameWithDates); separator="$$$") as ?producedThings)
         (GROUP_CONCAT(DISTINCT(?thingStartingDate); separator="$$$") as ?startingDates)
         (GROUP_CONCAT(DISTINCT(?thingEndingDate); separator="$$$") as ?endingDates)
         (GROUP_CONCAT(DISTINCT(?role); separator="$$$") as ?agentRoles)
@@ -91,7 +91,7 @@ let authorSelect = (authorId) => {
             # Try to associate each date to each produced thing
             BIND(COALESCE(?thingStartingDate, "") AS ?thingStartingDateParsed)
             BIND(COALESCE(?thingEndingDate, "") AS ?thingEndingDateParsed)
-            BIND(CONCAT(?thingName, "|||", ?thingStartingDateParsed, "|||", ?thingEndingDateParsed) AS ?thingNameWithDates)
+            BIND(CONCAT(?thingStartingDateParsed, " - ", ?thingEndingDateParsed, ", ", ?thingName) AS ?thingNameWithDates)
         
         }
       
