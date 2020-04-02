@@ -38,7 +38,7 @@ let wikidataQuery = (options) => {
     (SAMPLE(?altLabelIT) as ?altLabelIta)
     (SAMPLE(?altLabelEN) as ?altLabelEng)
     (SAMPLE(?altLabelFR) as ?altLabelFra)
-    (SAMPLE(?altLabelES) as ?altLabelEsp)
+    (SAMPLE(?altLabelES) as ?altLabelSpa)
     (SAMPLE(?altLabelDE) as ?altLabelDeu)
     (SAMPLE(?altLabelLA) as ?altLabelLat)
     (GROUP_CONCAT(DISTINCT ?bookLabel; separator="###") as ?titles)
@@ -128,7 +128,11 @@ let wikidataQuery = (options) => {
       }
     
       OPTIONAL {
-        ?i wdt:P39 ?positionHeldID
+        { 
+          ?i wdt:P39 ?positionHeldID
+        } UNION {
+          ?i wdt:P106 ?positionHeldID
+        }
         SERVICE wikibase:label {
           bd:serviceParam wikibase:language "it,en" .
           ?positionHeldID rdfs:label ?positionHeldLabel .
@@ -288,8 +292,12 @@ function authorLink(body) {
     // Parse query
     let hash = crypto.createHash('md5').update(SECRET_KEY + body.Idrecord + 'updEntita').digest("hex");
 
-    return composeQuery("id=" + body.Idrecord + "&mode=updEntita&check=" + hash + "&dati=" + encodeURIComponent(JSON.stringify(body)));
-
+    return {
+      method: 'POST',
+      url: 'http://www.scrivaniabbcc.it/AFXD/API/olaf/Services.do?id=' + body.Idrecord + "&mode=updEntita&check="  + hash,
+      json: body
+    }
+    
 }
 
 // Query composer

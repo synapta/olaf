@@ -175,15 +175,15 @@ module.exports = function(app) {
 
         let output = parser.parseOutput(request.body);
         output['Idrecord'] = request.params.uri;
+        let requests = queries.authorLink(output);
 
         // if wikidata is linked to a AFXD resource we save the query response in the database.
         if (output['Wikidata']) {
             queries.storeWikidataInfo(db, output);
         }
-
-        nodeRequest.post({
-            url: queries.authorLink(output)
-        }, (err, res, body) => {
+        
+        // Map requests to make Promise
+        nodeRequest(requests, (err, res, body)=>{
 
             // Handle error
             if(err) throw err;
@@ -192,7 +192,6 @@ module.exports = function(app) {
             response.json(JSON.parse(body));
 
         });
-
     });
 
     app.post('/api/v1/:token/author-skip/', (request, response) => {

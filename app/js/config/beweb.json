@@ -144,7 +144,7 @@
       "limit": null,
       "label": "Varianti",
       "select": true,
-      "composite": ["und", "ita", "lat", "eng", "fra", "esp", "deu"]
+      "composite": ["und", "ita", "lat", "eng", "fra", "spa", "deu"]
     },
     "sources": {
       "input": "Fonti_archivistiche_e_bibliografiche",
