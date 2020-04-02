@@ -189,7 +189,9 @@ module.exports = function(app) {
             if(err) throw err;
 
             // Send back Beweb response
-            response.json(JSON.parse(body));
+            if (typeof body === 'string')
+                body = JSON.parse(body)
+            response.json(body);
 
         });
     });
