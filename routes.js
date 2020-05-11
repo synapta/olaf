@@ -18,13 +18,12 @@ let configToken      = null;
 const db = pgp(pgConnection);
 const bewebQueries = require('./users/beweb/queries');
 
+// Beweb scheduling
 schedule.scheduleJob('21 */4 * * *', function(firedate) {
     console.log(firedate, "checking modifications");
     bewebQueries.getAllIdBeweb(db, function(data) {
         let parseAnother = function() {
-            if (data.length === 0 ) {
-                return;
-            }
+            if (data.length === 0 ) return;
             let record = data.pop();
             bewebQueries.checkWikidataModification(db, record.id_beweb, function(data) {
                 setTimeout(function(){ parseAnother(); }, 10000); 
@@ -33,7 +32,6 @@ schedule.scheduleJob('21 */4 * * *', function(firedate) {
         parseAnother();
     })
 });
-
 
 // Token validation
 function validateToken(token) {
@@ -49,12 +47,6 @@ function validateToken(token) {
 }
 
 module.exports = function(app) {
-
-    // Setting up express
-    app.use('/', express.static('./app'));
-
-    app.use(bodyParser.urlencoded({extended: false}));
-    app.use(bodyParser.json());
 
     // Token middleware
     app.all(['/api/v1/:token/*', '/get/:token/*'], (request, response, next) => {

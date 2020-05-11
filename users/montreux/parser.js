@@ -41,8 +41,7 @@ function getAuthorSimilarOptions(author, options, callback){
     options.forEach((option) => {
         if(author.titles && author.titles.length > 0 && option.titles) {
             if (!Array.isArray(author.titles)) {
-                author.titles = [author.titles]
-
+                author.titles = [author.titles];
             }
             // Match with author titles
             author.titles.forEach((title) => {
@@ -86,10 +85,7 @@ function parseAuthorOptions(author, bodies, callback) {
 
     // Enrich all options with VIAF and return them
     Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
-
         options.map(el => el.getString());
-        console.log(options);
-
         getAuthorSimilarOptions(author, options, function(options) {
             callback(options);
         });
