@@ -41,7 +41,7 @@ function validateToken(token) {
     // Get valid tokens
     let validTokens = ['cobis', 'aaso', 'amt', 'cai', 'cmus', 'dssp',
                        'fga', 'ibmp', 'inaf', 'inrim', 'oato', 'plev',
-                       'slvm', 'toas', 'beweb'];
+                       'slvm', 'toas', 'beweb', 'montreux'];
 
     // Check if token is valid
     return validTokens.includes(token);
