@@ -1,8 +1,9 @@
 // Requirements
 const fuzz           = require('fuzzball');
-
+const nodeRequest    = require('request-promise');
 const Option         = require('../../option').Option;
 const Author         = require('../../author').Author;
+const CryptoJS       = require("crypto-js");
 
 // Configuration
 let config           = null;
@@ -82,8 +83,7 @@ function parseAuthorOptions(author, bodies, callback) {
     console.log(musicBrainzBody.aliases);*/
 
     // Get wikidata options
-    let options = parseMusicBrainzBody(musicBrainzBody);
-    callback(options);
+    parseMusicBrainzBody(musicBrainzBody, callback);
 
     // Enrich all options with VIAF and return them
     /*Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
@@ -95,15 +95,13 @@ function parseAuthorOptions(author, bodies, callback) {
 
 }
 
-function parseMusicBrainzBody(body) {
+function parseMusicBrainzBody(body, callback) {
 
     // Parse results
     let results = body.artists;
 
     // Store lifespans
     results.forEach(result => {
-
-        console.log(result);
 
         // Store begin and end date
         result['birth-date'] = result['life-span'].begin;
@@ -120,8 +118,36 @@ function parseMusicBrainzBody(body) {
 
     });
 
-    // Construct options from query results
-    return results.map(el => new Option(el, 'musicbrainz', config));
+    // Get Wikidata ID
+    let resultWithWikidata = results.filter(result => !!result.wikidata);
+    let wikidataId = resultWithWikidata.map(result => result.wikidata.split('/')[result.wikidata.split('/').length - 1]);
+    let imageRequests = wikidataId.map(id => nodeRequest('https://www.wikidata.org/w/api.php?action=wbgetclaims&format=json&property=P18&entity=' + id));
+
+    Promise.all(imageRequests).then(responses => {
+
+        // Get image names
+        responses = responses.map(result => JSON.parse(result));
+        responses = responses.map(result => {
+            return result['claims']['P18'].length ? result['claims']['P18'][0]['mainsnak']['datavalue']['value'].replace(/\s/gmi, '_') : null;
+        });
+
+        // Store hash and generate images url
+        let hash = responses.map(result => result === null ? null : CryptoJS.MD5(result).toString());
+        let urls = [];
+        responses.forEach((result, index) => {
+            let url = `https://upload.wikimedia.org/wikipedia/commons/${hash[index][0]}/${hash[index][0]}${hash[index][1]}/${responses[index]}`;
+            urls.push(result === null ? null : url)
+        });
+
+        // Append image to the proper result
+        let imagesCounter = 0;
+        results.forEach(result => {
+            if(result.wikidata) result.image = urls[imagesCounter++];
+        });
+
+        callback(results.map(el => new Option(el, 'musicbrainz', config)));
+
+    });
 
 }
 
