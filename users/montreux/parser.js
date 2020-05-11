@@ -20,15 +20,15 @@ function configInit(configObj) {
 function parseAuthor(body){
 
     // Map Cobis result to standard format
-    let binding = body.results.bindings[0];
+    //let binding = body.results.bindings[0];
     let parsedBody = {};
 
-    Object.keys(binding).map((key) => {
+    Object.keys(body).map((key) => {
 
-        if(binding[key].value.includes('###'))
-            binding[key].value = binding[key].value.split('###');
+        if(body[key].includes('###'))
+            body[key] = body[key].split('###');
 
-        parsedBody[key] = binding[key].value
+        parsedBody[key] = body[key]
 
     });
 
@@ -75,50 +75,55 @@ function getAuthorSimilarOptions(author, options, callback){
 function parseAuthorOptions(author, bodies, callback) {
 
     // Store bodies
-    let wikidataBody = bodies[0];
-    let viafBody = bodies[1];
+    let musicBrainzBody = bodies[0];
+
+    /*console.log(musicBrainzBody);
+    console.log(musicBrainzBody.artists.map(artist => artist["tags"]));
+    console.log(musicBrainzBody.aliases);*/
 
     // Get wikidata options
-    let wikidataOptions = parseWikidataOptions(wikidataBody);
-    let viafOptions = parseViafOptions(viafBody, wikidataOptions.filter(el => el.viaf).map(el => el.getViafId()));
-    let options = wikidataOptions.concat(viafOptions);
+    let options = parseMusicBrainzBody(musicBrainzBody);
+    callback(options);
 
     // Enrich all options with VIAF and return them
-    Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
+    /*Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
         options.map(el => el.getString());
         getAuthorSimilarOptions(author, options, function(options) {
             callback(options);
         });
+    });*/
+
+}
+
+function parseMusicBrainzBody(body) {
+
+    // Parse results
+    let results = body.artists;
+
+    // Store lifespans
+    results.forEach(result => {
+
+        console.log(result);
+
+        // Store begin and end date
+        result['birth-date'] = result['life-span'].begin;
+        result['death-date'] = result['life-span'].end;
+
+        if(result['begin_area']) result['birth-place'] = result['begin_area']['sort-name'];
+        if(result['end_area']) result['death-place'] = result['end_area']['sort-name'];
+
+        let wikidataObject = result.relations.filter(rel => rel.type === 'wikidata');
+        if(wikidataObject.length) result.wikidata = wikidataObject[0].url.resource;
+
+        result.titles = [...new Set(result['release-groups'].map(rel => rel.title))];
+        result.genres = result.genres.map(genre => genre.name);
+
     });
 
-}
-
-function parseWikidataOptions(body) {
-
-    // Parse results
-    let results = body.results.bindings;
-
     // Construct options from query results
-    return results.map(el => new Option(el, 'wikidata', config));
+    return results.map(el => new Option(el, 'musicbrainz', config));
 
 }
-
-function parseViafOptions(body, viafUris) {
-
-    // Invalid fields
-    let invalidFields = ['uniformtitleexpression', 'uniformtitlework'];
-
-    // Parse results
-    let results = body.result || [];
-    // Filter current results removing known authors and options with invalid fields
-    results = results.filter((object, index, array) => array.map((el) => el.viafid).indexOf(object.viafid) === index);
-    results = results.filter(el => !viafUris.includes(el['viafid']) && !invalidFields.includes(el['nametype']));
-
-    // Construct options from query results
-    return results.map(el => new Option(el, 'viaf', config));
-
-}
-
 
 // Exports
 exports.parseAuthor = (body) => {

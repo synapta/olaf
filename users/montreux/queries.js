@@ -1,4 +1,4 @@
-const nodeRequest    = require('request');
+const nodeRequest  = require('request-promise');
 
 let authorSearch = (nameCombinations) => {
 
@@ -224,10 +224,10 @@ let wikidataQuery = (options) => {
 };
 
 // Functions
-function authorOptions(name, surname){
+function authorOptions(name){
 
     // Compose queries
-    return [makeWikidataQuery(name, surname), makeViafQuery(name, surname)];
+    return [makeMusicBrainzQuery(name)];
 
 }
 
@@ -302,41 +302,52 @@ function composeQuery(query) {
 
 }
 
-function composeQueryEntityListWikidata(name, surname){
+function makeMusicBrainzQuery(name){
 
-    // Compose query
-    return {
+    let musicBrainzRequest = {
         method: 'GET',
-        uri: 'https://www.wikidata.org/w/api.php',
+        uri: 'https://musicbrainz.org/ws/2/artist/',
         qs: {
-            action: "wbsearchentities",
-            search: (name + " " + surname).trim(),
-            strictlanguage: false,
-            language: "en",
-            limit: 20,
-            format: "json"
-        },
-        json: true
-    }
-}
-
-function composeQueryWikidata(query){
-
-    // Compose query
-    return {
-        method: 'GET',
-        uri: 'https://query.wikidata.org/sparql',
-        qs: {
-            query: query
+            query: `artist:${name}`,
+            limit: 6,
+            fmt: 'json'
         },
         headers: {
-            'cache-control': 'no-cache',
-            Host: 'query.wikidata.org',
-            'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
-            Accept: 'application/sparql-results+json',
-            'user-agent': 'pippo',
+            'User-Agent': 'pippo/0.0.1'
         }
-    }
+    };
+
+    let artistRequest = (id) => {
+        return {
+            method: 'GET',
+            uri: 'https://musicbrainz.org/ws/2/artist/' + id,
+            qs: {
+                //query: `artist:${name}`,
+                //limit: 6,
+                fmt: 'json',
+                inc: 'release-groups+url-rels+genres'
+            },
+            headers: {
+                'User-Agent': 'pippo/0.0.1'
+            }
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+        nodeRequest(musicBrainzRequest).then((response) => {
+
+            // Do make requests based on artist ID
+            response = JSON.parse(response);
+            let requests = response.artists.map(artist => nodeRequest(artistRequest(artist.id)));
+
+            // Enrich response object
+            Promise.all(requests).then((responses) => {
+                response.artists = responses.map(res => JSON.parse(res));
+                resolve(JSON.stringify(response));
+            }).catch((err) => reject(err));
+
+        })
+    });
 
 }
 
@@ -375,84 +386,14 @@ function makeWikidataQuery(name, surname) {
 
 }
 
-function composeQueryVIAF(name, surname){
-    // Compose query
-    return {
-        method: 'GET',
-        uri: 'https://www.viaf.org/viaf/AutoSuggest',
-        qs: {
-            query: (name + " " + surname).trim(),
-        },
-        headers: {
-            'cache-control': 'no-cache',
-            'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
-            'user-agent': 'topolino',
-        }
-    }
-
-}
-
-function makeViafQuery(name, surname) {
-    return new Promise ( function(resolve, reject) {
-        nodeRequest(composeQueryVIAF(name, surname), function (error, response, body) {
-            if (error) {
-                console.error(error);
-                reject();
-            }
-            resolve(body);
-        });
-    });
-}
-
-function parseViafOptions(body, viafUris) {
-
-    // Invalid fields
-    let invalidFields = ['uniformtitleexpression', 'uniformtitlework'];
-
-    // Parse results
-    let results = (body.result || []).slice(0, 4);
-    // Filter current results removing known authors and options with invalid fields
-    results = results.filter(el => !viafUris.includes(el['viafid']) && !invalidFields.includes(el['nametype']));
-
-    // Construct options from query results
-    return results.map(el => new Option(el, 'viaf', config));
-
-}
-
-function parseWikidataOptions(body) {
-
-    // Parse results
-    let results = body.results.bindings;
-
-    // Construct options from query results
-    return results.map(el => new Option(el, 'wikidata', config));
-
-}
-
-function parseAuthorOptions(author, bodies, callback) {
-    console.log('pippo');
-
-    // Store bodies
-    let wikidataBody = bodies[0];
-    let viafBody = bodies[1];
-
-    // Get wikidata options
-    let wikidataOptions = parseWikidataOptions(wikidataBody);
-    let viafOptions = parseViafOptions(viafBody, wikidataOptions.filter(el => el.viaf).map(el => el.getViafId()));
-    let options = wikidataOptions.concat(viafOptions);
-
-    // Enrich all options with VIAF and return them
-    Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
-        options.map(el => el.getString());
-        callback(options);
-    });
-
-}
 
 // Exports
-exports.authorSelect = (params) => composeQuery(authorSelect(params));
+//exports.authorSelect = (params) => composeQuery(authorSelect(params));
 exports.authorOptions = authorOptions;
-exports.parseAuthorOptions = parseAuthorOptions;
+//exports.parseAuthorOptions = parseAuthorOptions;
 exports.authorSkip = authorSkip;
 exports.authorLink = authorLink;
+exports.authorSelect = (params) => {
+    return 'https://www.libripolito.it'
+};
 
