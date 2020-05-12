@@ -163,6 +163,12 @@ module.exports = function(app) {
         // Map requests to make Promise
         requests = requests.map(req => promiseRequest(req));
 
+        // delete Cobis cache
+        let cobisID = request.body.authorUri.split("/").pop();
+        nodeRequest.get("https://dati.cobis.to.it/api/cache/clear/" + cobisID, (err,res,body) => {
+            console.log(body)
+        });
+
         // Send requests
         Promise.all(requests).then((data) => {
             // Send response
