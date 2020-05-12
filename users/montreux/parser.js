@@ -19,21 +19,7 @@ function configInit(configObj) {
  * Parse author response in order to obtain OLAF author object
  * **/
 function parseAuthor(body){
-
-    // Map Cobis result to standard format
-    //let binding = body.results.bindings[0];
-    let parsedBody = {};
-
-    Object.keys(body).map((key) => {
-
-        if(body[key].includes('###'))
-            body[key] = body[key].split('###');
-
-        parsedBody[key] = body[key]
-
-    });
-
-    return new Author(parsedBody, config);
+    return new Author(body, config);
 }
 
 function getAuthorSimilarOptions(author, options, callback){
@@ -128,15 +114,20 @@ function parseMusicBrainzBody(body, callback) {
         // Get image names
         responses = responses.map(result => JSON.parse(result));
         responses = responses.map(result => {
-            return result['claims']['P18'].length ? result['claims']['P18'][0]['mainsnak']['datavalue']['value'].replace(/\s/gmi, '_') : null;
+            return (result['claims']['P18'] !== undefined && result['claims']['P18'].length) ? result['claims']['P18'][0]['mainsnak']['datavalue']['value'].replace(/\s/gmi, '_') : null;
         });
 
         // Store hash and generate images url
         let hash = responses.map(result => result === null ? null : CryptoJS.MD5(result).toString());
         let urls = [];
         responses.forEach((result, index) => {
-            let url = `https://upload.wikimedia.org/wikipedia/commons/${hash[index][0]}/${hash[index][0]}${hash[index][1]}/${responses[index]}`;
-            urls.push(result === null ? null : url)
+
+            // Generate URL
+            let url = null;
+            if(result)
+                url = `https://upload.wikimedia.org/wikipedia/commons/${hash[index][0]}/${hash[index][0]}${hash[index][1]}/${responses[index]}`;
+
+            urls.push(url)
         });
 
         // Append image to the proper result

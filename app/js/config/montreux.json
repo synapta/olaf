@@ -5,12 +5,24 @@
   "interlinking": true,
   "fields": {
     "uri": {
-      "input": null,
+      "input": "url",
       "musicbrainz": "id"
     },
     "name": {
       "input": "name",
       "musicbrainz": "name"
+    },
+    "firstName": {
+      "input": "firstName",
+      "musicbrainz": null
+    },
+    "lastName": {
+      "input": "lastName",
+      "musicbrainz": null
+    },
+    "stageName": {
+      "input": "stageName",
+      "musicbrainz": null
     },
     "titles": {
       "input": null,
@@ -48,7 +60,7 @@
       "input": null,
       "musicbrainz": "disambiguation"
     },
-    "music-genres": {
+    "musicGenres": {
       "input": null,
       "musicbrainz": "genres"
     },

@@ -306,7 +306,7 @@ function makeMusicBrainzQuery(name){
 
     let musicBrainzRequest = {
         method: 'GET',
-        uri: 'https://musicbrainz.org/ws/2/artist/',
+        uri: 'https://musicbrainz.synapta.io/ws/2/artist/',
         qs: {
             query: `artist:${name}`,
             limit: 6,
@@ -320,10 +320,8 @@ function makeMusicBrainzQuery(name){
     let artistRequest = (id) => {
         return {
             method: 'GET',
-            uri: 'https://musicbrainz.org/ws/2/artist/' + id,
+            uri: 'https://musicbrainz.synapta.io/ws/2/artist/' + id,
             qs: {
-                //query: `artist:${name}`,
-                //limit: 6,
                 fmt: 'json',
                 inc: 'release-groups+url-rels+genres'
             },
@@ -386,6 +384,38 @@ function makeWikidataQuery(name, surname) {
 
 }
 
+function randomTestAuthorSelect() {
+
+    let authors = [
+        {
+            "id":34,
+            "url":"https://mjf-database.epfl.ch/public/persons/34",
+            "name":"Black Milk",
+            "firstName":"Curtis",
+            "lastName":"Cross",
+            "stageName":"Black Milk"
+        },
+        {
+            "id":36,
+            "url":"https://mjf-database.epfl.ch/public/persons/36",
+            "name":"DJ Hex",
+            "firstName":"Eugene",
+            "lastName":"Howell",
+            "stageName":"DJ Hex"
+        },
+        {
+            "id":37,
+            "url":"https://mjf-database.epfl.ch/public/persons/37",
+            "name":"Aaron Abernathy",
+            "firstName":"Aaron",
+            "lastName":"Abernathy"
+        }
+    ];
+
+    return authors[Math.floor(Math.random() * authors.length)]
+
+}
+
 
 // Exports
 //exports.authorSelect = (params) => composeQuery(authorSelect(params));
@@ -393,7 +423,5 @@ exports.authorOptions = authorOptions;
 //exports.parseAuthorOptions = parseAuthorOptions;
 exports.authorSkip = authorSkip;
 exports.authorLink = authorLink;
-exports.authorSelect = (params) => {
-    return 'https://www.libripolito.it'
-};
+exports.authorSelect = randomTestAuthorSelect;
 

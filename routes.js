@@ -99,30 +99,10 @@ module.exports = function(app) {
         // Make request
         nodeRequest(queryAuthor, (err, res, body) => {
 
-            let testBody = {
-                name: 'Charlie Parker',
-                genres: ['bebop', 'jazz'],
-                area: 'USA',
-                gender: 'Male',
-                born: '1920-08-29',
-                died: '1955-03-12',
-                description: `
-                    Charles Parker Jr. (August 29, 1920 – March 12, 1955), also referred to by his nicknames Yardbird or simply 
-                    Bird, was an American jazz saxophonist and composer. Parker was a highly influential soloist and leading 
-                    figure in the development of bebop, a form of jazz characterized by fast tempos, virtuosic technique, and 
-                    advanced harmonies. Parker was a blazingly fast virtuoso and introduced revolutionary harmonic ideas into 
-                    jazz, including rapid passing chords, new variants of altered chords, and chord substitutions. Primarily a 
-                    player of the alto saxophone, Bird's tone ranged from clean and penetrating to sweet and somber.
-                    
-                    Parker acquired the nickname "Yardbird" early in his career on the road with Jay McShann. This, and the 
-                    shortened form "Bird", continued to be used for the rest of his life, inspiring the titles of a number of 
-                    Parker compositions, such as "Yardbird Suite", "Ornithology", "Bird Gets the Worm", and "Bird of Paradise". 
-                    Parker was an icon for the hipster subculture and later the Beat Generation, personifying the jazz musician 
-                    as an uncompromising artist and intellectual rather than just an entertainer.`
-            };
-
             // Handle and send author
-            let author = parser.parseAuthor(testBody);
+            let author = parser.parseAuthor(queryAuthor);
+
+            console.log(author);
 
             // Query options
             let nameSearch = (author.name || '').trim();

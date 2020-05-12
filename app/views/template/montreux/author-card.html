@@ -5,9 +5,10 @@
             <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Autore</a>
 
             <p class="author-name">
-                <a target="_blank" href="{{uri}}">
-                    <i id="author-link" class="fas fa-external-link-alt"></i> {{rawName}}
+                <a style="display: block" target="_blank" href="{{uri}}">
+                    <i id="author-link" class="fas fa-external-link-alt"></i> {{name}}
                 </a>
+                <span class="author-subtitle" style="text-align: center; font-weight: bold">{{firstName}} {{lastName}}</span>
             </p>
 
             {{#type}}
