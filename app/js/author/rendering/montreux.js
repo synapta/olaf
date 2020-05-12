@@ -32,3 +32,8 @@ function renderAuthorOptions(options){
         $('#loader').fadeOut();
     });
 }
+
+// Render modal
+function renderModal(){
+    $('.ui.modal').modal('show');
+}
