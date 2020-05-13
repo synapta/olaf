@@ -1,10 +1,4 @@
 const nodeRequest   = require('request-promise');
-const request       = require('sync-request');
-const Database      = require('./database').Database;
-
-// Initialize driver
-let   url           = 'https://mjf-database.epfl.ch/exports/d9bc43ed77fc1dfcc405ca8598241a4e';
-const driver        = new Database(JSON.parse(request('GET', url).getBody('utf8')));
 
 let authorSearch = (nameCombinations) => {
 
