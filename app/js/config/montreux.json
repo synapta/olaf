@@ -25,7 +25,7 @@
       "musicbrainz": null
     },
     "titles": {
-      "input": null,
+      "input": "songs",
       "musicbrainz": "titles"
     },
     "roles": {
@@ -35,6 +35,10 @@
     "type": {
       "input": null,
       "musicbrainz": "type"
+    },
+    "exhibitions": {
+      "input": "exhibitions",
+      "musicbrainz": null
     },
     "birthDate": {
       "input": null,
@@ -61,8 +65,12 @@
       "musicbrainz": "disambiguation"
     },
     "musicGenres": {
-      "input": null,
+      "input": "genres",
       "musicbrainz": "genres"
+    },
+    "instruments": {
+      "input": "instruments",
+      "musicbrainz": null
     },
     "gender": {
       "input": null,

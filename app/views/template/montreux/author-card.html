@@ -5,60 +5,54 @@
             <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Autore</a>
 
             <p class="author-name">
-                <a style="display: block" target="_blank" href="{{uri}}">
-                    <i id="author-link" class="fas fa-external-link-alt"></i> {{name}}
+                <a target="_blank" href="{{uri}}">
+                    <i id="author-link" class="fas fa-external-link-alt"></i> {{rawName}}
                 </a>
-                <span class="author-subtitle" style="text-align: center; font-weight: bold">{{firstName}} {{lastName}}</span>
             </p>
 
-            {{#type}}
-            <a class="ui blue ribbon label"> <i class="fas fa-book"></i> Categoria</a>
-            <p class="card-box">
-                {{type}}, {{gender}}
-            </p>
-            {{/type}}
+            {{#instruments.length}}
+                <a href="{{uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Strumenti suonati</a>
+                <ul class="ui bulleted list">
+                    {{#instruments}}
+                    <li>
+                        <div class="item title">{{.}}</div>
+                    </li>
+                    {{/instruments}}
+                </ul>
+            {{/instruments.length}}
 
-            {{#birthDate}}
-            <a class="ui blue ribbon label"> <i class="fas fa-star"></i> Data di nascita</a>
-            <p class="card-box">
-                {{birthDate}}, {{birthPlace}}
-            </p>
-            {{/birthDate}}
+            {{#musicGenres.length}}
+                <a href="{{uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Generi caratteristici</a>
+                <ul class="ui bulleted list">
+                    {{#musicGenres}}
+                    <li>
+                        <div class="item title">{{.}}</div>
+                    </li>
+                    {{/musicGenres}}
+                </ul>
+            {{/musicGenres.length}}
 
-            {{#deathDate}}
-            <a class="ui blue ribbon label"> <i class="fas fa-cross"></i> Data di morte</a>
-            <p class="card-box">
-                {{deathDate}}, {{deathPlace}}
-            </p>
-            {{/deathDate}}
-
-            {{#yearFirstBook}}
-            <a class="ui blue ribbon label"> <i class="fas fa-book"></i> Intervallo Date Opere</a>
-            <p class="card-box">
-                dal {{yearFirstBook}} al {{yearLastBook}}
-            </p>
-            {{/yearFirstBook}}
-
+            {{#exhibitions.length}}
+                <a href="{{uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Esibizioni</a>
+                <ul class="ui bulleted list">
+                    {{#exhibitions}}
+                    <li>
+                        <div class="item title">{{.}}</div>
+                    </li>
+                    {{/exhibitions}}
+                </ul>
+            {{/exhibitions.length}}
 
             {{#titles.length}}
-            <a href="{{uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titles.length}}) - Visualizza tutte</a>
-            <ul class="ui bulleted list card-box">
-                {{#titles}}
-                <li>
-                    <div class="item title">{{.}}</div>
-                </li>
-                {{/titles}}
-            </ul>
+                <a href="{{uri}}" target="_blank" class="ui blue ribbon label"> <i class="fas fa-book"></i> Opere ({{titles.length}}) - Visualizza tutte</a>
+                <ul class="ui bulleted list card-box">
+                    {{#titles}}
+                    <li>
+                        <div class="item title">{{.}}</div>
+                    </li>
+                    {{/titles}}
+                </ul>
             {{/titles.length}}
-
-            {{#roles.length}}
-            <a class="ui blue ribbon label"> <i class="fas fa-briefcase"></i> Ruoli</a>
-            <div class="ui bulleted list card-box">
-                {{#roles}}
-                <div class="item">{{.}}</div>
-                {{/roles}}
-            </div>
-            {{/roles.length}}
 
         </div>
 
