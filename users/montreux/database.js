@@ -33,13 +33,13 @@ class Database {
 
             let concert = this._concerts[key];
 
-            concert.location = this._locations[concert.location].name;
-            concert.genres = concert.genres.map(genre => this._genres[genre].name);
-            concert.songs = concert.songs.map(song => this._songs[song]);
+            concert.location = !!this._locations[concert.location] ? this._locations[concert.location].name : null;
+            concert.genres = concert.genres.map(genre => !!this._genres[genre] ? this._genres[genre].name : null);
+            concert.songs = concert.songs.map(song => !!this._songs[song] ? this._songs[song] : null);
             concert.musicians = concert.musicians.map(musician => {
                 return {
                     person: this._persons[musician.person],
-                    instruments: musician.instruments.map(instrument => this._instruments[instrument].name)
+                    instruments: musician.instruments.map(instrument => !!this._instruments[instrument] ? this._instruments[instrument].name : null)
                 }
             })
 
@@ -50,7 +50,7 @@ class Database {
     concertsFromArtist(artist) {
         // Get all concerts related to the artist
         return Object.values(this._concerts).filter(concert => concert.musicians.map(
-            musician => musician.person.name).includes(artist)
+            musician => !!musician.person ? musician.person.name : null).includes(artist)
         )
     }
 
@@ -85,37 +85,11 @@ class Database {
 
     }
 
+    get artists() {
+        return this._persons;
+    }
+
 }
 
+// Exports
 exports.Database = Database;
-
-/*request('https://mjf-database.epfl.ch/exports/d9bc43ed77fc1dfcc405ca8598241a4e', (err, res, body) => {
-
-    let dump = JSON.parse(body);
-
-    // Store concerts, songs, persons and locations
-    let concerts = arrayToObject(dump.concerts);
-    let songs = arrayToObject(dump.songs);
-    let persons = arrayToObject(dump.persons);
-    let locations = arrayToObject(dump.locations);
-    let genres = arrayToObject(dump.genres);
-    let instruments = arrayToObject(dump.instruments);
-
-    // Generate concerts schema
-    Object.keys(concerts).forEach(key => {
-
-        let concert = concerts[key];
-
-        concert.location = locations[concert.location].name;
-        concert.genres = concert.genres.map(genre => genres[genre].name);
-        concert.songs = concert.songs.map(song => songs[song]);
-        concert.musicians = concert.musicians.map(musician => {
-            return {
-                person: persons[musician.person],
-                instruments: musician.instruments.map(instrument => instruments[instrument].name)
-            }
-        })
-
-    });
-
-});*/
