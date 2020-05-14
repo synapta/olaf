@@ -76,20 +76,8 @@ function parseAuthorOptions(author, bodies, callback) {
     // Store bodies
     let musicBrainzBody = bodies[0];
 
-    /*console.log(musicBrainzBody);
-    console.log(musicBrainzBody.artists.map(artist => artist["tags"]));
-    console.log(musicBrainzBody.aliases);*/
-
     // Get wikidata options
     parseMusicBrainzBody(musicBrainzBody, callback);
-
-    // Enrich all options with VIAF and return them
-    /*Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
-        options.map(el => el.getString());
-        getAuthorSimilarOptions(author, options, function(options) {
-            callback(options);
-        });
-    });*/
 
 }
 
@@ -111,7 +99,10 @@ function parseMusicBrainzBody(body, callback) {
         let wikidataObject = result.relations.filter(rel => rel.type === 'wikidata');
         if(wikidataObject.length) result.wikidata = wikidataObject[0].url.resource;
 
-        result.titles = [...new Set(result['release-groups'].map(rel => rel.title))];
+        result.titles = result.recordings.map(recording =>  {
+            let date = Math.min(...recording.releases.map(rel => rel.date));
+            return `${!!date ? date : '-'}, ${recording.title}`
+        });
         result.genres = result.genres.map(genre => genre.name);
 
     });
@@ -133,12 +124,10 @@ function parseMusicBrainzBody(body, callback) {
         let hash = responses.map(result => result === null ? null : CryptoJS.MD5(result).toString());
         let urls = [];
         responses.forEach((result, index) => {
-
             // Generate URL
             let url = null;
             if(result)
                 url = `https://upload.wikimedia.org/wikipedia/commons/${hash[index][0]}/${hash[index][0]}${hash[index][1]}/${responses[index]}`;
-
             urls.push(url)
         });
 

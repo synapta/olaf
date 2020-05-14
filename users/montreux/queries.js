@@ -308,7 +308,7 @@ function makeMusicBrainzQuery(name){
         method: 'GET',
         uri: 'https://musicbrainz.synapta.io/ws/2/artist/',
         qs: {
-            query: `artist:${name}`,
+            query: `artist:"${name}"`,
             limit: 6,
             fmt: 'json'
         },
@@ -323,7 +323,22 @@ function makeMusicBrainzQuery(name){
             uri: 'https://musicbrainz.synapta.io/ws/2/artist/' + id,
             qs: {
                 fmt: 'json',
-                inc: 'release-groups+url-rels+genres'
+                inc: 'url-rels+genres'
+            },
+            headers: {
+                'User-Agent': 'pippo/0.0.1'
+            }
+        }
+    };
+
+    let recordingsRequest = (id) => {
+        return {
+            method: 'GET',
+            uri: 'https://musicbrainz.synapta.io/ws/2/recording/',
+            qs: {
+                query: 'arid:' + id,
+                fmt: 'json',
+                limit: 100
             },
             headers: {
                 'User-Agent': 'pippo/0.0.1'
@@ -339,9 +354,14 @@ function makeMusicBrainzQuery(name){
             let requests = response.artists.map(artist => nodeRequest(artistRequest(artist.id)));
 
             // Enrich response object
-            Promise.all(requests).then((responses) => {
-                response.artists = responses.map(res => JSON.parse(res));
-                resolve(JSON.stringify(response));
+            Promise.all(requests).then((artistsResponses) => {
+                let requests = response.artists.map(artist => nodeRequest(recordingsRequest(artist.id)));
+                Promise.all(requests).then((recordingsResponses) => {
+                    recordingsResponses = recordingsResponses.map(res => JSON.parse(res));
+                    response.artists = artistsResponses.map(res => JSON.parse(res));
+                    response.artists.forEach((artist, index) => artist.recordings = recordingsResponses[index].recordings);
+                    resolve(JSON.stringify(response));
+                })
             }).catch((err) => reject(err));
 
         })
