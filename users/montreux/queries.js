@@ -302,13 +302,13 @@ function composeQuery(query) {
 
 }
 
-function makeMusicBrainzQuery(name){
+function makeMusicBrainzQuery(name, recordings=true){
 
     let musicBrainzRequest = {
         method: 'GET',
         uri: 'https://musicbrainz.synapta.io/ws/2/artist/',
         qs: {
-            query: `artist:"${name}"`,
+            query: `artist:"${name}"~95`,
             limit: 6,
             fmt: 'json'
         },
@@ -354,15 +354,17 @@ function makeMusicBrainzQuery(name){
             let requests = response.artists.map(artist => nodeRequest(artistRequest(artist.id)));
 
             // Enrich response object
-            Promise.all(requests).then((artistsResponses) => {
-                let requests = response.artists.map(artist => nodeRequest(recordingsRequest(artist.id)));
-                Promise.all(requests).then((recordingsResponses) => {
-                    recordingsResponses = recordingsResponses.map(res => JSON.parse(res));
-                    response.artists = artistsResponses.map(res => JSON.parse(res));
-                    response.artists.forEach((artist, index) => artist.recordings = recordingsResponses[index].recordings);
-                    resolve(JSON.stringify(response));
-                })
-            }).catch((err) => reject(err));
+            if(recordings) {
+                Promise.all(requests).then((artistsResponses) => {
+                    let requests = response.artists.map(artist => nodeRequest(recordingsRequest(artist.id)));
+                    Promise.all(requests).then((recordingsResponses) => {
+                        recordingsResponses = recordingsResponses.map(res => JSON.parse(res));
+                        response.artists = artistsResponses.map(res => JSON.parse(res));
+                        response.artists.forEach((artist, index) => artist.recordings = recordingsResponses[index].recordings);
+                        resolve(JSON.stringify(response));
+                    })
+                }).catch((err) => reject(err));
+            } else resolve(resolve(JSON.stringify(response)));
 
         })
     });
@@ -444,4 +446,5 @@ exports.authorOptions = authorOptions;
 exports.authorSkip = authorSkip;
 exports.authorLink = authorLink;
 exports.authorSelect = randomTestAuthorSelect;
+exports.makeMusicBrainzQuery = makeMusicBrainzQuery;
 
