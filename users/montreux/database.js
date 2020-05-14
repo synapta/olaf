@@ -1,4 +1,6 @@
-const request = require('request');
+const request = require('sync-request');
+let   url     = 'https://mjf-database.epfl.ch/exports/d9bc43ed77fc1dfcc405ca8598241a4e';
+let   dump    = null;
 
 class Database {
 
@@ -13,7 +15,10 @@ class Database {
         return [...new Set(array)]
     }
 
-    constructor(dump) {
+    constructor() {
+
+        // Get dump
+        if(!dump) dump = JSON.parse(request('GET', url).getBody('utf8'));
 
         // Store concerts, songs, persons and locations
         this._concerts = this._arrayToObject(dump.concerts);

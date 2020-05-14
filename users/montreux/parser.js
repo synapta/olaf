@@ -1,15 +1,13 @@
 // Requirements
 const fuzz           = require('fuzzball');
 const nodeRequest    = require('request-promise');
-const request        = require('sync-request');
 const Option         = require('../../option').Option;
 const Author         = require('../../author').Author;
 const CryptoJS       = require("crypto-js");
 const Database       = require('./database').Database;
 
 // Initialize driver
-let   url           = 'https://mjf-database.epfl.ch/exports/d9bc43ed77fc1dfcc405ca8598241a4e';
-const driver        = new Database(JSON.parse(request('GET', url).getBody('utf8')));
+const driver        = new Database();
 
 // Configuration
 let config           = null;
