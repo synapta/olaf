@@ -24,13 +24,12 @@ function generateCsv(file, index, callback) {
     // Get options for each artist
     if(slice.length) {
 
-        console.log(`Processing artists from ${index} to ${index + 100}.`);
+        console.log(`Processing artists from ${index} to ${index + 10}.`);
 
-        Promise.all(artists.slice(index, index + 100).map(artist => getArtistOptions(artist.name, false))).then(responses => {
+        Promise.all(artists.slice(index, index + 10).map(artist => getArtistOptions(artist.name, false))).then(responses => {
 
             // Parse each response and enrich artist
             responses = responses.map(response => JSON.parse(response));
-
             responses.forEach((response, i) => {
 
                 let j = i + index;
@@ -38,15 +37,21 @@ function generateCsv(file, index, callback) {
                 artists[j].musicbrainzId = response.artists.length ? response.artists[0].id : '';
                 artists[j].musicbrainzName = response.artists.length ? response.artists[0].name : '';
                 artists[j].musicbrainzBirthDate = (response.artists.length && !!response.artists[0]['life-span'] && !!response.artists[0]['life-span'].begin) ? response.artists[0]['life-span'].begin : '';
+                artists[j].musicbrainzBands = (response.artists.length && !!response.artists[0].relations) ? response.artists[0].relations.filter(rel => rel.type === 'member of band').map(band => band.artist.name).join('; ') : '';
+                artists[j].wikidata = (response.artists.length && !!response.artists[0].relations) ? response.artists[0].relations.filter(rel => rel.type === 'wikidata').map(rel => rel.url.resource).join('; ') : '';
 
                 file.write(Object.values(artists[j]).map(artist => `"${artist}"`).join(',') + '\n');
 
             });
 
-            sleep(5000).then(() => {
-                generateCsv(file, index + 100, callback);
+            sleep(10000).then(() => {
+                generateCsv(file, index + 10, callback);
             });
 
+        }).catch((err) => {
+            sleep(10000).then(() => {
+                generateCsv(file, index, callback);
+            });
         });
     } else callback();
 
@@ -69,7 +74,9 @@ let artists = Object.values(driver.artists).map(artist => {
         instruments: artistDetails.instruments.join('; '),
         musicbrainzId: '',
         musicbrainzName: '',
-        musicbrainzBirthDate: ''
+        musicbrainzBirthDate: '',
+        musicbrainzBands: '',
+        wikidata: ''
     }
 });
 

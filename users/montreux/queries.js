@@ -354,19 +354,22 @@ function makeMusicBrainzQuery(name, recordings=true){
             let requests = response.artists.map(artist => nodeRequest(artistRequest(artist.id)));
 
             // Enrich response object
-            if(recordings) {
-                Promise.all(requests).then((artistsResponses) => {
-                    let requests = response.artists.map(artist => nodeRequest(recordingsRequest(artist.id)));
+            Promise.all(requests).then((artistsResponses) => {
+                let requests = response.artists.map(artist => nodeRequest(recordingsRequest(artist.id)));
+                if(recordings) {
                     Promise.all(requests).then((recordingsResponses) => {
                         recordingsResponses = recordingsResponses.map(res => JSON.parse(res));
                         response.artists = artistsResponses.map(res => JSON.parse(res));
                         response.artists.forEach((artist, index) => artist.recordings = recordingsResponses[index].recordings);
                         resolve(JSON.stringify(response));
-                    })
-                }).catch((err) => reject(err));
-            } else resolve(resolve(JSON.stringify(response)));
+                    }).catch((err) => reject(err));
+                } else {
+                    response.artists = artistsResponses.map(res => JSON.parse(res));
+                    resolve(resolve(JSON.stringify(response)))
+                }
+            }).catch((err) => reject(err));
 
-        })
+        }).catch((err) => reject(err));
     });
 
 }

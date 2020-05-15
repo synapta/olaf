@@ -112,10 +112,6 @@ function parseMusicBrainzBody(body, callback) {
         let wikidataObject = result.relations.filter(rel => rel.type === 'wikidata');
         if(wikidataObject.length) result.wikidata = wikidataObject[0].url.resource;
 
-        console.log(result.bands);
-        console.log(result.events);
-        console.log(result.instruments);
-
         result.titles = result.recordings.map(recording =>  {
             let date = Math.min(...recording.releases.map(rel => rel.date));
             return `${!!date ? date : '-'}, ${recording.title}`
