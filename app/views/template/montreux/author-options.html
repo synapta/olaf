@@ -43,6 +43,30 @@
                 </ul>
             </div>
             {{/musicGenres.length}}
+            {{#instruments.length}}
+            <a class="ui red ribbon label">Strumenti caratteristici</a>
+            <div class="ui items">
+                <ul class="ui bulleted list card-box">
+                    {{#instruments}}
+                    <li>
+                        <div class="item">{{.}}</div>
+                    </li>
+                    {{/instruments}}
+                </ul>
+            </div>
+            {{/instruments.length}}
+            {{#bands.length}}
+            <a class="ui red ribbon label">Gruppi</a>
+            <div class="ui items">
+                <ul class="ui bulleted list card-box">
+                    {{#bands}}
+                    <li>
+                        <div class="item">{{.}}</div>
+                    </li>
+                    {{/bands}}
+                </ul>
+            </div>
+            {{/bands.length}}
             {{#titles.length}}
             <a class="ui red ribbon label">Opere dell'autore</a>
             <div class="ui items">
@@ -63,6 +87,18 @@
                 </div>
             </div>
             {{/titles.length}}
+            {{#exhibitions.length}}
+            <a class="ui red ribbon label">Esibizioni</a>
+            <div class="ui items">
+                <ul class="ui bulleted list card-box">
+                    {{#exhibitions}}
+                    <li>
+                        <div class="item">{{.}}</div>
+                    </li>
+                    {{/exhibitions}}
+                </ul>
+            </div>
+            {{/exhibitions.length}}
             <a class="ui red ribbon label">Esplora in...</a>
             <div class="center aligned card-box">
                 {{#wikidata}}<a href="{{.}}" target="_blank" class="ui center aligned label basic">Fonte: Wikidata</a>{{/wikidata}}
