@@ -95,6 +95,11 @@ function parseMusicBrainzBody(body, callback) {
 
         if(result['begin_area']) result['birth-place'] = result['begin_area']['sort-name'];
         if(result['end_area']) result['death-place'] = result['end_area']['sort-name'];
+        if(result['area']) {
+            if(result.area['iso-3166-1-codes'] && result.area['iso-3166-1-codes'].length)
+                result.areaIso = result.area['iso-3166-1-codes'][0].toLowerCase();
+            result.area = result.area.name;
+        }
 
         let wikidataObject = result.relations.filter(rel => rel.type === 'wikidata');
         if(wikidataObject.length) result.wikidata = wikidataObject[0].url.resource;

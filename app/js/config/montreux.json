@@ -79,6 +79,14 @@
     "image": {
       "input": null,
       "musicbrainz": "image"
+    },
+    "area": {
+      "input": null,
+      "musicbrainz": "area"
+    },
+    "areaIso": {
+      "input": null,
+      "musicbrainz": "areaIso"
     }
   }
 }

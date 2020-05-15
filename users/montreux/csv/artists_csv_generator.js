@@ -60,8 +60,8 @@ let artists = Object.values(driver.artists).map(artist => {
 
     return {
         name: artist.name,
-        firstName: artist.firstName,
-        lastName: artist.lastName,
+        firstName: !!artist.stageName ? artist.stageName : '',
+        lastName: !!artist.stageName ? artist.stageName : '',
         stageName: !!artist.stageName ? artist.stageName : '',
         genres: artistDetails.genres.join('; '),
         dates: artistDetails.exhibitions.map(exhibition => exhibition.split(', ')[0]).join('; '),
