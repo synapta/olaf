@@ -38,7 +38,7 @@
     },
     "exhibitions": {
       "input": "exhibitions",
-      "musicbrainz": null
+      "musicbrainz": "events"
     },
     "birthDate": {
       "input": null,
@@ -70,7 +70,7 @@
     },
     "instruments": {
       "input": "instruments",
-      "musicbrainz": null
+      "musicbrainz": "instruments"
     },
     "gender": {
       "input": null,
@@ -87,6 +87,10 @@
     "areaIso": {
       "input": null,
       "musicbrainz": "areaIso"
+    },
+    "bands": {
+      "input": null,
+      "musicbrainz": "bands"
     }
   }
 }

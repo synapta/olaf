@@ -323,7 +323,7 @@ function makeMusicBrainzQuery(name, recordings=true){
             uri: 'https://musicbrainz.synapta.io/ws/2/artist/' + id,
             qs: {
                 fmt: 'json',
-                inc: 'url-rels+genres'
+                inc: 'url-rels+genres+artist-rels+event-rels+instrument-rels+release-rels'
             },
             headers: {
                 'User-Agent': 'pippo/0.0.1'

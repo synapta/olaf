@@ -101,8 +101,20 @@ function parseMusicBrainzBody(body, callback) {
             result.area = result.area.name;
         }
 
+        // Store band relationships
+        result.bands = result.relations.filter(rel => rel.type === 'member of band').map(band => band.artist.name);
+        result.events = result.relations.filter(rel => rel['target-type'] === 'event').map(event => event.event.name);
+        result.instruments = result.relations.filter(rel => rel.type === 'instrument').map(instrument => instrument.attributes[0]);
+
+        // Remove instruments duplicates
+        result.instruments = [...new Set(result.instruments)];
+
         let wikidataObject = result.relations.filter(rel => rel.type === 'wikidata');
         if(wikidataObject.length) result.wikidata = wikidataObject[0].url.resource;
+
+        console.log(result.bands);
+        console.log(result.events);
+        console.log(result.instruments);
 
         result.titles = result.recordings.map(recording =>  {
             let date = Math.min(...recording.releases.map(rel => rel.date));
