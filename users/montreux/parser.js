@@ -156,21 +156,15 @@ function parseMusicBrainzBody(body, callback) {
 
 }
 
+function getArtist(uri=null) {
+    let driver = new Database();
+    return driver.retrieveArtist(uri);
+}
+
 // Exports
-exports.parseAuthor = (body) => {
-    return parseAuthor(body);
-};
-
-exports.parseAuthorOptions = (author, bodies, callback) => {
-    parseAuthorOptions(author, bodies, callback);
-};
-
-exports.parseOutput = (data) => {
-    return parseOutput(data);
-};
-
-exports.configInit = (configObj) => {
-    configInit(configObj);
-};
-
+exports.parseAuthor = parseAuthor;
+exports.parseAuthorOptions = parseAuthorOptions;
+//exports.parseOutput = parseOutput;
+exports.configInit = configInit;
 exports.config = config;
+exports.getArtist = getArtist;

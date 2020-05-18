@@ -47,6 +47,12 @@ class Database {
 
     }
 
+    retrieveArtist(artist) {
+        // Get random artist or by url
+        if(artist) return this._persons.filter(person => person.url === artist);
+        return Object.values(this._persons)[Math.floor(Math.random()*Object.values(this._persons).length)];
+    }
+
     concertsFromArtist(artist) {
         // Get all concerts related to the artist
         return Object.values(this._concerts).filter(concert => concert.musicians.map(

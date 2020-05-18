@@ -22,64 +22,7 @@ let authorSearch = (nameCombinations) => {
 };
 
 let authorSelect = (authorId) => {
-    return `PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
-            PREFIX schema: <http://schema.org/>
-            PREFIX dcterm: <http://purl.org/dc/terms/>
-            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            PREFIX owl: <http://www.w3.org/2002/07/owl#>
-            PREFIX bookType: <http://dati.cobis.to.it/vocabulary/bookType/>
-            PREFIX olaf: <http://olaf.synapta.io/onto/>
-            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-
-            SELECT ?personURI 
-                   ?personName 
-                   (SAMPLE(?description) as ?description) 
-                   (SAMPLE(?link) as ?link) 
-                   (MIN(xsd:integer(?years)) as ?annoMin)
-                   (MAX(xsd:integer(?years)) as ?annoMax)
-                   (GROUP_CONCAT(DISTINCT(?personRole); separator="###") as ?personRole) 
-                   (GROUP_CONCAT(distinct(?titleFull); separator="###") as ?title) WHERE {
-
-                {
-                    SELECT ?personURI (COUNT(DISTINCT ?contribution) AS ?titlesCount) WHERE {
-
-                        ?contribution bf2:agent ?personURI .
-                        ?instance bf2:instanceOf ?work .
-                        ?work bf2:contribution ?contribution .
-                        ?contribution bf2:agent ?personURI .
-                        
-                        ${authorId ? `
-                            FILTER (?personURI = <http://dati.cobis.to.it/agent/${authorId}>)
-                        ` : `
-                            MINUS {?personURI owl:sameAs ?wd}
-                            MINUS {?personURI cobis:hasViafURL ?vf}
-                            MINUS {?personURI olaf:skipped ?skipped}
-                        `}
-
-                    } GROUP BY ?personURI
-                      ${authorId ? `` : `
-                          ORDER BY DESC(?titlesCount)
-                          LIMIT 1                      
-                          OFFSET ${Math.floor(Math.random() * 49)}
-                      `}
-                }
-
-                ?instance bf2:instanceOf ?work .
-                ?work bf2:contribution ?contribution .
-                ?contribution bf2:agent ?personURI .
-                ?instance bf2:title ?titleURI .
-                ?titleURI rdfs:label ?title .
-                OPTIONAL {?instance cobis:dataNormalizzata ?years .}
-                BIND(CONCAT(IF(BOUND(?years), ?years, "" ) , " ~ " , ?title) as ?titleFull)
-
-                OPTIONAL {?personURI schema:description ?description . }
-                OPTIONAL {?personURI foaf:isPrimaryTopicOf ?link . }
-                OPTIONAL {?personURI schema:name ?personName . }
-                OPTIONAL {?contribution bf2:role/rdfs:label ?personRole . }
-
-            } GROUP BY ?personURI ?personName
-              LIMIT 1`;
+    return 'http://localhost:3646/api/v1/montreux/get-artist/' + (authorId ? authorId : '');
 };
 
 let cobisInsertTimestamp = (authorUri) => {
@@ -409,7 +352,7 @@ function makeWikidataQuery(name, surname) {
 
 }
 
-function randomTestAuthorSelect() {
+/*function randomTestAuthorSelect() {
 
     let authors = [
         {
@@ -439,7 +382,7 @@ function randomTestAuthorSelect() {
 
     return authors[Math.floor(Math.random() * authors.length)]
 
-}
+}*/
 
 
 // Exports
@@ -448,6 +391,6 @@ exports.authorOptions = authorOptions;
 //exports.parseAuthorOptions = parseAuthorOptions;
 exports.authorSkip = authorSkip;
 exports.authorLink = authorLink;
-exports.authorSelect = randomTestAuthorSelect;
+exports.authorSelect = authorSelect;
 exports.makeMusicBrainzQuery = makeMusicBrainzQuery;
 

@@ -100,9 +100,7 @@ module.exports = function(app) {
         nodeRequest(queryAuthor, (err, res, body) => {
 
             // Handle and send author
-            let author = parser.parseAuthor(queryAuthor);
-
-            console.log(author);
+            let author = parser.parseAuthor(JSON.parse(body));
 
             // Query options
             let nameSearch = (author.name || '').trim();
@@ -201,6 +199,7 @@ module.exports = function(app) {
 
     });
 
+    // Beweb APIs
     app.post('/api/v1/:token/add-author-again', (request, response) => {
         // Send requests
         let data = request.body;
@@ -217,5 +216,10 @@ module.exports = function(app) {
             response.json(data);
         });
     });
+
+    // Montreux APIs
+    app.get('/api/v1/montreux/get-artist/:artistUri?', (request, response) => {
+        response.json(parser.getArtist(request.params.artistUri));
+    })
 
 };
