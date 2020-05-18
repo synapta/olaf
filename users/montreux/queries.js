@@ -22,7 +22,7 @@ let authorSearch = (nameCombinations) => {
 };
 
 let authorSelect = (authorId) => {
-    return 'http://localhost:3646/api/v1/montreux/get-artist/' + (authorId ? authorId : '');
+    return 'http://localhost:3646/api/v1/montreux/get-artist/' + (authorId ? encodeURIComponent(authorId) : '');
 };
 
 let cobisInsertTimestamp = (authorUri) => {
@@ -249,7 +249,7 @@ function makeMusicBrainzQuery(name, recordings=true){
 
     let musicBrainzRequest = {
         method: 'GET',
-        uri: 'https://musicbrainz.synapta.io/ws/2/artist/',
+        uri: 'https://musicbrainz.org/ws/2/artist/',
         qs: {
             query: `artist:"${name}"~95`,
             limit: 6,
@@ -263,7 +263,7 @@ function makeMusicBrainzQuery(name, recordings=true){
     let artistRequest = (id) => {
         return {
             method: 'GET',
-            uri: 'https://musicbrainz.synapta.io/ws/2/artist/' + id,
+            uri: 'https://musicbrainz.org/ws/2/artist/' + id,
             qs: {
                 fmt: 'json',
                 inc: 'url-rels+genres+artist-rels+event-rels+instrument-rels+release-rels'
@@ -277,7 +277,7 @@ function makeMusicBrainzQuery(name, recordings=true){
     let recordingsRequest = (id) => {
         return {
             method: 'GET',
-            uri: 'https://musicbrainz.synapta.io/ws/2/recording/',
+            uri: 'https://musicbrainz.org/ws/2/recording/',
             qs: {
                 query: 'arid:' + id,
                 fmt: 'json',

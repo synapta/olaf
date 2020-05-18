@@ -49,7 +49,7 @@ class Database {
 
     retrieveArtist(artist) {
         // Get random artist or by url
-        if(artist) return this._persons.filter(person => person.url === artist);
+        if(artist) return Object.values(this._persons).filter(person => person.url === artist)[0];
         return Object.values(this._persons)[Math.floor(Math.random()*Object.values(this._persons).length)];
     }
 

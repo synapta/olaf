@@ -219,7 +219,8 @@ module.exports = function(app) {
 
     // Montreux APIs
     app.get('/api/v1/montreux/get-artist/:artistUri?', (request, response) => {
-        response.json(parser.getArtist(request.params.artistUri));
+        let artist = parser.getArtist(request.params.artistUri);
+        response.json(artist);
     })
 
 };

@@ -157,7 +157,6 @@ function parseMusicBrainzBody(body, callback) {
 }
 
 function getArtist(uri=null) {
-    let driver = new Database();
     return driver.retrieveArtist(uri);
 }
 
