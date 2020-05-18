@@ -75,11 +75,11 @@ function getAuthorSimilarOptions(author, options, callback){
                 // Highlight similar titles
                 option.titles.forEach((title, index) => {
                     if(similarTitles[index])
-                        option.titles[index] = '⟹' + title;
+                        option.titles[index] = '<b>' + title + '</b>';
                 });
 
                 // Order title by highlighting
-                option.titles = option.titles.sort((a, b) => b.includes('⟹') - a.includes('⟹'));
+                option.titles = option.titles.sort((a, b) => b.includes('<b>') - a.includes('<b>'));
 
             }
 
@@ -177,20 +177,8 @@ function parseViafOptions(body, viafUris) {
 
 
 // Exports
-exports.parseAuthor = (body) => {
-    return parseAuthor(body);
-};
-
-exports.parseAuthorOptions = (author, bodies, callback) => {
-    parseAuthorOptions(author, bodies, callback);
-};
-
-exports.parseOutput = (data) => {
-    return parseOutput(data);
-};
-
-exports.configInit = (configObj) => {
-    configInit(configObj);
-};
-
+exports.parseAuthor = parseAuthor;
+exports.parseAuthorOptions = parseAuthorOptions;
+exports.parseOutput = parseOutput;
+exports.configInit = configInit;
 exports.config = config;
