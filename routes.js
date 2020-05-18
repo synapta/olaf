@@ -1,12 +1,12 @@
 // Requirements
-const express        = require('express');
-const bodyParser     = require('body-parser');
 const nodeRequest    = require('request');
 const pgp            = require('pg-promise')({});
+const pgConnection   = require('./pgConfig').pgConnection;
+const db             = pgp(pgConnection);
+const bewebQueries   = require('./users/beweb/queries');
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
 const Config         = require('./config').Config;
-const pgConnection   = require('./pgConfig').pgConnection;
 const schedule       = require('node-schedule');
 
 // Modules
@@ -15,16 +15,12 @@ let parser           = null;
 let config           = null;
 let configToken      = null;
 
-const db = pgp(pgConnection);
-const bewebQueries = require('./users/beweb/queries');
-
+// Beweb scheduling
 schedule.scheduleJob('21 */4 * * *', function(firedate) {
     console.log(firedate, "checking modifications");
     bewebQueries.getAllIdBeweb(db, function(data) {
         let parseAnother = function() {
-            if (data.length === 0 ) {
-                return;
-            }
+            if (data.length === 0 ) return;
             let record = data.pop();
             bewebQueries.checkWikidataModification(db, record.id_beweb, function(data) {
                 setTimeout(function(){ parseAnother(); }, 10000); 
@@ -34,14 +30,13 @@ schedule.scheduleJob('21 */4 * * *', function(firedate) {
     })
 });
 
-
 // Token validation
 function validateToken(token) {
 
     // Get valid tokens
     let validTokens = ['cobis', 'aaso', 'amt', 'cai', 'cmus', 'dssp',
                        'fga', 'ibmp', 'inaf', 'inrim', 'oato', 'plev',
-                       'slvm', 'toas', 'beweb'];
+                       'slvm', 'toas', 'beweb', 'montreux'];
 
     // Check if token is valid
     return validTokens.includes(token);
@@ -49,12 +44,6 @@ function validateToken(token) {
 }
 
 module.exports = function(app) {
-
-    // Setting up express
-    app.use('/', express.static('./app'));
-
-    app.use(bodyParser.urlencoded({extended: false}));
-    app.use(bodyParser.json());
 
     // Token middleware
     app.all(['/api/v1/:token/*', '/get/:token/*'], (request, response, next) => {
@@ -109,11 +98,13 @@ module.exports = function(app) {
 
         // Make request
         nodeRequest(queryAuthor, (err, res, body) => {
+
             // Handle and send author
             let author = parser.parseAuthor(JSON.parse(body));
 
             // Query options
-            let requests = queries.authorOptions((author.name || '').trim(), '');
+            let nameSearch = (author.name || '').trim();
+            let requests = queries.authorOptions(nameSearch, '');
  
             // Make options queries
             Promise.all(requests).then((bodies) => {
@@ -195,8 +186,7 @@ module.exports = function(app) {
             if(err) throw err;
 
             // Send back Beweb response
-            if (typeof body === 'string')
-                body = JSON.parse(body)
+            if (typeof body === 'string') body = JSON.parse(body);
             response.json(body);
 
         });
@@ -215,6 +205,7 @@ module.exports = function(app) {
 
     });
 
+    // Beweb APIs
     app.post('/api/v1/:token/add-author-again', (request, response) => {
         // Send requests
         let data = request.body;
@@ -231,5 +222,11 @@ module.exports = function(app) {
             response.json(data);
         });
     });
+
+    // Montreux APIs
+    app.get('/api/v1/montreux/get-artist/:artistUri?', (request, response) => {
+        let artist = parser.getArtist(request.params.artistUri);
+        response.json(artist);
+    })
 
 };

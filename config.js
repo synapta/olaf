@@ -99,6 +99,17 @@ class Config {
 
     }
 
+    getMusixBrainzDictionary() {
+
+        let musicBrainzDictionary = {};
+
+        // Map config fields to get dictionary
+        Object.keys(this.config.fields).map(el => musicBrainzDictionary[el] = this.config.fields[el].musicbrainz);
+
+        return musicBrainzDictionary;
+
+    }
+
     getToFormatFields() {
         return Object.keys(this.config.fields).filter(el => this.config.fields[el].format)
     }
