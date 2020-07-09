@@ -53,7 +53,7 @@ class Option {
                 // Parse dates
                 else if(key === 'birthDate' || key === 'deathDate')
                     // Handle dates
-                    this[key] = this[key].substr(0, 10);
+                    this[key] = this[key].substr(0, 10).replace(/-/g, "/");
 
                 else if(key.includes('variant'))
                     // Handle variants
