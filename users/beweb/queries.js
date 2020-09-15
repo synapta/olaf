@@ -232,7 +232,7 @@ let wikidataQuery = (options) => {
     
       OPTIONAL {
         ?i wdt:P213 ?isniraw
-        BIND(concat('http://www.isni.org/', STR(?isniraw)) as ?ISNI)
+        BIND(concat('https://isni.oclc.org/xslt/DB=1.2//CMD?ACT=SRCH&IKT=8006&TRM=ISN%3A', STR(?isniraw)) as ?ISNI)
       }
     
       MINUS{
