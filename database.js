@@ -26,7 +26,7 @@ function getJsonDataType(name) {
     }
 }
 
-const User = sequelize.define({
+const User = sequelize.define('User', {
     user_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -55,7 +55,7 @@ const User = sequelize.define({
     timestamps: false
 });
 
-const Job = sequelize.define({
+const Job = sequelize.define('Job', {
     job_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -81,14 +81,14 @@ const Job = sequelize.define({
         defaultValue: 'once'
     },
     last_update: {
-        type: DataTypes.DATETIME
+        type: DataTypes.DATE
     }
 }, {
     tableName: 'jobs',
     timestamps: false
 });
 
-const Source = sequelize.define({
+const Source = sequelize.define('Source', {
     source_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -109,7 +109,7 @@ const Source = sequelize.define({
         defaultValue: 'once'
     },
     last_update: {
-        type: DataTypes.DATETIME
+        type: DataTypes.DATE
     }
 }, {
     tableName: 'sources',
@@ -128,7 +128,7 @@ Source.belongsTo(Job, {
     }
 });
 
-const Item = sequelize.define({
+const Item = sequelize.define('Item', {
     item_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -144,7 +144,7 @@ const Item = sequelize.define({
     },
     item_body: getJsonDataType('item_body'),
     lock_timestamp: {
-        type: DataTypes.DATETIME
+        type: DataTypes.DATE
     },
     is_processed: {
         type: DataTypes.BOOLEAN,
@@ -157,7 +157,7 @@ const Item = sequelize.define({
         defaultValue: false
     },
     last_update: {
-        type: DataTypes.DATETIME
+        type: DataTypes.DATE
     }
 }, {
     tableName: 'items',
@@ -176,7 +176,7 @@ Item.belongsTo(Job, {
     }
 });
 
-const Candidate = sequelize.define({
+const Candidate = sequelize.define('Candidate', {
     candidate_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -207,7 +207,7 @@ const Candidate = sequelize.define({
         defaultValue: false
     },
     last_update: {
-        type: DataTypes.DATETIME
+        type: DataTypes.DATE
     }
 }, {
     tableName: 'candidates',
@@ -226,7 +226,7 @@ Candidate.belongsTo(Item, {
     }
 });
 
-const Action = sequelize.define({
+const Action = sequelize.define('Action', {
     action_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -255,7 +255,7 @@ const Action = sequelize.define({
         defaultValue: false
     },
     timestamp: {
-        type: DataTypes.DATETIME,
+        type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW
     }
