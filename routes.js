@@ -148,6 +148,18 @@ module.exports = function(app, passport = null, driver = null) {
     */
 
     // Frontend
+    app.get('/', (request, response) => {
+        response.sendFile('index.html', { root: __dirname + '/app' });
+    });
+
+    app.get('/newjob', (request, response) => {
+        response.sendFile('new-job.html', { root: __dirname + '/app/views' });
+    });
+
+    app.get('/job/:jobName', (request, response) => {
+        response.sendFile('job.html', { root: __dirname + '/app/views' });
+    });
+
     app.get(['/get/:token/author/', '/get/:token/authorityfile/', '/get/:token/author/:authorId', '/get/:token/authorityfile/:authorId'], (request, response) => {
         response.sendFile('author.html', {root: __dirname + '/app/views'});
     });

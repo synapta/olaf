@@ -1,0 +1,107 @@
+:root {
+  --primary: #3D405B;
+  --primary-rgb: 61,64,91;
+  --primary-contrast: #ffffff;
+  --primary-contrast-rgb: 255,255,255;
+  --primary-shade: #363850;
+  --primary-tint: #50536b;
+
+  --secondary: #E07A5F;
+  --secondary-rgb: 224,122,95;
+  --secondary-contrast: #000000;
+  --secondary-contrast-rgb: 0,0,0;
+  --secondary-shade: #c56b54;
+  --secondary-tint: #e3876f;
+
+  --tertiary: #F4F1DE;
+  --tertiary-rgb: 244,241,222;
+  --tertiary-contrast: #000000;
+  --tertiary-contrast-rgb: 0,0,0;
+  --tertiary-shade: #d7d4c3;
+  --tertiary-tint: #f5f2e1;
+
+  --success: #2dd36f;
+  --success-rgb: 45,211,111;
+  --success-contrast: #ffffff;
+  --success-contrast-rgb: 255,255,255;
+  --success-shade: #28ba62;
+  --success-tint: #42d77d;
+
+  --warning: #ffc409;
+  --warning-rgb: 255,196,9;
+  --warning-contrast: #000000;
+  --warning-contrast-rgb: 0,0,0;
+  --warning-shade: #e0ac08;
+  --warning-tint: #ffca22;
+
+  --danger: #eb445a;
+  --danger-rgb: 235,68,90;
+  --danger-contrast: #ffffff;
+  --danger-contrast-rgb: 255,255,255;
+  --danger-shade: #cf3c4f;
+  --danger-tint: #ed576b;
+
+  --dark: #222428;
+  --dark-rgb: 34,36,40;
+  --dark-contrast: #ffffff;
+  --dark-contrast-rgb: 255,255,255;
+  --dark-shade: #1e2023;
+  --dark-tint: #383a3e;
+
+  --medium: #92949c;
+  --medium-rgb: 146,148,156;
+  --medium-contrast: #ffffff;
+  --medium-contrast-rgb: 255,255,255;
+  --medium-shade: #808289;
+  --medium-tint: #9d9fa6;
+
+  --light: #f4f5f8;
+  --light-rgb: 244,245,248;
+  --light-contrast: #000000;
+  --light-contrast-rgb: 0,0,0;
+  --light-shade: #d7d8da;
+  --light-tint: #f5f6f9;
+}
+
+
+.primary-bg {
+  background-color: var(--primary) !important;
+  color: var(--primary-contrast) !important;
+}
+
+.primary-bg h1,
+.primary-bg h2,
+.primary-bg h3,
+.primary-bg h4,
+.primary-bg h5,
+.primary-bg p {
+  color: var(--primary-contrast) !important;
+}
+
+.secondary-bg {
+  background-color: var(--secondary) !important;
+  color: var(--secondary-contrast) !important;
+}
+
+.secondary-bg h1,
+.secondary-bg h2,
+.secondary-bg h3,
+.secondary-bg h4,
+.secondary-bg h5,
+.secondary-bg p {
+  color: var(--secondary-contrast) !important;
+}
+
+.tertiary-bg {
+  background-color: var(--tertiary) !important;
+  color: var(--tertiary-contrast) !important;
+}
+
+.tertiary-bg h1,
+.tertiary-bg h2,
+.tertiary-bg h3,
+.tertiary-bg h4,
+.tertiary-bg h5,
+.tertiary-bg p {
+  color: var(--tertiary-contrast) !important;
+}
