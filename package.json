@@ -35,7 +35,14 @@
     "sequelize": "^6.3.5",
     "sqlite3": "^5.0.0",
     "sugar": "latest",
-    "sync-request": "latest",
-    "underscore": "^1.9.1"
+    "underscore": "^1.9.1",
+    "mongodb": "latest",
+    "bcrypt": "latest",
+    "passport": "latest",
+    "passport-local": "latest",
+    "passport-auth-token": "latest",
+    "connect-flash": "latest",
+    "express-session": "latest",
+    "nodemailer": "latest"
   }
 }

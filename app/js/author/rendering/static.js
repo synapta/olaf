@@ -1,8 +1,35 @@
 // Render navbar
 function renderNavbar() {
     $.get('/views/template/author/navbar.html', (template) => {
-        $('.navbar').html(template).promise().done(showUserToken(params.userToken));
+        //let output = Mustache.render(template, user);
+        $('.navbar').html(template).promise().done(() => {
+            // Show user token
+            showUserToken(params.userToken);
+            // Append username
+            if(user)
+                $('.navbar > .header').append(`<span style="color: black"> - Benvenuto ${user.username}!</span>`)
+        });
     })
+}
+
+// Render verification message
+function renderVerificationMessage(){
+
+    // Get queries from url
+    let queries = getQueriesFromUrl(window.location.href);
+
+    // Store message
+    let message =
+        `<div class="ui positive message">
+            <i onclick="$(this).parent().remove()" class="close icon"></i>
+            <div class="header">
+                Hai verificato il tuo account con successo
+            </div>
+        </div>`;
+
+    if('verified' in queries)
+        $('.container').prepend(message);
+
 }
 
 // Render user token

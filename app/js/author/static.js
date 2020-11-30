@@ -8,6 +8,9 @@ let config = null;
 // Extract and store params from url
 let params = parseUrl(window.location.href, {'userToken': 4, 'authorId': 6});
 
+// Store logged user
+let user = null;
+
 // Selection and matching
 let selectedOptions = {};
 let selectedFields = {};
@@ -333,42 +336,51 @@ function authorSend(){
 $(document).ready(() => {
     // Load alternative scripts
     _loadAlternativeScripts(() => {
+        $.get('/api/v1/' + params.userToken + '/logged-user', (loggedUser) => {
 
-        // Render navbar
-        renderNavbar();
+            // Store logged user
+            if(loggedUser)
+                user = loggedUser;
 
-        // Load configuration
-        $.get(`/api/v1/${params.userToken}/config/`, (json) => {
+            // Render navbar
+            renderNavbar();
+            renderVerificationMessage();
 
-            // Store config
-            config = json;
+            // Load configuration
+            $.get(`/api/v1/${params.userToken}/config/`, (json) => {
 
-            // Get current author and its options
-            $.ajax({
+                // Store config
+                config = json;
 
-                url: '/api/v1/' + params.userToken + '/author/' + (params.authorId ? params.authorId : ''),
-                method: 'GET',
-                dataType: 'json',
+                // Get current author and its options
+                $.ajax({
 
-                success: response => {
+                    url: '/api/v1/' + params.userToken + '/author/' + (params.authorId ? params.authorId : ''),
+                    method: 'GET',
+                    dataType: 'json',
 
-                    // Store author response
-                    author = response.author;
-                    options = response.options;
+                    success: response => {
 
-                    // Render author card
-                    renderAuthorCard(author);
-                    // Render author options
-                    renderAuthorOptions({'options': options});
+                        // Store author response
+                        author = response.author;
+                        options = response.options;
 
-                    // Check empty response
-                    if(options.length === 0) {
-                        alert(`Non sono presenti match per l'autore ${author.name}.\nVerrai reindirizzato verso il prossimo autore.`);
-                        authorSkip(author.uri);
+                        // Render author card
+                        renderAuthorCard(author);
+                        // Render author options
+                        renderAuthorOptions({'options': options});
+
+
+                        // Check empty response
+                        if (options.length === 0) {
+                            alert('Non sono presenti match per questo autore.');
+                            authorSkip(author.uri);
+                        }
+
                     }
-
-                }
+                });
             });
+
         });
 
     });
