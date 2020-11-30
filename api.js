@@ -1,5 +1,25 @@
+const isValidUTF8 = require('utf-8-validate');
+const fs = require('fs');
+const tmp = require('tmp');
+
 const { User, Job, Source, Item, Candidate, Action } = require('./database');
 const { JobTypes, SourceTypes } = require('./config');
+
+// Upload
+const uploadFile = async (req, res) => {
+    if (req.is('text/csv')) {
+        if (isValidUTF8(req.body)) {
+            const file = tmp.fileSync();
+            fs.writeSync(file.fd, req.body);
+            fs.closeSync(file.fd);
+            res.json({ "path": file.name });
+        } else {
+            res.sendStatus(400);
+        }
+    } else {
+        res.sendStatus(412);
+    }
+}
 
 // Job
 const getJob = async (req, res) => {
@@ -78,6 +98,7 @@ const deleteSource = async (req, res) => {
 }
 
 module.exports = {
+    uploadFile,
     getJob,
     createJob,
     getSource,
