@@ -1,5 +1,9 @@
 // Requirements
+const bodyParser = require('body-parser');
 const api = require('./api');
+
+const rawParser = bodyParser.raw({ type: '*/*', limit: '100mb' });
+
 /*
 const nodeRequest    = require('request');
 const promiseRequest = require('request-promise');
@@ -98,7 +102,7 @@ function setupRoutines(driver) {
 }
 */
 
-module.exports = function(app, passport = null, driver = null) {
+module.exports = function (app, passport = null, driver = null) {
 
     /*
     // Token middleware
@@ -149,21 +153,26 @@ module.exports = function(app, passport = null, driver = null) {
 
     // Frontend
     app.get(['/get/:token/author/', '/get/:token/authorityfile/', '/get/:token/author/:authorId', '/get/:token/authorityfile/:authorId'], (request, response) => {
-        response.sendFile('author.html', {root: __dirname + '/app/views'});
+        response.sendFile('author.html', { root: __dirname + '/app/views' });
     });
 
     app.get('/get/:token/login', (request, response) => {
-        response.sendFile('login.html', {root: __dirname + '/app/views'});
+        response.sendFile('login.html', { root: __dirname + '/app/views' });
     });
 
     app.get('/get/:token/user-verification', (request, response) => {
-        response.sendFile('user-verification.html', {root: __dirname + '/app/views'});
+        response.sendFile('user-verification.html', { root: __dirname + '/app/views' });
     });
 
     app.get('/get/:token/author-list/', (request, response) => {
         if (request.params.token === 'beweb') {
-            response.sendFile('author-list.html', {root: __dirname + '/app/views'});
+            response.sendFile('author-list.html', { root: __dirname + '/app/views' });
         }
+    });
+
+    // Upload
+    app.post('/api/v2/upload', rawParser, (req, res) => {
+        api.uploadFile(req, res);
     });
 
     // Job

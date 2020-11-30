@@ -15,7 +15,7 @@ const app = express();
 app.use(morgan('common'));
 app.use('/', express.static('./app'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+//app.use(bodyParser.urlencoded({extended: false}));
 //app.use(session({secret: 'synapta'}));
 //app.use(passport.initialize());
 //app.use(passport.session());
