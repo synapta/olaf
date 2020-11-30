@@ -5,6 +5,7 @@ const fs             = require('fs');
 const schedule       = require('node-schedule');
 const Config         = require('./config').Config;
 
+
 // Modules
 let queries          = null;
 let parser           = null;
@@ -13,6 +14,24 @@ let config           = null;
 let configToken      = null;
 let mailer           = null;
 let enrichments      = null;
+
+const db = pgp(pgConnection);
+const bewebQueries = require('./users/beweb/queries');
+
+schedule.scheduleJob('21 4 * * *', function(firedate) {
+
+    console.log(firedate, "checking modifications");
+    bewebQueries.getAllIdBeweb(db, function(data) {
+        let parseAnother = function() {
+            if (data.length === 0 ) return;
+            let record = data.pop();
+            bewebQueries.checkWikidataModification(db, record.id_beweb, function(data) {
+                setTimeout(function(){ parseAnother(); }, 10000); 
+            });
+        };
+        parseAnother();
+    })
+});
 
 // Token validation
 function validateToken(token) {
@@ -28,6 +47,7 @@ function validateToken(token) {
 }
 
 function loginToken(token) {
+
 
     // Get tokens that need login
     let loginTokens = ['arco', 'arco-things'];
@@ -278,6 +298,7 @@ module.exports = function(app, passport = null, driver = null) {
                     parser.mergeOptionsAndMatches(validationFields.options, validationFields.matches);
                     response.json({author: validationFields.author, options: validationFields.options});
                 }
+
             });
         }
 
@@ -318,6 +339,12 @@ module.exports = function(app, passport = null, driver = null) {
         if(configToken !== 'arco')
             requests = requests.map(req => promiseRequest(req));
 
+        // delete Cobis cache
+        let cobisID = request.body.authorUri.split("/").pop();
+        nodeRequest.get("https://dati.cobis.to.it/api/cache/clear/" + cobisID, (err,res,body) => {
+            console.log(body)
+        });
+
         // Send requests
         Promise.all(requests).then((data) => {
             // Send response
@@ -330,24 +357,24 @@ module.exports = function(app, passport = null, driver = null) {
 
         let output = parser.parseOutput(request.body);
         output['Idrecord'] = request.params.uri;
+        let requests = queries.authorLink(output);
 
         // if wikidata is linked to a AFXD resource we save the query response in the database.
         if (output['Wikidata']) {
             queries.storeWikidataInfo(db, output);
         }
-
-        nodeRequest.post({
-            url: queries.authorLink(output)
-        }, (err, res, body) => {
+        
+        // Map requests to make Promise
+        nodeRequest(requests, (err, res, body)=>{
 
             // Handle error
             if(err) throw err;
 
             // Send back Beweb response
-            response.json(JSON.parse(body));
+            if (typeof body === 'string') body = JSON.parse(body);
+            response.json(body);
 
         });
-
     });
 
     app.post('/api/v1/:token/author-skip/', (request, response) => {
@@ -378,6 +405,7 @@ module.exports = function(app, passport = null, driver = null) {
         })
     });
 
+
     app.post('/api/v1/:token/add-author-again', (request, response) => {
         // Send requests
         let data = request.body;
@@ -394,5 +422,11 @@ module.exports = function(app, passport = null, driver = null) {
             response.json(data);
         });
     });
+
+    // Montreux APIs
+    app.get('/api/v1/montreux/get-artist/:artistUri?', (request, response) => {
+        let artist = parser.getArtist(request.params.artistUri);
+        response.json(artist);
+    })
 
 };

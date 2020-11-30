@@ -150,7 +150,6 @@ function authorMatch(){
         renderAuthorMatchesContainer(author, params.userToken, Object.values(selectedOptions), () => {
             renderAuthorMatches();
         });
-
     }
 }
 
@@ -385,6 +384,7 @@ $(document).ready(() => {
                                     authorSkip(author.uri);
                                 }
                             }
+
                         }
                     });
                 });

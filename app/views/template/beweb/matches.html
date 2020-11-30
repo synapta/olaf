@@ -38,7 +38,7 @@
                             <td>
                                 {{#value}}
                                     <div class="label-wrapper">
-                                        <a style="{{#parseImage}}{{.}}{{/parseImage}}" data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                                        <a style="{{#parseImage}}{{.}}{{/parseImage}}" data-label="{{field}}" data-value="{{.}}" onclick='matchField("{{field}}", "{{.}}")' class="ui label field_selection">
                                             <i style="margin-right: 5px" class="fas fa-plus"></i>
                                             {{.}}
                                         </a>
@@ -89,7 +89,7 @@
                                 <td>
                                     {{#value}}
                                         <div class="label-wrapper">
-                                            <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                                            <a data-label="{{field}}" data-value="{{.}}" onclick='matchField("{{field}}", "{{.}}")' class="ui label field_selection">
                                                 <i style="margin-right: 5px" class="fas fa-plus"></i>
                                                 {{.}}
                                             </a>
@@ -139,7 +139,7 @@
                                 <td>
                                     {{#value}}
                                         <div class="label-wrapper">
-                                            <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                                            <a data-label="{{field}}" data-value="{{.}}" onclick='matchField("{{field}}", "{{.}}")' class="ui label field_selection">
                                                 <i style="margin-right: 5px" class="fas fa-plus"></i>
                                                 {{.}}
                                             </a>
@@ -177,7 +177,7 @@
                     <td valign="top" id="{{label}}">
 
                         <div style="margin-bottom: 10px;">
-                            <div onclick="addNewField('{{label}}')" class="ui mini green icon button add-new-field">
+                            <div onclick='addNewField("{{label}}")' class="ui mini green icon button add-new-field">
                                 <i class="fas fa-plus"></i>
                             </div>
                             <b>{{dictionary}}</b>
@@ -190,7 +190,7 @@
                     <td>
                         {{#value}}
                             <div class="label-wrapper">
-                                <a data-label="{{field}}" data-value="{{.}}" onclick="matchField('{{field}}', '{{.}}')" class="ui label field_selection">
+                                <a data-label="{{field}}" data-value="{{.}}" onclick='matchField("{{field}}", "{{.}}")' class="ui label field_selection">
                                     <i style="margin-right: 5px" class="fas fa-plus"></i>
                                     {{.}}
                                 </a>

@@ -213,12 +213,15 @@ function _renderLinkIcon(render, text) {
 
     // Store rendered text
     let renderedText = render(text);
+    if(renderedText.match(/.*:\shttp/gmi))
+        renderedText = renderedText.split(': ')[1];
 
     // Render link icon in case of link
     if(renderedText.includes('http'))
-        return `<a class="wrapper_link" target="_blank" href="${render(text)}"><i class="fas fa-external-link-alt"></i></a>`;
+        return `<a class="wrapper_link" target="_blank" href="${renderedText}"><i class="fas fa-external-link-alt"></i></a>`;
 
     return ''
+
 }
 
 function _renderImage(render, text) {

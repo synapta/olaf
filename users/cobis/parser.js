@@ -40,10 +40,15 @@ function getAuthorSimilarOptions(author, options, callback){
     // Parse all options
     options.forEach((option) => {
         if(author.titles && author.titles.length > 0 && option.titles) {
-            if (!Array.isArray(author.titles)) {
-                author.titles = [author.titles]
 
-            }
+            // Handle non-array titles
+            if (!Array.isArray(author.titles))
+                author.titles = [author.titles];
+
+            // Similar authors collection and count
+            let similarTitles = [];
+            let similarCount = 0;
+
             // Match with author titles
             author.titles.forEach((title) => {
                 if (title.length > 0) {
@@ -57,15 +62,70 @@ function getAuthorSimilarOptions(author, options, callback){
                         if (result.length > 0)
                         // Set option suggested
                             option.setOptionAsSuggested();
+
                     });
+
+                    // Count similar results
+                    let isSimilar = results.map((result) => result.length > 0).some(() => true);
+                    similarTitles.push(isSimilar);
+                    similarCount = similarCount + isSimilar;
+
                 }
             });
+
+            if(similarCount > 0) {
+
+                // Set current option as suggest
+                option.setOptionAsSuggested(similarCount);
+
+                // Highlight similar titles
+                option.titles.forEach((title, index) => {
+                    if(similarTitles[index])
+                        option.titles[index] = '<b>' + title + '</b>';
+                });
+
+                // Order title by highlighting
+                option.titles = option.titles.sort((a, b) => b.includes('<b>') - a.includes('<b>'));
+
+            }
+
         }
     });
 
     options = options.sort((a, b) => (b.suggested - a.suggested));
     // Callback suggested options
     callback(options);
+
+}
+
+function parseOutput(data){	
+
+    let output = {};	
+    let outputDictionary = config.getInputDictionary();	
+    let configFields = config.getConfig().fields;	
+
+    // Translate data output to Cobis dictionary	
+    Object.keys(data).map((field) => {	
+        if((configFields[field].limit === null || configFields[field].limit > 1) && !Array.isArray(data[field]))	
+            data[field] = [data[field]];	
+        output[outputDictionary[field]] = data[field];	
+    });	
+
+    // Get composite fields	
+    Object.keys(configFields).filter(field => configFields[field].composite).forEach(compositeField => {	
+        // Initialize output composite object	
+        output[outputDictionary[compositeField]] = [];	
+        // Populate output composite object and remove unnecessary composite fields	
+        Object.keys(data).filter(field => field.includes(compositeField)).map(field => {	
+            if((configFields[field].limit === null || configFields[field].limit > 1) && !Array.isArray(data[field]))	
+                data[field] = [data[field]];	
+            let subfieldKey = field.replace(compositeField, '').toLowerCase();	
+            output[outputDictionary[compositeField]].push({[subfieldKey]: data[field]});	
+            delete output[outputDictionary[field]];	
+        });	
+    });	
+
+    return output;	
 
 }
 
@@ -125,20 +185,8 @@ function parseViafOptions(body, viafUris) {
 
 
 // Exports
-exports.parseAuthor = (body) => {
-    return parseAuthor(body);
-};
-
-exports.parseAuthorOptions = (author, bodies, callback) => {
-    parseAuthorOptions(author, bodies, callback);
-};
-
-exports.parseOutput = (data) => {
-    return parseOutput(data);
-};
-
-exports.configInit = (configObj) => {
-    configInit(configObj);
-};
-
+exports.parseAuthor = parseAuthor;
+exports.parseAuthorOptions = parseAuthorOptions;
+exports.parseOutput = parseOutput;
+exports.configInit = configInit;
 exports.config = config;
