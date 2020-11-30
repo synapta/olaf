@@ -1,7 +1,21 @@
+const JobTypes = [
+    { alias: "xxx", description: "Example of job type" }
+];
+
+const SourceTypes = [
+    { alias: "csv", description: "Upload a CSV file" }
+];
+
+module.exports = {
+    JobTypes,
+    SourceTypes
+}
+
 /**
  * A class to parse user configurations
  * **/
 
+ /*
 class Config {
 
     constructor(config) {
@@ -122,3 +136,4 @@ class Config {
 
 // Exports
 exports.Config = Config;
+*/
