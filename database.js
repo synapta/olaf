@@ -1,6 +1,8 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize('sqlite:db.sqlite');
 
+const { JobTypes, SourceTypes } = require('./config');
+
 function getJsonDataType(name) {
     return {
         type: DataTypes.TEXT,
@@ -68,17 +70,32 @@ const Job = sequelize.define('Job', {
     alias: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
+        unique: true,
+        validate: {
+            isAlpha: true,
+            isLowercase: true
+        }
     },
     job_type: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            isJobType(value) {
+                const found = JobTypes.some(el => el.alias === value);
+                if (!found) {
+                    throw new Error('Job type is not valid!');
+                }
+            }
+        }
     },
     job_config: getJsonDataType('job_config'),
     update_policy: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'once'
+        defaultValue: 'once',
+        validate: {
+            isIn: [['once']]
+        }
     },
     last_update: {
         type: DataTypes.DATE
@@ -100,13 +117,24 @@ const Source = sequelize.define('Source', {
     },
     source_type: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            isSourceType(value) {
+                const found = SourceTypes.some(el => el.alias === value);
+                if (!found) {
+                    throw new Error('Source type is not valid!');
+                }
+            }
+        }
     },
     source_config: getJsonDataType('source_config'),
     update_policy: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'once'
+        defaultValue: 'once',
+        validate: {
+            isIn: [['once']]
+        }
     },
     last_update: {
         type: DataTypes.DATE
