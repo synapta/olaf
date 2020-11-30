@@ -14,7 +14,7 @@ const getJob = async (req, res) => {
             res.sendStatus(400);
             return;
         }
-        const job = await Job.findByPk(jobId);
+        const job = await Job.findOne({ where: { job_id: jobId }, include: Source });
         if (job === null) {
             res.sendStatus(404);
         } else {
