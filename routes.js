@@ -156,7 +156,11 @@ module.exports = function (app, passport = null, driver = null) {
         response.sendFile('index.html', { root: __dirname + '/app' });
     });
 
-    app.get('/newjob', (request, response) => {
+    app.get('/login', (request, response) => {
+        response.sendFile('login.html', { root: __dirname + '/app/views' });
+    });
+
+    app.get('/new-job', (request, response) => {
         response.sendFile('new-job.html', { root: __dirname + '/app/views' });
     });
 

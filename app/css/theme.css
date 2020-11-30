@@ -1,10 +1,10 @@
 :root {
-  --primary: #3D405B;
-  --primary-rgb: 61,64,91;
+  --primary: #335c67;
+  --primary-rgb: 51,92,103;
   --primary-contrast: #ffffff;
   --primary-contrast-rgb: 255,255,255;
-  --primary-shade: #363850;
-  --primary-tint: #50536b;
+  --primary-shade: #2d515b;
+  --primary-tint: #476c76;
 
   --secondary: #E07A5F;
   --secondary-rgb: 224,122,95;
@@ -63,10 +63,21 @@
   --light-tint: #f5f6f9;
 }
 
+body.logged .not-logged-element {
+  display: none !important;
+}
+
+body.not-logged .logged-element {
+  display: none !important;
+}
 
 .primary-bg {
   background-color: var(--primary) !important;
   color: var(--primary-contrast) !important;
+}
+
+.primary-bg.border {
+  border: 1px solid var(--primary-shade) !important;
 }
 
 .primary-bg h1,
@@ -74,8 +85,13 @@
 .primary-bg h3,
 .primary-bg h4,
 .primary-bg h5,
-.primary-bg p {
+.primary-bg p,
+.primary-bg a {
   color: var(--primary-contrast) !important;
+}
+
+.primary-color {
+  color: var(--primary) !important;
 }
 
 .secondary-bg {
@@ -83,13 +99,22 @@
   color: var(--secondary-contrast) !important;
 }
 
+.secondary-bg.border {
+  border: 1px solid var(--secondary-shade) !important;
+}
+
 .secondary-bg h1,
 .secondary-bg h2,
 .secondary-bg h3,
 .secondary-bg h4,
 .secondary-bg h5,
-.secondary-bg p {
+.secondary-bg p,
+.secondary-bg a {
   color: var(--secondary-contrast) !important;
+}
+
+.secondary-color {
+  color: var(--secondary) !important;
 }
 
 .tertiary-bg {
@@ -97,11 +122,20 @@
   color: var(--tertiary-contrast) !important;
 }
 
+.tertiary-bg.border {
+  border: 1px solid var(--tertiary-shade) !important;
+}
+
 .tertiary-bg h1,
 .tertiary-bg h2,
 .tertiary-bg h3,
 .tertiary-bg h4,
 .tertiary-bg h5,
-.tertiary-bg p {
+.tertiary-bg p,
+.tertiary-bg a {
   color: var(--tertiary-contrast) !important;
+}
+
+.tertiary-color {
+  color: var(--tertiary) !important;
 }

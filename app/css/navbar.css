@@ -10,6 +10,12 @@ body > .ui.container {
   padding: .012em;
 }
 
+.navbar-logo {
+  width: 25px !important;
+  height: auto !important;
+  margin-right: 5px !important;
+}
+
 /* Nav */
 .ui.fixed.borderless.menu {
   background-color: var(--primary);

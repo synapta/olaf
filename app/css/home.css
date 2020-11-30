@@ -1,5 +1,10 @@
 .masthead.segment {
-  min-height: 700px;
+  min-height: 600px;
+  padding: 1em 0em;
+}
+
+body.not-logged .masthead.segment {
+  min-height: 800px;
   padding: 1em 0em;
 }
 
@@ -21,4 +26,12 @@
 .masthead h2 {
   font-size: 1.7em;
   font-weight: normal;
+}
+
+.masthead .cta-btn > span {
+  margin-right: 5px;
+}
+
+#jobs {
+  margin-bottom: 3rem;
 }

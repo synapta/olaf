@@ -8,7 +8,8 @@ getText('/views/template/navbar.html').then(template => {
 getText('/views/template/footer.html').then(template => {
   const footerContainer = document.getElementById('footer');
   if (footerContainer) {
-    footerContainer.innerHTML = template;
+    const out = Mustache.render(template, { currentYear: new Date().getFullYear() })
+    footerContainer.innerHTML = out;
   };
 });
 
