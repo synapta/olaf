@@ -179,21 +179,25 @@ module.exports = function(app, passport = null, driver = null) {
     });
 
     // Job
+    app.post('/api/v2/job', (req, res) => {
+        api.createJob(req, res);
+    });
+
     app.get('/api/v2/job/:id', (req, res) => {
         api.getJob(req, res);
     });
 
-    app.put('/api/v2/job', (req, res) => {
-        api.createJob(req, res);
-    });
-
     // Source
-    app.get('/api/v2/source/:id', (req, res) => {
-        api.getSourceByJob(req, res);
+    app.post('/api/v2/source', (req, res) => {
+        api.createSource(req, res);
     });
 
-    app.put('/api/v2/source', (req, res) => {
-        api.createSource(req, res);
+    app.get('/api/v2/source/:id', (req, res) => {
+        api.getSource(req, res);
+    });
+
+    app.delete('/api/v2/source/:id', (req, res) => {
+        api.deleteSource(req, res);
     });
 
     /*
