@@ -34,20 +34,20 @@ const createJob = async (req, res) => {
 }
 
 // Source
-const getSourceByJob = async (req, res) => {
+const getSource = async (req, res) => {
     if (req.params.id === '_types') {
         res.json(SourceTypes);
     } else {
-        const jobId = parseInt(req.params.id);
-        if (isNaN(jobId)) {
+        const sourceId = parseInt(req.params.id);
+        if (isNaN(sourceId)) {
             res.sendStatus(400);
             return;
         }
-        const sources = await Source.findAll({ where: { job_id: jobId } });
-        if (sources === null) {
+        const source = await Source.findOne({ where: { source_id: sourceId }, include: Job });
+        if (source === null) {
             res.sendStatus(404);
         } else {
-            res.json(sources);
+            res.json(source);
         }
     }
 }
@@ -62,9 +62,25 @@ const createSource = async (req, res) => {
     }
 }
 
+const deleteSource = async (req, res) => {
+    const sourceId = parseInt(req.params.id);
+    if (isNaN(sourceId)) {
+        res.sendStatus(400);
+        return;
+    }
+    try {
+        await Source.destroy({ where: { source_id: sourceId } });
+        res.sendStatus(200);
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(400);
+    }
+}
+
 module.exports = {
     getJob,
     createJob,
-    getSourceByJob,
-    createSource
+    getSource,
+    createSource,
+    deleteSource
 }
