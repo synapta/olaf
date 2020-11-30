@@ -3,7 +3,7 @@
     <div class="column">
         <div data-item="{{string}}" class="ui raised segment author-option">
             {{#suggested}}
-                <a class="ui blue ribbon label">Autore consigliato ({{similarFeatures}} su {{titles.length}} opere coincidenti)</a>
+            <a class="ui blue ribbon label">Autore consigliato ({{similarFeatures}} su {{titles.length}} opere coincidenti)</a>
             {{/suggested}}
             <div class="author-name">
                 <div class="author-title">{{name}}</div>
@@ -24,36 +24,81 @@
                         {{#positionHeld}}<p><b>Occupazione:</b> {{.}}</p>{{/positionHeld}}
                         {{#birthDate}}<p><b>Data di nascita:</b> {{.}}{{#birthPlace}}, {{.}}{{/birthPlace}}</p>{{/birthDate}}
                         {{#deathDate}}<p><b>Data di morte: </b> {{.}}{{#deathPlace}}, {{.}}{{/deathPlace}}</p>{{/deathDate}}
-                        {{^description}}
-                            {{^birthDate}}
-                                {{^deathDate}}
-                                    <i>Non sono presenti informazioni aggiuntive riguardo questo elemento</i>
-                                {{/deathDate}}
-                            {{/birthDate}}
-                        {{/description}}
+                        {{#area}}<p><b>Area attività: </b> {{.}} {{#areaIso}}<i class="{{.}} flag"></i>{{/areaIso}}</p>{{/area}}
+                        {{^description}} {{^birthDate}} {{^deathDate}}
+                            <i>Non sono presenti informazioni aggiuntive riguardo questo elemento</i>
+                        {{/deathDate}} {{/birthDate}} {{/description}}
                     </div>
                 </div>
             </div>
+            {{#musicGenres.length}}
+            <a class="ui red ribbon label">Generi caratteristici</a>
+            <div class="ui items">
+                <ul class="ui bulleted list card-box">
+                    {{#musicGenres}}
+                    <li>
+                        <div class="item">{{.}}</div>
+                    </li>
+                    {{/musicGenres}}
+                </ul>
+            </div>
+            {{/musicGenres.length}}
+            {{#instruments.length}}
+            <a class="ui red ribbon label">Strumenti caratteristici</a>
+            <div class="ui items">
+                <ul class="ui bulleted list card-box">
+                    {{#instruments}}
+                    <li>
+                        <div class="item">{{.}}</div>
+                    </li>
+                    {{/instruments}}
+                </ul>
+            </div>
+            {{/instruments.length}}
+            {{#bands.length}}
+            <a class="ui red ribbon label">Gruppi</a>
+            <div class="ui items">
+                <ul class="ui bulleted list card-box">
+                    {{#bands}}
+                    <li>
+                        <div class="item">{{.}}</div>
+                    </li>
+                    {{/bands}}
+                </ul>
+            </div>
+            {{/bands.length}}
             {{#titles.length}}
-                <a class="ui red ribbon label">Testi dell'autore</a>
-                <div class="ui items">
-                    <div class="ui accordion">
-                        <div class="active title">
-                            <i class="dropdown icon"></i>
-                            Visualizza testi {{titlesSource}}
-                        </div>
-                        <div class="active content">
-                            <ul class="ui bulleted list card-box">
-                                {{#titles}}
-                                    <li>
-                                        <div class="item">{{{.}}}</div>
-                                    </li>
-                                {{/titles}}
-                            </ul>
-                        </div>
+            <a class="ui red ribbon label">Opere dell'autore</a>
+            <div class="ui items">
+                <div class="ui accordion">
+                    <div class="active title">
+                        <i class="dropdown icon"></i>
+                        Visualizza opere {{titlesSource}}
+                    </div>
+                    <div class="active content">
+                        <ul class="ui bulleted list card-box">
+                            {{#titles}}
+                            <li>
+                                <div class="item">{{.}}</div>
+                            </li>
+                            {{/titles}}
+                        </ul>
                     </div>
                 </div>
+            </div>
             {{/titles.length}}
+            {{#exhibitions.length}}
+            <a class="ui red ribbon label">Esibizioni</a>
+            <div class="ui items">
+                <ul class="ui bulleted list card-box">
+                    {{#exhibitions}}
+                    <li>
+                        <div class="item">{{.}}</div>
+                    </li>
+                    {{/exhibitions}}
+                </ul>
+            </div>
+            {{/exhibitions.length}}
             <a class="ui red ribbon label">Esplora in...</a>
             <div class="center aligned card-box">
                 {{#wikidata}}<a href="{{.}}" target="_blank" class="ui center aligned label basic">Fonte: Wikidata</a>{{/wikidata}}

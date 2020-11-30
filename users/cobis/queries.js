@@ -100,105 +100,113 @@ let cobisInsertSkip = (authorUri) => {
 let wikidataQuery = (options) => {
 
     return `
-        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-        PREFIX wd: <http://www.wikidata.org/entity/>
-        
-        SELECT (?item as ?wikidata) 
-               (SAMPLE (?nome) as ?nome) 
-               (sample( ?tipologia) as ?tipologia) 
-               (SAMPLE (?num) as ?num) 
-               (SAMPLE (?descrizione) as ?descrizione) 
-               (SAMPLE (?altLabel) as ?altLabel)
-               (sample( ?bookLabel) as ?titles)
-               (SAMPLE (?birthDate) as ?birthDate) 
-               (SAMPLE (?deathDate) as ?deathDate) 
-               (SAMPLE (?immagine) as ?immagine) 
-               (SAMPLE (?itwikipedia) as ?itwikipedia) 
-               (SAMPLE (?enwikipedia) as ?enwikipedia) 
-               (SAMPLE (?viafurl) as ?viafurl)
-               (SAMPLE (?treccani) as ?treccani)  (SAMPLE (?sbn) as ?sbn)
-        WHERE {
-
-            SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "it, en".
-                ?item rdfs:label ?nome .
-                ?type rdfs:label ?tipologia.
-                ?item skos:altLabel ?altLabel .
-                ?item schema:description ?descrizione
-            }
-
-            VALUES ?item { ${options.join(' ')} }
-            
-            OPTIONAL {
-                ?book wdt:P31 wd:Q571 .
-                ?book wdt:P50 ?item .
-                ?book rdfs:label ?bookLabel .
-                filter (lang(?bookLabel) = "it")
-            }
-
-            OPTIONAL {
-                ?item wdt:P569 ?birthDate .
-            }
-
-            OPTIONAL {
-                ?item wdt:P570 ?deathDate .
-            }
-
-            OPTIONAL {
-                ?item wdt:P18 ?immagine .
-            }
-
-            OPTIONAL {
-                ?item wdt:P3365 ?treccani .
-            }
-
-            OPTIONAL {
-                ?itwikipedia schema:about ?item .
-                FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
-            }
-
-            OPTIONAL {
-                ?enwikipedia schema:about ?item .
-                FILTER(CONTAINS(STR(?enwikipedia), 'en.wikipedia.org'))
-            }
-
-            OPTIONAL {
-                ?item wdt:P214 ?viaf
-                BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
-            }
-
-            OPTIONAL {
-                ?item wdt:P396 ?sbn_raw
-                BIND(REPLACE(STR(?sbn_raw), "\\\\\\\\", "_") as ?sbn)
-            }
-
-            MINUS{
-                ?item wdt:P31 wd:Q15632617
-            }
-
-            MINUS{
-                ?item wdt:P31 wd:Q4167410
-            }
-            
-            MINUS {
-                ?item wdt:P31 wd:Q28798908
-            }
-            
-            MINUS {
-                ?item wdt:P31 wd:Q13442814
-            }
-
-            MINUS{
-                ?item wdt:P31 ?class.
-                ?class wdt:P279* wd:Q234460
-                VALUES ?class {wd:Q838948 wd:Q14204246}
-            }
-
-            ?item wdt:P31 ?type .
-
-        }
-        GROUP BY ?item
-        ORDER BY ASC(?num) LIMIT 20`
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    PREFIX wd: <http://www.wikidata.org/entity/>
+    
+    SELECT (?item as ?wikidata) 
+           (SAMPLE(?nome) as ?nome) 
+           (SAMPLE(?tipologia) as ?tipologia) 
+           (SAMPLE(?num) as ?num) 
+           (SAMPLE(?descrizione) as ?descrizione) 
+           (SAMPLE(?altLabel) as ?altLabel)
+           (GROUP_CONCAT(DISTINCT ?book; separator="###") as ?titles)
+           (SAMPLE(?birthDate) as ?birthDate) 
+           (SAMPLE(?deathDate) as ?deathDate) 
+           (SAMPLE(?immagine) as ?immagine) 
+           (SAMPLE(?itwikipedia) as ?itwikipedia) 
+           (SAMPLE(?enwikipedia) as ?enwikipedia) 
+           (SAMPLE(?viafurl) as ?viafurl)
+           (SAMPLE(?treccani) as ?treccani)
+           (SAMPLE(?sbn) as ?sbn)
+           (GROUP_CONCAT(DISTINCT ?occupation; separator="###") as ?positionHeld)
+    WHERE {
+    
+      SERVICE wikibase:label {
+        bd:serviceParam wikibase:language "it,en".
+        ?item rdfs:label ?nome .
+        ?type rdfs:label ?tipologia.
+        ?item skos:altLabel ?altLabel .
+        ?item schema:description ?descrizione .
+        ?bookID rdfs:label ?book .
+        ?occupationID rdfs:label ?occupation .
+      }
+    
+      VALUES ?item {
+        ${options.join(' ')}
+      }
+    
+      OPTIONAL {
+        ?bookID wdt:P50 ?item .
+      }
+      
+      OPTIONAL {
+        ?item wdt:P106 ?occupationID
+      }
+    
+      OPTIONAL {
+        ?item wdt:P569 ?birthDate .
+      }
+    
+      OPTIONAL {
+        ?item wdt:P570 ?deathDate .
+      }
+    
+      OPTIONAL {
+        ?item wdt:P18 ?immagine .
+      }
+    
+      OPTIONAL {
+        ?item wdt:P3365 ?treccani .
+      }
+    
+      OPTIONAL {
+        ?itwikipedia schema:about ?item .
+        FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
+      }
+    
+      OPTIONAL {
+        ?enwikipedia schema:about ?item .
+        FILTER(CONTAINS(STR(?enwikipedia), 'en.wikipedia.org'))
+      }
+    
+      OPTIONAL {
+        ?item wdt:P214 ?viaf
+        BIND(CONCAT('https://viaf.org/viaf/', ?viaf) as ?viafurl)
+      }
+    
+      OPTIONAL {
+        ?item wdt:P396 ?sbn_raw
+        BIND(REPLACE(STR(?sbn_raw), "\\\\\\\\", "_") as ?sbn)
+      }
+    
+      MINUS{
+        ?item wdt:P31 wd:Q15632617
+      }
+    
+      MINUS{
+        ?item wdt:P31 wd:Q4167410
+      }
+    
+      MINUS {
+        ?item wdt:P31 wd:Q28798908
+      }
+    
+      MINUS {
+        ?item wdt:P31 wd:Q13442814
+      }
+    
+      MINUS{
+        ?item wdt:P31 ?class.
+        ?class wdt:P279* wd:Q234460
+        VALUES ?class {wd:Q838948 wd:Q14204246}
+      }
+    
+      ?item wdt:P31 ?type .
+    
+    }
+    GROUP BY ?item
+    ORDER BY ASC(?num) 
+    LIMIT 20`
 };
 
 // Functions

@@ -16,6 +16,8 @@ class Option {
             this._parseWikidataBody();
         else if (type === 'viaf')
             this._parseViafBody();
+        else if(type === 'musicbrainz')
+            this._parseMusicBrainzBody();
 
         // Format input data
         this._formatFields();
@@ -27,10 +29,14 @@ class Option {
 
         // Get Wikidata Map from module
         let map = this.config.getWikidataDictionary();
+        let groupedFields = ['titles', 'roles'];
 
         // Parse rawBody in order to populate current object
         Object.keys(map).forEach((key) => {
             if(this.rawBody[map[key]]) {
+
+                if(groupedFields.includes(key) && this.rawBody[map[key]].value)
+                    this.rawBody[map[key]].value = this.rawBody[map[key]].value.split('###');
 
                 // Store value in current object
                 this[key] = this.rawBody[map[key]].value;
@@ -47,7 +53,7 @@ class Option {
                 // Parse dates
                 else if(key === 'birthDate' || key === 'deathDate')
                     // Handle dates
-                    this[key] = this[key].substr(0, 10);
+                    this[key] = this[key].substr(0, 10).replace(/-/g, "/");
 
                 else if(key.includes('variant'))
                     // Handle variants
@@ -79,6 +85,24 @@ class Option {
                 if(key === 'optionSbn')
                     this[key] = "IT_ICCU_" + this[key].substring(0, 4).toUpperCase() + "_" + this[key].substring(4, 10);
 
+            } else
+                // Set current field as null on field absence
+                this[key] = null;
+
+        });
+
+    }
+
+    _parseMusicBrainzBody() {
+
+        // Get Wikidata Map from module
+        let map = this.config.getMusixBrainzDictionary();
+
+        // Parse rawBody in order to populate current object
+        Object.keys(map).forEach((key) => {
+            if (map[key] && this.rawBody[map[key]]) {
+                // Store value in current object
+                this[key] = this.rawBody[map[key]];
             } else
                 // Set current field as null on field absence
                 this[key] = null;
@@ -207,8 +231,9 @@ class Option {
         this.string = JSON.stringify(this);
     }
 
-    setOptionsAsSuggested() {
+    setOptionAsSuggested(numberOfSimilarTitles) {
         this.suggested = true;
+        this.similarFeatures = numberOfSimilarTitles;
     }
 
 }
