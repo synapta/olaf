@@ -171,7 +171,7 @@ module.exports = function(app, passport = null, driver = null) {
         api.getJob(req, res);
     });
 
-    app.put('/api/v2/job', (req, res) => {
+    app.post('/api/v2/job', (req, res) => {
         api.createJob(req, res);
     });
 
@@ -180,7 +180,7 @@ module.exports = function(app, passport = null, driver = null) {
         api.getSourceByJob(req, res);
     });
 
-    app.put('/api/v2/source', (req, res) => {
+    app.post('/api/v2/source', (req, res) => {
         api.createSource(req, res);
     });
 
