@@ -1,4 +1,6 @@
 // Requirements
+const api = require('./api');
+/*
 const nodeRequest    = require('request');
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
@@ -87,16 +89,18 @@ function loggingFlow(url) {
 
 function setupRoutines(driver) {
     if(driver) {
-        schedule.scheduleJob('*/5 * * * *', (fireDate) => {
+        schedule.scheduleJob('5 * * * *', (fireDate) => {
             enrichments.resetLocks(driver, () => {
                 console.log(fireDate, "Reset locks");
             });
         });
     }
 }
+*/
 
 module.exports = function(app, passport = null, driver = null) {
 
+    /*
     // Token middleware
     app.all(['/api/v1/:token/*', '/get/:token/*'], (request, response, next) => {
 
@@ -141,6 +145,7 @@ module.exports = function(app, passport = null, driver = null) {
         }
 
     });
+    */
 
     // Frontend
     app.get(['/get/:token/author/', '/get/:token/authorityfile/', '/get/:token/author/:authorId', '/get/:token/authorityfile/:authorId'], (request, response) => {
@@ -161,6 +166,16 @@ module.exports = function(app, passport = null, driver = null) {
         }
     });
 
+    // Jobs
+    app.get('/api/v2/job/:id', (req, res) => {
+        api.getJob(req, res);
+    });
+
+    app.put('/api/v2/job', (req, res) => {
+        api.createJob(req, res);
+    });
+
+    /*
     // Arco users
     app.post('/api/v1/:token/signup', (request, response) => {
         auth.insertUser(driver, request.body.email, request.body.password, request.body.username, (email, token, err) => {
@@ -428,5 +443,6 @@ module.exports = function(app, passport = null, driver = null) {
         let artist = parser.getArtist(request.params.artistUri);
         response.json(artist);
     })
+    */
 
 };

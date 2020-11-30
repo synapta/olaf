@@ -2,11 +2,11 @@
 const express      = require('express');
 const morgan       = require('morgan');
 const bodyParser   = require('body-parser');
-const MongoClient  = require('mongodb').MongoClient;
-const session      = require('express-session');
-const schedule     = require('node-schedule');
-const passport     = require('passport');
-const flash        = require('connect-flash');
+//const MongoClient  = require('mongodb').MongoClient;
+//const session      = require('express-session');
+//const schedule     = require('node-schedule');
+//const passport     = require('passport');
+//const flash        = require('connect-flash');
 
 // Setting up express
 const app = express();
@@ -16,11 +16,12 @@ app.use(morgan('common'));
 app.use('/', express.static('./app'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
-app.use(session({secret: 'synapta'}));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(flash());
+//app.use(session({secret: 'synapta'}));
+//app.use(passport.initialize());
+//app.use(passport.session());
+//app.use(flash());
 
+/*
 // Get routes
 MongoClient.connect("mongodb://localhost:27017/", (err, client) => {
 
@@ -35,4 +36,12 @@ MongoClient.connect("mongodb://localhost:27017/", (err, client) => {
     });
 
 });
+*/
 
+require('./routes.js')(app);
+
+const server = app.listen(3646, 'localhost', () => {
+    const host = server.address().address;
+    const usesPort = server.address().port;
+    console.log('Server listening at http://%s:%s', host, usesPort);
+});

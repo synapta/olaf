@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('sqlite::memory:');
+const sequelize = new Sequelize('sqlite:db.sqlite');
 
 function getJsonDataType(name) {
     return {

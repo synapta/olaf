@@ -6,3 +6,4 @@ pgConfig.js
 .vscode/*
 package-lock.json
 users/montreux/csv/artists.csv
+db.sqlite
