@@ -1,5 +1,26 @@
 const nodeRequest    = require('request');
 
+let authorSearch = (nameCombinations) => {
+
+    return `
+    SELECT DISTINCT ?item WHERE {
+  
+        VALUES ?names {
+            "${nameCombinations.join(' ')}"
+        }
+          
+        SERVICE wikibase:mwapi {
+            bd:serviceParam wikibase:api "EntitySearch" .
+            bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+            bd:serviceParam mwapi:search ?names .
+            bd:serviceParam mwapi:language "it" .
+            ?item wikibase:apiOutputItem mwapi:item .
+        }
+      
+    }`;
+
+};
+
 let authorSelect = (authorId) => {
     return `PREFIX bf2: <http://id.loc.gov/ontologies/bibframe/>
             PREFIX schema: <http://schema.org/>
@@ -58,7 +79,7 @@ let authorSelect = (authorId) => {
                 OPTIONAL {?contribution bf2:role/rdfs:label ?personRole . }
 
             } GROUP BY ?personURI ?personName
-              ${authorId ? `LIMIT 1` : ``}`;
+              LIMIT 1`;
 };
 
 let cobisInsertTimestamp = (authorUri) => {
@@ -100,113 +121,106 @@ let cobisInsertSkip = (authorUri) => {
 let wikidataQuery = (options) => {
 
     return `
-    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-    PREFIX wd: <http://www.wikidata.org/entity/>
-    
-    SELECT (?item as ?wikidata) 
-           (SAMPLE(?nome) as ?nome) 
-           (SAMPLE(?tipologia) as ?tipologia) 
-           (SAMPLE(?num) as ?num) 
-           (SAMPLE(?descrizione) as ?descrizione) 
-           (SAMPLE(?altLabel) as ?altLabel)
-           (GROUP_CONCAT(DISTINCT ?book; separator="###") as ?titles)
-           (SAMPLE(?birthDate) as ?birthDate) 
-           (SAMPLE(?deathDate) as ?deathDate) 
-           (SAMPLE(?immagine) as ?immagine) 
-           (SAMPLE(?itwikipedia) as ?itwikipedia) 
-           (SAMPLE(?enwikipedia) as ?enwikipedia) 
-           (SAMPLE(?viafurl) as ?viafurl)
-           (SAMPLE(?treccani) as ?treccani)
-           (SAMPLE(?sbn) as ?sbn)
-           (GROUP_CONCAT(DISTINCT ?occupation; separator="###") as ?positionHeld)
-    WHERE {
-    
-      SERVICE wikibase:label {
-        bd:serviceParam wikibase:language "it,en".
-        ?item rdfs:label ?nome .
-        ?type rdfs:label ?tipologia.
-        ?item skos:altLabel ?altLabel .
-        ?item schema:description ?descrizione .
-        ?bookID rdfs:label ?book .
-        ?occupationID rdfs:label ?occupation .
-      }
-    
-      VALUES ?item {
-        ${options.join(' ')}
-      }
-    
-      OPTIONAL {
-        ?bookID wdt:P50 ?item .
-      }
-      
-      OPTIONAL {
-        ?item wdt:P106 ?occupationID
-      }
-    
-      OPTIONAL {
-        ?item wdt:P569 ?birthDate .
-      }
-    
-      OPTIONAL {
-        ?item wdt:P570 ?deathDate .
-      }
-    
-      OPTIONAL {
-        ?item wdt:P18 ?immagine .
-      }
-    
-      OPTIONAL {
-        ?item wdt:P3365 ?treccani .
-      }
-    
-      OPTIONAL {
-        ?itwikipedia schema:about ?item .
-        FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
-      }
-    
-      OPTIONAL {
-        ?enwikipedia schema:about ?item .
-        FILTER(CONTAINS(STR(?enwikipedia), 'en.wikipedia.org'))
-      }
-    
-      OPTIONAL {
-        ?item wdt:P214 ?viaf
-        BIND(CONCAT('https://viaf.org/viaf/', ?viaf) as ?viafurl)
-      }
-    
-      OPTIONAL {
-        ?item wdt:P396 ?sbn_raw
-        BIND(REPLACE(STR(?sbn_raw), "\\\\\\\\", "_") as ?sbn)
-      }
-    
-      MINUS{
-        ?item wdt:P31 wd:Q15632617
-      }
-    
-      MINUS{
-        ?item wdt:P31 wd:Q4167410
-      }
-    
-      MINUS {
-        ?item wdt:P31 wd:Q28798908
-      }
-    
-      MINUS {
-        ?item wdt:P31 wd:Q13442814
-      }
-    
-      MINUS{
-        ?item wdt:P31 ?class.
-        ?class wdt:P279* wd:Q234460
-        VALUES ?class {wd:Q838948 wd:Q14204246}
-      }
-    
-      ?item wdt:P31 ?type .
-    
-    }
-    GROUP BY ?item
-    ORDER BY ASC(?num) 
-    LIMIT 20`
+        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+        PREFIX wd: <http://www.wikidata.org/entity/>
+        
+        SELECT (?item as ?wikidata) 
+               (SAMPLE (?nome) as ?nome) 
+               (sample( ?tipologia) as ?tipologia) 
+               (SAMPLE (?num) as ?num) 
+               (SAMPLE (?descrizione) as ?descrizione) 
+               (SAMPLE (?altLabel) as ?altLabel)
+               (sample( ?bookLabel) as ?titles)
+               (SAMPLE (?birthDate) as ?birthDate) 
+               (SAMPLE (?deathDate) as ?deathDate) 
+               (SAMPLE (?immagine) as ?immagine) 
+               (SAMPLE (?itwikipedia) as ?itwikipedia) 
+               (SAMPLE (?enwikipedia) as ?enwikipedia) 
+               (SAMPLE (?viafurl) as ?viafurl)
+               (SAMPLE (?treccani) as ?treccani)  (SAMPLE (?sbn) as ?sbn)
+        WHERE {
+
+            SERVICE wikibase:label {
+                bd:serviceParam wikibase:language "it, en".
+                ?item rdfs:label ?nome .
+                ?type rdfs:label ?tipologia.
+                ?item skos:altLabel ?altLabel .
+                ?item schema:description ?descrizione
+            }
+
+            VALUES ?item {${options.join(' ')}}
+            
+            OPTIONAL {
+                ?book wdt:P31 wd:Q571 .
+                ?book wdt:P50 ?item .
+                ?book rdfs:label ?bookLabel .
+                filter (lang(?bookLabel) = "it")
+            }
+
+            OPTIONAL {
+                ?item wdt:P569 ?birthDate .
+            }
+
+            OPTIONAL {
+                ?item wdt:P570 ?deathDate .
+            }
+
+            OPTIONAL {
+                ?item wdt:P18 ?immagine .
+            }
+
+            OPTIONAL {
+                ?item wdt:P3365 ?treccani .
+            }
+
+            OPTIONAL {
+                ?itwikipedia schema:about ?item .
+                FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
+            }
+
+            OPTIONAL {
+                ?enwikipedia schema:about ?item .
+                FILTER(CONTAINS(STR(?enwikipedia), 'en.wikipedia.org'))
+            }
+
+            OPTIONAL {
+                ?item wdt:P214 ?viaf
+                BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
+            }
+
+            OPTIONAL {
+                ?item wdt:P396 ?sbn_raw
+                BIND(REPLACE(STR(?sbn_raw), "\\\\\\\\", "_") as ?sbn)
+            }
+
+            MINUS{
+                ?item wdt:P31 wd:Q15632617
+            }
+
+            MINUS{
+                ?item wdt:P31 wd:Q4167410
+            }
+            
+            MINUS {
+                ?item wdt:P31 wd:Q28798908
+            }
+            
+            MINUS {
+                ?item wdt:P31 wd:Q13442814
+            }
+
+            MINUS{
+                ?item wdt:P31 ?class.
+                ?class wdt:P279* wd:Q234460
+                VALUES ?class {wd:Q838948 wd:Q14204246}
+            }
+
+            ?item wdt:P31 ?type .
+
+        }
+        GROUP BY ?item
+        ORDER BY ASC(?num)
+        LIMIT 1`
 };
 
 // Functions
@@ -217,7 +231,10 @@ function authorOptions(name, surname){
 
 }
 
-function authorLink(body) {
+function authorLink(request, driver) {
+
+    // Store body
+    let body = request.body;
 
     // Get body params
     let authorUri = body.authorUri;
@@ -241,7 +258,7 @@ function authorLink(body) {
     Object.keys(links).forEach((key) => {
 
         // Parse query
-        if(links[key] !== undefined) {  
+        if(links[key] !== undefined) {
             requests.push(composeQuery(cobisInsertTimestamp(authorUri)));
 
             if (key === 'wikidata') {
@@ -265,10 +282,10 @@ function authorLink(body) {
 
 }
 
-function authorSkip(body) {
+function authorSkip(request, driver) {
 
     // Get body params
-    let authorUri = body.authorId;
+    let authorUri = request.body.authorId;
     // Return query
     return composeQuery(cobisInsertSkip(authorUri));
 
@@ -293,24 +310,24 @@ function composeQueryEntityListWikidata(name, surname){
         uri: 'https://www.wikidata.org/w/api.php',
         qs: {
             action: "wbsearchentities",
-            search: name + " " + surname,
+            search: (name + " " + surname).trim(),
+            strictlanguage: false,
             language: "en",
-            limit: 20, 
+            limit: 20,
             format: "json"
         },
         json: true
     }
 }
 
-function composeQueryWikidata(list){
-    
+function composeQueryWikidata(query){
 
     // Compose query
     return {
         method: 'GET',
         uri: 'https://query.wikidata.org/sparql',
         qs: {
-            query: wikidataQuery(list)
+            query: query
         },
         headers: {
             'cache-control': 'no-cache',
@@ -323,26 +340,39 @@ function composeQueryWikidata(list){
 
 }
 
-function makeWikidataQuery (name, surname) {
-    return new Promise ( function(resolve, reject) {
-        nodeRequest(composeQueryEntityListWikidata(name, surname), function (error, response, body) {
-            if (error) {
-                console.error(error)
+function makeWikidataQuery(name, surname) {
+
+    // Find the author on wikidata
+    return new Promise((resolve, reject) => {
+        nodeRequest(composeQueryWikidata(authorSearch([(name + ' ' + surname).trim()])), (err, res, body) => {
+
+            if (err) {
+                console.error(err);
                 reject();
             }
-            let qList = [];
-            body.search.forEach( elem => {
-                qList.push("wd:" + elem.id);
-            });
-            nodeRequest(composeQueryWikidata(qList), function (error, response, body) {
-                if (error) {
-                    console.error(error);
-                    reject();
-                }
-                resolve(body);
-            });
+
+            try{
+
+                // Store Agents
+                let agents = JSON.parse(body).results.bindings.map(binding => binding.item.value.replace('http://www.wikidata.org/entity/', 'wd:'));
+                if(agents) {
+                    nodeRequest(composeQueryWikidata(wikidataQuery(agents)), (err, res, body) => {
+                        if (err) {
+                            console.error(err);
+                            reject();
+                        }
+                        resolve(body);
+                    });
+                } else
+                    resolve(JSON.stringify({results: {bindings: []}}))
+
+            } catch {
+                reject();
+            }
+
         })
     });
+
 }
 
 function composeQueryVIAF(name, surname){
@@ -351,12 +381,12 @@ function composeQueryVIAF(name, surname){
         method: 'GET',
         uri: 'https://www.viaf.org/viaf/AutoSuggest',
         qs: {
-            query: (name + " " + surname).trim()
+            query: (name + " " + surname).trim(),
         },
         headers: {
             'cache-control': 'no-cache',
             'Accept-Language': 'it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3',
-            'user-agent': 'pippo',
+            'user-agent': 'topolino',
         }
     }
 
@@ -400,7 +430,7 @@ function parseWikidataOptions(body) {
 }
 
 function parseAuthorOptions(author, bodies, callback) {
-console.log('pippo');
+    console.log('pippo');
 
     // Store bodies
     let wikidataBody = bodies[0];
@@ -410,6 +440,7 @@ console.log('pippo');
     let wikidataOptions = parseWikidataOptions(wikidataBody);
     let viafOptions = parseViafOptions(viafBody, wikidataOptions.filter(el => el.viaf).map(el => el.getViafId()));
     let options = wikidataOptions.concat(viafOptions);
+
     // Enrich all options with VIAF and return them
     Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
         options.map(el => el.getString());
@@ -419,22 +450,9 @@ console.log('pippo');
 }
 
 // Exports
-exports.authorSelect = (params) => {
-    return composeQuery(authorSelect(params));
-};
+exports.authorSelect = (params) => composeQuery(authorSelect(params));
+exports.authorOptions = authorOptions;
+exports.parseAuthorOptions = parseAuthorOptions;
+exports.authorSkip = authorSkip;
+exports.authorLink = authorLink;
 
-exports.authorOptions = (name, surname) => {
-    return authorOptions(name, surname);
-};
-
-exports.parseAuthorOptions = (author, bodies, callback) => {
-    parseAuthorOptions(author, bodies, callback);
-};
-
-exports.authorSkip = (body) => {
-    return authorSkip(body);
-};
-
-exports.authorLink = (body) => {
-    return authorLink(body)
-};

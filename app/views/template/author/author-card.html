@@ -17,6 +17,17 @@
                 </p>
             {{/type}}
 
+            {{#dates.length}}
+                <a class="ui blue ribbon label"> <i class="fas fa-book"></i> Date autore</a>
+                <ul class="ui bulleted list card-box">
+                    {{#dates}}
+                        <li>
+                            <div class="item title">{{.}}</div>
+                        </li>
+                    {{/dates}}
+                </ul>
+            {{/dates.length}}
+
             {{#birthDate}}
                 <a class="ui blue ribbon label"> <i class="fas fa-star"></i> Data di nascita</a>
                 <p class="card-box">
@@ -74,7 +85,7 @@
                     </a>
                 </div>
             </div>
-            <div onclick="authorSkip('{{uri}}')" data-identifier="{{uri}}" class="fluid ui button">Salta autore</div>
+            <div onclick="authorSkip('{{uri}}')" data-identifier="{{uri}}" id="skip-author" class="fluid ui button">Salta autore</div>
         </div>
 
     </div>

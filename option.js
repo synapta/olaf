@@ -1,4 +1,5 @@
 const requests  = require('request-promise');
+const SHA256    = require("crypto-js/sha256");
 
 /**
  * A class to model author options
@@ -29,7 +30,8 @@ class Option {
 
         // Get Wikidata Map from module
         let map = this.config.getWikidataDictionary();
-        let groupedFields = ['titles', 'roles'];
+        let groupedFields = ['titles', 'roles', 'workStartingDates', 'workEndingDates'];
+
 
         // Parse rawBody in order to populate current object
         Object.keys(map).forEach((key) => {
@@ -151,7 +153,10 @@ class Option {
 
         // Query VIAF endpoint in order to get more author data
         if(this.getViafId()) {
-            await requests('https://www.viaf.org/viaf/' + this.getViafId() + '/?httpAccept=application/json').then((response) => {
+            await requests({
+                url: 'https://www.viaf.org/viaf/' + this.getViafId() + '/?httpAccept=application/json',
+                headers: {'User-Agent': 'topolino'}
+            }).then((response) => {
 
                 // Store response as JSON
                 response = JSON.parse(response);
@@ -228,6 +233,7 @@ class Option {
     }
 
     getString() {
+        this.hash = SHA256(JSON.stringify(this)).toString();
         this.string = JSON.stringify(this);
     }
 

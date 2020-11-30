@@ -2,7 +2,7 @@
 const fuzz           = require('fuzzball');
 
 const Option         = require('../../option').Option;
-const Author         = require('../../author').Author;
+const Thing         = require('../../thing').Thing;
 
 // Configuration
 let config           = null;
@@ -32,7 +32,7 @@ function parseAuthor(body){
 
     });
 
-    return new Author(parsedBody, config);
+    return new Thing(parsedBody, config);
 }
 
 function getAuthorSimilarOptions(author, options, callback){

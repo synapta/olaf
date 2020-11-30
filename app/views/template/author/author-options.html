@@ -1,10 +1,16 @@
 <div class="ui two column grid">
     {{#options}}
     <div class="column">
-        <div data-item="{{string}}" class="ui raised segment author-option">
+        <div data-item="{{string}}"
+             data-hash="{{hash}}"
+             class="ui raised segment author-option">
             {{#suggested}}
+
                 <a class="ui blue ribbon label">Autore consigliato ({{similarFeatures}} su {{titles.length}} opere coincidenti)</a>
             {{/suggested}}
+            {{#matches}}
+                <a class="ui blue ribbon label">Selezionato da {{.}} utenti</a>
+            {{/matches}}
             <div class="author-name">
                 <div class="author-title">{{name}}</div>
                 <div class="author-subtitle">
@@ -40,7 +46,7 @@
                     <div class="ui accordion">
                         <div class="active title">
                             <i class="dropdown icon"></i>
-                            Visualizza testi {{titlesSource}}
+                            Visualizza opere {{titlesSource}}
                         </div>
                         <div class="active content">
                             <ul class="ui bulleted list card-box">
@@ -57,7 +63,7 @@
             <a class="ui red ribbon label">Esplora in...</a>
             <div class="center aligned card-box">
                 {{#wikidata}}<a href="{{.}}" target="_blank" class="ui center aligned label basic">Fonte: Wikidata</a>{{/wikidata}}
-                {{#viaf}}<a class="ui center aligned basic label" href="{{.}}" target="_blank">Fonte:  VIAF</a>{{/viaf}}
+                {{#viaf}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">VIAF</a>{{/viaf}}
                 {{#wikipedia}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikipedia IT</a>{{/wikipedia}}
                 {{#wikimediaCommons}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">Wikimedia Commons</a>{{/wikimediaCommons}}
                 {{#isni}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">ISNI</a>{{/isni}}
@@ -74,7 +80,7 @@
                 {{#cerl}}<a class="ui center aligned blue label" href="{{.}}" target="_blank">CERL</a>{{/cerl}}
             </div>
             <div class="ui divider"></div>
-            <button onclick="authorSelect(this, this.parentElement.getAttribute('data-item'))" class="ui fluid green button author-selection">Seleziona candidato</button>
+            <button onclick="authorSelect(this)" class="ui fluid green button author-selection">Seleziona candidato</button>
         </div>
     </div>
     {{/options}}

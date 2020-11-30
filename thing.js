@@ -1,7 +1,7 @@
 /**
  * A class to model author card
  * **/
-class Author {
+class Thing {
 
     constructor(rawBody, config) {
 
@@ -67,19 +67,7 @@ class Author {
         if(Array.isArray(this.name))
             this.name = this.name[0];
 
-        this.name = this.name
-            .replace(/\s*detto\s+/gmi, ' ')
-            .replace(/\s*\(.*\)/gmi, '')
-            .replace(/\s*\<.*\>|\_/gmi, '')
-            .split(' ')
-            .reverse()
-            .map(el => el.trim())
-            .join(' ')
-            .split(',')
-            .reverse()
-            .map(el => el.trim())
-            .join(' ')
-            .trim();
+        this.name = this.name.split('(')[0];
 
     }
 
@@ -118,4 +106,4 @@ class Author {
 }
 
 // Exports
-exports.Author = Author;
+exports.Thing = Thing;

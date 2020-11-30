@@ -16,6 +16,7 @@ function insertUser(driver, email, password, username, callback) {
                    '_id': email,
                    password: hash,
                    username: username,
+                   role: 'user',
                    token: token,
                    verified: false
                }).then(callback(email, token, false))

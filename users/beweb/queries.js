@@ -287,7 +287,7 @@ function authorOptions(name, surname){
 
 }
 
-function authorLink(body) {
+function authorLink(body, driver) {
 
     // Parse query
     let hash = crypto.createHash('md5').update(SECRET_KEY + body.Idrecord + 'updEntita').digest("hex");
@@ -512,6 +512,7 @@ function getAllIdBeweb(db, cb) {
 }
 
 
+
 function checkWikidataModification (db, id_beweb, cb) {
   nodeRequest(composeQuery(authorSelect(id_beweb)), (err, res, body) => {
       if (err) {
@@ -610,8 +611,8 @@ exports.authorOptions = (name, surname) => {
     return authorOptions(name, surname);
 };
 
-exports.authorSkip = (body) => {
-    return authorSkip(body);
+exports.authorSkip = (request, driver) => {
+    return authorSkip(request, driver);
 };
 
 exports.authorLink = (body) => {

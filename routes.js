@@ -1,10 +1,9 @@
 // Requirements
 const nodeRequest    = require('request');
-//const pgp            = require('pg-promise')({});
 const promiseRequest = require('request-promise');
 const fs             = require('fs');
+const schedule       = require('node-schedule');
 const Config         = require('./config').Config;
-//const pgConnection   = require('./pgConfig').pgConnection;
 
 
 // Modules
@@ -14,11 +13,12 @@ let auth             = null;
 let config           = null;
 let configToken      = null;
 let mailer           = null;
+let enrichments      = null;
 
-//const db = pgp(pgConnection);
-//const bewebQueries = require('./users/beweb/queries');
+const db = pgp(pgConnection);
+const bewebQueries = require('./users/beweb/queries');
 
-/*schedule.scheduleJob('21 4 * * *', function(firedate) {
+schedule.scheduleJob('21 4 * * *', function(firedate) {
 
     console.log(firedate, "checking modifications");
     bewebQueries.getAllIdBeweb(db, function(data) {
@@ -31,14 +31,15 @@ let mailer           = null;
         };
         parseAnother();
     })
-});*/
+});
 
 // Token validation
 function validateToken(token) {
 
     // Get valid tokens
     let validTokens = ['cobis', 'aaso', 'amt', 'cai', 'cmus', 'dssp',
-                       'fga', 'ibmp', 'inaf', 'inrim', 'oato', 'plev',                       'slvm', 'toas', 'beweb', 'arco'];
+                       'fga', 'ibmp', 'inaf', 'inrim', 'oato', 'plev',
+                       'slvm', 'toas', 'beweb', 'arco', 'arco-things'];
 
     // Check if token is valid
     return validTokens.includes(token);
@@ -49,7 +50,7 @@ function loginToken(token) {
 
 
     // Get tokens that need login
-    let loginTokens = ['arco'];
+    let loginTokens = ['arco', 'arco-things'];
 
     // Check if current token need login
     return loginTokens.includes(token);
@@ -67,7 +68,14 @@ function loggingFlow(url) {
         '/api/v1/:token/verify-user',
         '/api/v1/:token/username-existence',
         '/api/v1/:token/email-existence',
-        '/api/v1/:token/logged-user'
+        '/api/v1/:token/logged-user',
+        '/api/v1/:token/feed-enrichments',
+        '/api/v1/:token/author',
+        '/api/v1/:token/get-agents',
+        '/api/v1/:token/update-documents',
+        '/api/v1/:token/logged-user',
+        '/api/v1/:token/blank-documents',
+        '/api/v1/:token/store-things'
     ];
 
     // Replace placeholder with current token
@@ -75,6 +83,16 @@ function loggingFlow(url) {
 
     return allowedUrl.map((el) => url.includes(el)).some((el) => el);
 
+}
+
+function setupRoutines(driver) {
+    if(driver) {
+        schedule.scheduleJob('*/5 * * * *', (fireDate) => {
+            enrichments.resetLocks(driver, () => {
+                console.log(fireDate, "Reset locks");
+            });
+        });
+    }
 }
 
 module.exports = function(app, passport = null, driver = null) {
@@ -88,10 +106,11 @@ module.exports = function(app, passport = null, driver = null) {
         // Validate token
         if (validateToken(token)) {
 
-            // Load user config
+            // Load user config and routines once
             if(!config || token !== configToken) {
                 config = new Config(JSON.parse(fs.readFileSync(`./app/js/config/${token}.json`)));
                 configToken = token;
+                setupRoutines(driver);
             }
 
             // Load modules
@@ -101,6 +120,7 @@ module.exports = function(app, passport = null, driver = null) {
                 require('./users/' + token + '/passport')(passport, driver);
                 auth = require('./users/' + token + '/users');
                 mailer = require('./users/' + token + '/mailer');
+                enrichments = require('./users/' + token + '/enrichments');
             }
 
             // Initialize configuration
@@ -110,7 +130,7 @@ module.exports = function(app, passport = null, driver = null) {
             if(loginToken(token) && !request.user && !loggingFlow(request.originalUrl))
                 response.redirect('/get/' + token + '/login?redirect=' + request.originalUrl);
             else
-                next()
+                next();
 
         } else {
 
@@ -142,18 +162,18 @@ module.exports = function(app, passport = null, driver = null) {
     });
 
     // Arco users
-    app.post('/api/v1/arco/signup', (request, response) => {
+    app.post('/api/v1/:token/signup', (request, response) => {
         auth.insertUser(driver, request.body.email, request.body.password, request.body.username, (email, token, err) => {
             if(!err)
                 mailer.sendVerificationEmail(email, token, request.body.redirect, () => {
-                    response.redirect('/get/arco/user-verification')
+                    response.redirect('/get/' + configToken + '/user-verification')
                 });
             else
-                response.redirect('/get/arco/login?message=genericError');
+                response.redirect('/get/' + configToken + '/login?message=genericError');
         });
     });
 
-    app.post('/api/v1/arco/login', (request, response, next) => {
+    app.post('/api/v1/:token/login', (request, response, next) => {
         passport.authenticate('local', (err, user, info) => {
 
             if (err)
@@ -163,58 +183,125 @@ module.exports = function(app, passport = null, driver = null) {
 
             request.logIn(user, (err) => {
                 if (err) return next(err);
-                return response.redirect(request.body.redirect ? request.body.redirect : '/get/arco/author');
+                return response.redirect(request.body.redirect ? request.body.redirect : '/get/'+ configToken + '/author');
             });
 
         })(request, response, next);
     });
 
-    app.get('/api/v1/arco/verify-user/:token', passport.authenticate('authtoken', {params: 'token'}), (request, response) => {
+    app.get('/api/v1/:token/verify-user/:token', passport.authenticate('authtoken', {params: 'token'}), (request, response) => {
         response.redirect(request.query.redirect ? request.query.redirect + '?verified=true' : '/get/' + configToken + '/author?verified=true');
     });
 
-    app.get('/api/v1/arco/email-existence/:email', (request, response) => {
+    app.get('/api/v1/:token/email-existence/:email', (request, response) => {
         auth.findUserById(driver, request.params.email, (err, res) => {
             response.json({'exists': !!(!err && res)});
         })
     });
 
-    app.get('/api/v1/arco/username-existence/:username', (request, response) => {
+    app.get('/api/v1/:token/username-existence/:username', (request, response) => {
        auth.findUserByUsername(driver, request.params.username, (err, res) => {
            response.json({'exists': !!(!err && res)});
        })
     });
 
     app.get('/api/v1/:token/logged-user', (request, response) => {
-        response.json(request.user);
+        response.json({user: request.user ? request.user : null});
+    });
+
+    // Enrichments
+    app.get('/api/v1/:token/feed-enrichments', (request, response) => {
+        enrichments.feedEnrichments(driver, () => {
+            response.json({status: 'enriched'});
+        });
+    });
+
+    app.get('/api/v1/:token/store-things', (request, response) => {
+        nodeRequest(queries.getThings, (err, res, body) => {
+
+            // Store uris
+            body = JSON.parse(body);
+            let uris = body.results.bindings.map(el => el.thing.value);
+
+            enrichments.insertThings(driver, uris, () => {
+                response.json({stored: true});
+            })
+
+        })
     });
 
     // API
     app.get(['/api/v1/:token/author/', '/api/v1/:token/author/:authorId'], (request, response) => {
 
-        // Compose author query
-        let queryAuthor = queries.authorSelect(request.params.authorId);
+        let user = (!request.query.enrichment && request.user) ? request.user.username : null;
+        let agent = request.params.authorId;
 
-        // Make request
-        nodeRequest(queryAuthor, (err, res, body) => {
+        if((request.user && request.user.role === 'user') || !request.user) {
+            enrichments.getAndLockAgent(driver, user, agent, !request.query.enrichment, (result) => {
 
-            // Handle and send author
-            let author = parser.parseAuthor(JSON.parse(body));
+                if (result && !request.query.enrichment && result.enriched) {
+                    // Send stored options and author
+                    response.json({author: result.author, options: result.options});
+                } else {
 
-            // Query options
-            let nameSearch = (author.name || '').trim();
-            let requests = queries.authorOptions(nameSearch, '');
- 
-            // Make options queries
-            Promise.all(requests).then((bodies) => {
-                // Parse result
-                parser.parseAuthorOptions(author, bodies.map(body => JSON.parse(body)), (options) => {
-                    // Send back options and author response
-                    response.json({'author': author, 'options': options});
-                });
+                    // Compose author query
+                    let queryAuthor = queries.authorSelect(request.params.authorId ? request.params.authorId : result._id);
+
+                    // Make request
+                    nodeRequest(queryAuthor, (err, res, body) => {
+
+                        // Handle and send author
+                        let author = parser.parseAuthor(JSON.parse(body));
+                        // Query options
+                        let requests = queries.authorOptions((author.name || '').trim(), '');
+
+                        // Make options queries
+                        Promise.all(requests).then((bodies) => {
+
+                            bodies = bodies.map(body => {
+                                try {
+                                    JSON.parse(body)
+                                } catch {
+                                    return {}
+                                }
+                                return JSON.parse(body);
+                            });
+
+                            // Parse result
+                            parser.parseAuthorOptions(author, bodies, (options) => {
+
+                                let responseObject = {
+                                    author: author,
+                                    options: options
+                                };
+
+                                if (driver)
+                                    // Store current result
+                                    enrichments.storeEnrichment(driver, responseObject).then(response.json(responseObject));
+                                else
+                                    // Send back options and author response
+                                    response.json(responseObject);
+
+                            });
+
+                        }).catch((error) => console.error(error));
+
+                    });
+
+                }
+
             });
+        } else if(request.user && request.user.role === 'admin') {
+            enrichments.getMatchingToValidate(driver, agent, (validationFields) => {
+                if(!validationFields) response.json({author: null, options: null});
+                else {
+                    parser.mergeOptionsAndMatches(validationFields.options, validationFields.matches);
+                    response.json({author: validationFields.author, options: validationFields.options});
+                }
 
-        });
+            });
+        }
+
 
     });
 
@@ -248,10 +335,9 @@ module.exports = function(app, passport = null, driver = null) {
     app.post('/api/v1/:token/enrich-author/', (request, response) => {
 
         // Get requests
-        let requests = queries.authorLink(request.body);
-
-        // Map requests to make Promise
-        requests = requests.map(req => promiseRequest(req));
+        let requests = queries.authorLink(request, driver);
+        if(configToken !== 'arco')
+            requests = requests.map(req => promiseRequest(req));
 
         // delete Cobis cache
         let cobisID = request.body.authorUri.split("/").pop();
@@ -294,7 +380,9 @@ module.exports = function(app, passport = null, driver = null) {
     app.post('/api/v1/:token/author-skip/', (request, response) => {
 
         // Compose query
-        let requests = queries.authorSkip(request.body);
+        let requests = queries.authorSkip(request, driver);
+        if(configToken !== 'arco')
+            requests = requests.map(req => promiseRequest(req));
 
         // Send requests
         nodeRequest(requests, (err, res, body) => {
@@ -304,7 +392,20 @@ module.exports = function(app, passport = null, driver = null) {
 
     });
 
-    // Beweb APIs
+    app.post('/api/v1/:token/validate-matching/:agent', (request, response) => {
+        enrichments.validateMatching(driver, request.params.agent, () => {
+            request.body.option = request.body.option === 'null' ? null : request.body.option;
+            if(request.body.option) {
+                let option = JSON.parse(request.body.option);
+                response.json(option);
+            } else {
+                console.log('skipped');
+                response.json({skipped: true});
+            }
+        })
+    });
+
+
     app.post('/api/v1/:token/add-author-again', (request, response) => {
         // Send requests
         let data = request.body;

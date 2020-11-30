@@ -50,19 +50,23 @@ function _getAllSelectableFields() {
     return Object.keys(config.fields).filter(el => config.fields[el].select && !config.fields[el].composite);
 }
 
-function authorSelect(el, optionString){
+function authorSelect(el){
+
+    let dataset = el.parentElement.dataset;
+    let optionString = dataset.item;
+    let optionHash = dataset.hash;
 
     // Parse item
     let option = JSON.parse(optionString);
     let selected = null;
 
     // Toggle option selection
-    if(optionString in selectedOptions){
+    if(optionHash in selectedOptions){
 
         // Toggle selection flag
         selected = true;
         // Delete current selected option
-        delete selectedOptions[optionString];
+        delete selectedOptions[optionHash];
 
     } else {
 
@@ -75,7 +79,7 @@ function authorSelect(el, optionString){
         // Toggle selection flag
         selected = false;
         // Store current selected option
-        selectedOptions[optionString] = option;
+        selectedOptions[optionHash] = option;
 
     }
 
@@ -85,7 +89,6 @@ function authorSelect(el, optionString){
 }
 
 function authorMatch(){
-
     if(config.interlinking){
 
         // Store matching
@@ -94,7 +97,7 @@ function authorMatch(){
             url: '/api/v1/' + params.userToken + '/enrich-author/',
             async: true,
             data: {
-                option: JSON.stringify(Object.values(selectedOptions)[0]),
+                option: Object.keys(selectedOptions)[0],
                 agent: author.uri
             },
             success: (data) => {
@@ -147,9 +150,7 @@ function authorMatch(){
         renderAuthorMatchesContainer(author, params.userToken, Object.values(selectedOptions), () => {
             renderAuthorMatches();
         });
-
     }
-
 }
 
 function groupSelectionLabels(){
@@ -334,54 +335,63 @@ function authorSend(){
 
 // Get author, render author card, options and author labels
 $(document).ready(() => {
-    // Load alternative scripts
-    _loadAlternativeScripts(() => {
-        $.get('/api/v1/' + params.userToken + '/logged-user', (loggedUser) => {
 
-            // Store logged user
-            if(loggedUser)
-                user = loggedUser;
+    let href = window.location.href;
+    if(!(href.includes('login') || href.includes('user'))) {
+        // Load alternative scripts
+        _loadAlternativeScripts(() => {
+            $.get('/api/v1/' + params.userToken + '/logged-user', (loggedUser) => {
 
-            // Render navbar
-            renderNavbar();
-            renderVerificationMessage();
+                // Store logged user
+                if (loggedUser)
+                    user = loggedUser.user;
 
-            // Load configuration
-            $.get(`/api/v1/${params.userToken}/config/`, (json) => {
+                // Render navbar
+                renderNavbar();
+                renderVerificationMessage();
 
-                // Store config
-                config = json;
+                // Load configuration
+                $.get(`/api/v1/${params.userToken}/config/`, (json) => {
 
-                // Get current author and its options
-                $.ajax({
+                    // Store config
+                    config = json;
 
-                    url: '/api/v1/' + params.userToken + '/author/' + (params.authorId ? params.authorId : ''),
-                    method: 'GET',
-                    dataType: 'json',
+                    // Get current author and its options
+                    $.ajax({
 
-                    success: response => {
+                        url: '/api/v1/' + params.userToken + '/author/' + (params.authorId ? params.authorId : ''),
+                        method: 'GET',
+                        dataType: 'json',
 
-                        // Store author response
-                        author = response.author;
-                        options = response.options;
+                        success: response => {
+                            if(!response.author && !response.options){
+                                if(user.role === 'admin') renderNoMoreValidations();
+                                else renderNoMoreAgents();
+                            } else {
 
-                        // Render author card
-                        renderAuthorCard(author);
-                        // Render author options
-                        renderAuthorOptions({'options': options});
+                                // Store author response
+                                author = response.author;
+                                options = response.options;
 
+                                // Render author card
+                                renderAuthorCard(author);
+                                // Render author options
+                                renderAuthorOptions({'options': options});
 
-                        // Check empty response
-                        if (options.length === 0) {
-                            alert('Non sono presenti match per questo autore.');
-                            authorSkip(author.uri);
+                                // Check empty response
+                                if (options.length === 0) {
+                                    alert('Non sono presenti match per questo autore.');
+                                    authorSkip(author.uri);
+                                }
+                            }
+
                         }
-
-                    }
+                    });
                 });
+
             });
 
         });
+    }
 
-    });
 });

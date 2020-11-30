@@ -50,13 +50,19 @@ function getAuthorSimilarOptions(author, options, callback){
             let similarCount = 0;
 
             // Match with author titles
-            option.titles.forEach((title) => {
-                if(title.length > 0){
+            author.titles.forEach((title) => {
+                if (title.length > 0) {
+                    let titleClean = title.replace(/[0-9]+ \~ /, '');
 
-                    // Clean title and make a 0.8 cutoff comparison between titles
-                    let results = fuzz.extract(title.replace(/[0-9]+ \~ /, ''), author.titles, {
-                        scorer: fuzz.token_set_ratio,
-                        cutoff: 80
+                    // Threshold 0.8 match result
+                    let results = fuzz.extract(titleClean, option.titles, {scorer: fuzz.token_set_ratio, cutoff: 80});
+
+                    // Check similarity
+                    results.forEach((result) => {
+                        if (result.length > 0)
+                        // Set option suggested
+                            option.setOptionAsSuggested();
+
                     });
 
                     // Count similar results
@@ -140,7 +146,9 @@ function parseAuthorOptions(author, bodies, callback) {
 
     // Enrich all options with VIAF and return them
     Promise.all(options.map(el => el.enrichObjectWithViaf())).then(() => {
+
         options.map(el => el.getString());
+        console.log(options);
 
         getAuthorSimilarOptions(author, options, function(options) {
             callback(options);
