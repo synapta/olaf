@@ -9,4 +9,4 @@ function parse(config) {
     return fs.createReadStream(config.path).pipe(csv(config));
 }
 
-module.exports = { parse }
+module.exports = { parse };

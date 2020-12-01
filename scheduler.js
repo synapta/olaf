@@ -21,8 +21,7 @@ async function runJob(job) {
                 try {
                     item = await core.loadItem(item_body, source, job);
                 } catch (e) {
-                    // Could be a duplicate
-                    // console.error(e);
+                    console.error(e);
                 }
 
                 if (item) {
@@ -54,7 +53,6 @@ function parseSource(source) {
     const jobs = await Job.findAll({ where: { is_enabled: true } });
 
     for (let job of jobs) {
-        console.log(job.alias);
         try {
             await runJob(job);
         } catch (e) {
@@ -62,5 +60,4 @@ function parseSource(source) {
             console.error(job.dataValues);
         }
     }
-
 })();
