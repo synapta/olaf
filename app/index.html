@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OLAF</title>
+
+  <link rel="icon" sizes="64x64" type="image/png" href="/img/favicon.png" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/lib/semantic242.css" />
+  <!-- <link rel="stylesheet" type="text/css" href="/css/main.css" /> -->
+  <link rel="stylesheet" type="text/css" href="/css/theme.css" />
+  <link rel="stylesheet" type="text/css" href="/css/navbar.css" />
+  <link rel="stylesheet" type="text/css" href="/css/footer.css" />
+  <link rel="stylesheet" type="text/css" href="/css/home.css" />
+
+  <script src="https://kit.fontawesome.com/be7822736c.js"></script>
+</head>
+
+<body class="logged">
+
+  <nav id="navbar"></nav>
+
+  <div class="ui vertical masthead center aligned segment">
+    <div class="ui text container">
+      <h1 class="ui header">
+        Benvenuto in OLAF
+      </h1>
+      <h2>Open Linked Authority Files</h2>
+
+      <a class="ui huge secondary-bg button cta-btn logged-element" href="/new-job">
+        <span>CREA UN NUOVO JOB</span> <i class="plus icon"></i>
+      </a>
+
+      <a class="ui huge secondary-bg button cta-btn not-logged-element" href="/login">
+        <span>ENTRA</span> <i class="arrow right icon"></i>
+      </a>
+
+    </div>
+  </div>
+  
+  <div id="jobs" class="ui container logged-element"></div>
+
+  <footer id="footer"></footer>
+
+  <!-- Libraries -->
+  <script type="text/javascript" src="/js/lib/jquery341.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.js"></script>
+  <script src="/js/lib/semantic242.js"></script>
+
+  <script type="text/javascript" src="/js/utils/request.js"></script>
+  <script type="text/javascript" src="/js/utils/loader.js"></script>
+  <script type="text/javascript" src="/js/home.js"></script>
+  
+</body>
+
+</html>

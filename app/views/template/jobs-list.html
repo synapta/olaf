@@ -1,0 +1,31 @@
+<h1 class="ui header">Job Attivi</h1>
+
+<div class="ui cards">
+  {{#jobs}}
+  <div class="card">
+    <div class="content">
+      <div class="header">{{name}}</div>
+      <div class="meta">
+        <a>{{job_type}}</a>
+      </div>
+      <div class="description">
+        {{description}}
+      </div>
+    </div>
+    <div class="extra content">
+      <span class="right floated">
+        <a href="/job/{{alias}}">
+          VEDI
+          <i class="arrow right icon"></i>
+        </a>
+      </span>
+    </div>
+  </div>
+  {{/jobs}}
+</div>
+
+{{^jobs}}
+<div style="margin-top: 1rem;">
+  <p>Nessun job ancora. <a href="/new-job">Creane uno subito!</a></p>
+</div>
+{{/jobs}}
