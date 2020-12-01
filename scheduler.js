@@ -1,37 +1,58 @@
-const { User, Job, Source, Item, Candidate, Action } = require('./database');
+const { Job, Source, Log } = require('./database');
 
 async function runJob(job) {
     const sources = await Source.findAll({ where: { job_id: job.job_id, update_policy: 'once', last_update: null } });
     const core = require('./cores/' + job.job_type);
 
     for (let source of sources) {
+        await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'start', context: source.source_config } });
+
         let data = null;
 
         try {
             data = parseSource(source);
         } catch (e) {
-            console.error(e);
-            console.error(source.dataValues);
+            await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'error', type: 'source', message: e.toString() } });
         }
 
         if (data) {
+            const stats = {
+                totalItems: 0,
+                errorItems: 0,
+                zeroItems: 0,
+                validItems: 0,
+                validCandidates: 0,
+                errorCandidates: 0
+            }
+
             for await (const item_body of data) {
                 let item = null;
 
                 try {
                     item = await core.loadItem(item_body, source, job);
+                    stats.totalItems++;
                 } catch (e) {
-                    console.error(e);
+                    await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'error', type: 'item', message: e.toString(), context: item_body } });
+                    stats.errorItems++;
                 }
 
                 if (item) {
                     try {
-                        await core.loadCandidates(item, job);
+                        let numCandidates = await core.loadCandidates(item, job);
+                        if (numCandidates === 0) {
+                            stats.zeroItems++;
+                        } else if (numCandidates > 0) {
+                            stats.validItems++;
+                            stats.validCandidates += numCandidates;
+                        }
                     } catch (e) {
-                        console.log(e);
+                        await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'error', type: 'candidate', message: e.toString(), context: item.dataValues } });
+                        stats.errorCandidates++;
                     }
                 }
             }
+
+            await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'end', stats: stats } });
         }
 
         // Update source

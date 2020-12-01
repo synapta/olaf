@@ -22,14 +22,13 @@ async function loadItem(item_body, source, job) {
 async function loadCandidates(item, job) {
     // Check there are not candidates
     if (await Candidate.findOne({ where: { item_id: item.item_id } })) {
-        return;
+        return -1;
     }
 
     const query = require('../queries/wikidata');
     const candidates = await query.getCandidates(item.item_search);
 
     for (let candidate_body of candidates) {
-        console.log(candidate_body);
         await Candidate.create({
             item_id: item.item_id,
             candidate_uri: candidate_body.id.value,
@@ -38,6 +37,8 @@ async function loadCandidates(item, job) {
             last_update: new Date()
         });
     }
+
+    return candidates.length;
 }
 
 function nextItem() {

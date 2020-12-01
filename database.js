@@ -76,6 +76,10 @@ const Job = sequelize.define('Job', {
             isLowercase: true
         }
     },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
     job_type: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -357,12 +361,61 @@ Action.belongsTo(Candidate, {
     }
 });
 
+const Log = sequelize.define('Log', {
+    log_id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    job_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    source_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    description: getJsonDataType('description'),
+    timestamp: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+    }
+}, {
+    tableName: 'logs',
+    timestamps: false
+});
+
 (async () => {
     if (require.main === module) {
         // Create the database
         await sequelize.sync();
     }
 })();
+
+Job.hasMany(Log, {
+    foreignKey: {
+        name: 'job_id'
+    }
+});
+
+Log.belongsTo(Job, {
+    foreignKey: {
+        name: 'job_id'
+    }
+});
+
+Source.hasMany(Log, {
+    foreignKey: {
+        name: 'source_id'
+    }
+});
+
+Log.belongsTo(Source, {
+    foreignKey: {
+        name: 'source_id'
+    }
+});
 
 module.exports = {
     sequelize,
@@ -371,5 +424,6 @@ module.exports = {
     Source,
     Item,
     Candidate,
-    Action
+    Action,
+    Log
 };
