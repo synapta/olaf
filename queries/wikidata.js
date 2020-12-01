@@ -6,95 +6,40 @@ function getSparql(values) {
     PREFIX wdt: <http://www.wikidata.org/prop/direct/>
     
     SELECT ?id
-           (SAMPLE(?author) AS ?author)
+           (SAMPLE(?label) AS ?label)
            (SAMPLE(?description) AS ?description)
-           (SAMPLE(?birthDate) AS ?birthDate)
-           (SAMPLE(?deathDate) AS ?deathDate)
-           (SAMPLE(?occupations) AS ?occupations)
            (SAMPLE(?immagine) AS ?immagine)
            (SAMPLE(?itwikipedia) AS ?itwikipedia)
-           (SAMPLE(?viafurl) AS ?viafurl)           
-           (SAMPLE(?ULAN) AS ?ULAN)
-           (SAMPLE(?treccani) as ?treccani)
-           (SAMPLE(?commonsCategory) as ?commonsCategory)
-           (MAX(?workStartingYear) AS ?minThingDate)
-           (MAX(?workEndingYear) AS ?maxThingDate)
-           (GROUP_CONCAT(DISTINCT ?work; separator="###") AS ?works)
-           (SAMPLE(?worksCount) AS ?worksCount)
+
     WHERE {
         
       {
         SELECT ?id
-               ?author
+               ?label
                ?description
-               ?worksCount
-               ?birthDate
-               ?deathDate
-               ?occupations
                ?immagine
                ?itwikipedia
-               ?viafurl
-               ?ULAN
-               ?treccani
-               ?commonsCategory
-               ?work
         WHERE {
     
           {
     
             SELECT ?id
-                  ?author
+                  ?label
                   ?description
-                  (COUNT(DISTINCT ?workID) AS ?worksCount)
-                  (SAMPLE(?birthDate) AS ?birthDate)
-                  (SAMPLE(?deathDate) AS ?deathDate)
-                  (GROUP_CONCAT(DISTINCT ?occupation; separator="###") AS ?occupations)
                   (SAMPLE(?immagine) as ?immagine)
                   (SAMPLE(?itwikipedia) as ?itwikipedia)
-                  (SAMPLE(?viafurl) as ?viafurl)
-                  (SAMPLE(?ULAN) as ?ULAN)
-                  (SAMPLE(?treccani) as ?treccani)
-                  (SAMPLE(?commonsCategory) as ?commonsCategory)
+
             WHERE {
     
               # Setting up services
               SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "it,en".
-                ?id rdfs:label ?author .
+                bd:serviceParam wikibase:language "it,en" .
+                ?id rdfs:label ?label .
                 ?id schema:description ?description .
-                ?occupationID rdfs:label ?occupation
               }
     
-              # Select a single agent
               VALUES ?id {
                 ${values.join(' ')}
-              }
-    
-              # Get only people as Agent
-              ?id wdt:P31 wd:Q5 .
-    
-              # Get see also for creator property
-              wd:P170 wdt:P1659 ?seeAlsoCreator .
-              BIND(URI(REPLACE(STR(?seeAlsoCreator), "entity", "prop/direct")) AS ?creatorBinded)
-    
-              # Select all types of works produced by the given author
-              OPTIONAL {
-                {?workID ?creatorBinded ?id}
-                UNION
-                {?workID wdt:P170 ?id}
-              }
-    
-              # Get agent dates
-              OPTIONAL {
-                ?id wdt:P569 ?birthDate
-              }
-              OPTIONAL {
-                ?id wdt:P570 ?deathDate
-              }
-    
-              # Get agent occupations
-              OPTIONAL {
-                ?id wdt:P106 ?occupationID
               }
     
               OPTIONAL {
@@ -106,45 +51,12 @@ function getSparql(values) {
                 FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
               }
     
-              OPTIONAL {
-                ?id wdt:P214 ?viaf
-                BIND(concat('https://viaf.org/viaf/', ?viaf) as ?viafurl)
-              }
-              
-              OPTIONAL {
-                ?id wdt:P245 ?ULANr
-                BIND(concat('https://www.getty.edu/vow/ULANFullDisplay?find=&role=&nation=&subjectid=', STR(?ULANr)) as ?ULAN)
-              }
-              
-              OPTIONAL {
-                ?id wdt:P3365 ?trecRaw .
-                BIND(concat('http://www.treccani.it/enciclopedia/', ?trecRaw ) as ?treccani)
-              }
-              
-              OPTIONAL {
-                ?id wdt:P373 ?commonsCategory
-              }
-    
-            } GROUP BY ?id ?author ?description
+            } GROUP BY ?id ?label ?description
     
           }
     
-          # Get see also for creator property
-          wd:P170 wdt:P1659 ?seeAlsoCreator .
-          BIND(URI(REPLACE(STR(?seeAlsoCreator), "entity", "prop/direct")) AS ?creatorBinded)
-    
-          # Select all types of works produced by the given author
-          OPTIONAL {
-            {?workID ?creatorBinded ?id}
-            UNION
-            {?workID wdt:P170 ?id}
-            SERVICE wikibase:label {
-              bd:serviceParam wikibase:language "it,en".
-              ?workID rdfs:label ?work .
-            }
-          }
-    
-        } LIMIT 30
+        } LIMIT 10
+
       }
     
     } GROUP BY ?id`;
