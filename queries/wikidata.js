@@ -199,7 +199,11 @@ async function runSparql(values) {
 
 async function getCandidates(search) {
     const values = await runSearch(search);
-    return runSparql(values);
+    if (values.length > 0) {
+        return runSparql(values);
+    } else {
+        return [];
+    }
 }
 
 module.exports = { getCandidates };
