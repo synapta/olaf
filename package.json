@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/synapta/olaf#readme",
   "dependencies": {
+    "csv-parser": "^2.3.3",
     "express": "^4.17.1",
+    "got": "^11.8.0",
     "morgan": "^1.10.0",
     "sequelize": "^6.3.5",
     "sqlite3": "^5.0.0",

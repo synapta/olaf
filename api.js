@@ -104,4 +104,4 @@ module.exports = {
     getSource,
     createSource,
     deleteSource
-}
+};

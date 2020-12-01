@@ -76,6 +76,10 @@ const Job = sequelize.define('Job', {
             isLowercase: true
         }
     },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
     job_type: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -89,13 +93,10 @@ const Job = sequelize.define('Job', {
         }
     },
     job_config: getJsonDataType('job_config'),
-    update_policy: {
-        type: DataTypes.STRING,
+    is_enabled: {
+        type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: 'once',
-        validate: {
-            isIn: [['once']]
-        }
+        defaultValue: true
     },
     last_update: {
         type: DataTypes.DATE
@@ -133,7 +134,7 @@ const Source = sequelize.define('Source', {
         allowNull: false,
         defaultValue: 'once',
         validate: {
-            isIn: [['once']]
+            isIn: [['once', 'disabled']]
         }
     },
     last_update: {
@@ -162,11 +163,19 @@ const Item = sequelize.define('Item', {
         primaryKey: true,
         autoIncrement: true
     },
+    source_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
     job_id: {
         type: DataTypes.INTEGER,
         allowNull: false
     },
     item_uri: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    item_search: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -189,7 +198,25 @@ const Item = sequelize.define('Item', {
     }
 }, {
     tableName: 'items',
-    timestamps: false
+    timestamps: false,
+    indexes: [
+        {
+          unique: true,
+          fields: ['job_id', 'item_uri']
+        }
+      ]
+});
+
+Source.hasMany(Item, {
+    foreignKey: {
+        name: 'source_id'
+    }
+});
+
+Item.belongsTo(Source, {
+    foreignKey: {
+        name: 'source_id'
+    }
 });
 
 Job.hasMany(Item, {
@@ -239,7 +266,13 @@ const Candidate = sequelize.define('Candidate', {
     }
 }, {
     tableName: 'candidates',
-    timestamps: false
+    timestamps: false,
+    indexes: [
+        {
+          unique: true,
+          fields: ['item_id', 'candidate_uri']
+        }
+      ]
 });
 
 Item.hasMany(Candidate, {
@@ -328,12 +361,61 @@ Action.belongsTo(Candidate, {
     }
 });
 
+const Log = sequelize.define('Log', {
+    log_id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    job_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    source_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    description: getJsonDataType('description'),
+    timestamp: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+    }
+}, {
+    tableName: 'logs',
+    timestamps: false
+});
+
 (async () => {
     if (require.main === module) {
         // Create the database
         await sequelize.sync();
     }
 })();
+
+Job.hasMany(Log, {
+    foreignKey: {
+        name: 'job_id'
+    }
+});
+
+Log.belongsTo(Job, {
+    foreignKey: {
+        name: 'job_id'
+    }
+});
+
+Source.hasMany(Log, {
+    foreignKey: {
+        name: 'source_id'
+    }
+});
+
+Log.belongsTo(Source, {
+    foreignKey: {
+        name: 'source_id'
+    }
+});
 
 module.exports = {
     sequelize,
@@ -342,5 +424,6 @@ module.exports = {
     Source,
     Item,
     Candidate,
-    Action
+    Action,
+    Log
 };

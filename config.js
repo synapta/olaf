@@ -10,7 +10,7 @@ const SourceTypes = [
 module.exports = {
     JobTypes,
     SourceTypes
-}
+};
 
 /**
  * A class to parse user configurations
