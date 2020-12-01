@@ -160,11 +160,23 @@ module.exports = function (app, passport = null, driver = null) {
         response.sendFile('login.html', { root: __dirname + '/app/views' });
     });
 
+    app.get('/info', (request, response) => {
+        response.sendFile('info.html', { root: __dirname + '/app/views' });
+    });
+
+    app.get('/how-to', (request, response) => {
+        response.sendFile('howto.html', { root: __dirname + '/app/views' });
+    });
+
+    app.get('/privacy-policy', (request, response) => {
+        response.sendFile('privacy-policy.html', { root: __dirname + '/app/views' });
+    });
+
     app.get('/new-job', (request, response) => {
         response.sendFile('new-job.html', { root: __dirname + '/app/views' });
     });
 
-    app.get('/job/:jobName', (request, response) => {
+    app.get('/job/:alias', (request, response) => {
         response.sendFile('job.html', { root: __dirname + '/app/views' });
     });
 
