@@ -1,5 +1,5 @@
 const JobTypes = [
-    { alias: "xxx", description: "Example of job type" }
+    { alias: "main", description: "Generic job type" }
 ];
 
 const SourceTypes = [

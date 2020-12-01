@@ -89,13 +89,10 @@ const Job = sequelize.define('Job', {
         }
     },
     job_config: getJsonDataType('job_config'),
-    update_policy: {
-        type: DataTypes.STRING,
+    is_enabled: {
+        type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: 'once',
-        validate: {
-            isIn: [['once']]
-        }
+        defaultValue: true
     },
     last_update: {
         type: DataTypes.DATE
@@ -133,7 +130,7 @@ const Source = sequelize.define('Source', {
         allowNull: false,
         defaultValue: 'once',
         validate: {
-            isIn: [['once']]
+            isIn: [['once', 'disabled']]
         }
     },
     last_update: {
@@ -162,11 +159,19 @@ const Item = sequelize.define('Item', {
         primaryKey: true,
         autoIncrement: true
     },
+    source_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
     job_id: {
         type: DataTypes.INTEGER,
         allowNull: false
     },
     item_uri: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    item_search: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -189,7 +194,25 @@ const Item = sequelize.define('Item', {
     }
 }, {
     tableName: 'items',
-    timestamps: false
+    timestamps: false,
+    indexes: [
+        {
+          unique: true,
+          fields: ['job_id', 'item_uri']
+        }
+      ]
+});
+
+Source.hasMany(Item, {
+    foreignKey: {
+        name: 'source_id'
+    }
+});
+
+Item.belongsTo(Source, {
+    foreignKey: {
+        name: 'source_id'
+    }
 });
 
 Job.hasMany(Item, {
@@ -239,7 +262,13 @@ const Candidate = sequelize.define('Candidate', {
     }
 }, {
     tableName: 'candidates',
-    timestamps: false
+    timestamps: false,
+    indexes: [
+        {
+          unique: true,
+          fields: ['item_id', 'candidate_uri']
+        }
+      ]
 });
 
 Item.hasMany(Candidate, {
