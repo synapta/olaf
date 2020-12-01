@@ -76,6 +76,10 @@ body.not-logged .logged-element {
   color: var(--primary-contrast) !important;
 }
 
+button.primary-bg:hover {
+  background-color: var(--primary-shade) !important;
+}
+
 .primary-bg.border {
   border: 1px solid var(--primary-shade) !important;
 }
@@ -97,6 +101,10 @@ body.not-logged .logged-element {
 .secondary-bg {
   background-color: var(--secondary) !important;
   color: var(--secondary-contrast) !important;
+}
+
+button.secondary-bg:hover {
+  background-color: var(--secondary-shade) !important;
 }
 
 .secondary-bg.border {
@@ -122,6 +130,10 @@ body.not-logged .logged-element {
   color: var(--tertiary-contrast) !important;
 }
 
+button.tertiary-bg:hover {
+  background-color: var(--tertiary-shade) !important;
+}
+
 .tertiary-bg.border {
   border: 1px solid var(--tertiary-shade) !important;
 }
@@ -138,4 +150,40 @@ body.not-logged .logged-element {
 
 .tertiary-color {
   color: var(--tertiary) !important;
+}
+
+
+.ui.form .field > label.bottom-label {
+  font-size: 12.5px !important;
+  color: var(--medium) !important;
+}
+
+
+.ui.form .field > label.error-label {
+  display: none;
+  font-size: 16px !important;
+  color: var(--danger) !important;
+  font-weight: 900;
+}
+
+.ui.form .field.field input.wrong,
+.ui.form .field.field textarea.wrong {
+  background-color: rgba(var(--danger-rgb), .1) !important;
+  border-color: var(--danger) !important;
+}
+
+.d-block {
+  display: block !important
+}
+
+.d-iblock {
+  display: inline-block !important
+}
+
+.d-flex {
+  display: flex !important
+}
+
+.d-iflex {
+  display: inline-flex !important
 }

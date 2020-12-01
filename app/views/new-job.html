@@ -4,15 +4,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OLAF | Crea Job</title>
+  <title>OLAF | Nuovo Progetto</title>
 
   <link rel="icon" sizes="64x64" type="image/png" href="/img/favicon.png" />
 
   <!-- Styles -->
   <link rel="stylesheet" type="text/css" href="/css/lib/semantic242.css" />
+
   <link rel="stylesheet" type="text/css" href="/css/theme.css" />
   <link rel="stylesheet" type="text/css" href="/css/navbar.css" />
   <link rel="stylesheet" type="text/css" href="/css/footer.css" />
+
+  <link rel="stylesheet" type="text/css" href="/css/new-job.css" />
 
   <script src="https://kit.fontawesome.com/be7822736c.js"></script>
 </head>
@@ -21,8 +24,91 @@
 
   <nav id="navbar"></nav>
 
-  <div class="ui container">
-    <h1 class="ui dividing header">Crea un nuovo job</h1>
+  <div class="ui container" style="padding-top: 8rem; min-height: 800px;">
+
+    <h1 class="ui dividing header new-job-header">Creazione di un nuovo progetto <i> <span id="new-job-step">1</span>/2</i> </h1>
+
+    <div class="new-job-placeholder">
+      <div class="ui fluid placeholder">
+        <div class="header">
+          <div class="line"></div>
+        </div>
+        <div class="header">
+          <div class="line"></div>
+        </div>
+        <div class="header">
+          <div class="line"></div>
+        </div>
+        <div class="header">
+          <div class="line"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="new-job-step step-1">
+      <h3 class="ui dividing header" style="margin-bottom: 2rem !important;">Inserisci le informazioni di base</h3>
+      <form class="ui form new-job-form" data-step="1">
+        <div class="field">
+          <label>Nome*</label>
+          <input type="text" name="job-name" placeholder="Scegli un nome" required>
+          <label class="bottom-label">Ad esempio <i>Il Mio Progetto</i></label>
+        </div>
+        <div class="field">
+          <label>Alias*</label>
+          <input type="text" name="job-alias" placeholder="Inserisci un alias per il progetto" required>
+          <label class="error-label alias-error">L'alias che hai inserito non è valido!</label>
+          <label class="bottom-label">Usa solo lettere minuscole, nessun numero o simbolo. Ad esempio <i>ilmioprogetto</i></label>
+        </div>
+        <div class="field">
+          <label>Descrizione</label>
+          <textarea rows="2" name="job-description"
+            placeholder="Se necessario, descrivi brevemente il progetto"></textarea>
+        </div>
+        <div class="field">
+          <label>Tipo di progetto</label>
+          <select id="job-type-select" class="ui fluid search dropdown" name="job-type"></select>
+        </div>
+        <!-- <div class="field">
+          <div class="ui checkbox">
+            <input type="checkbox" tabindex="0" class="hidden">
+            <label>I agree to the Terms and Conditions</label>
+          </div>
+        </div> -->
+        <button class="ui button tertiary-bg border new-job-submit" type="submit">
+          AVANTI
+          <i class="arrow right icon"></i>
+        </button>
+      </form>
+    </div>
+
+    <div class="new-job-step step-2">
+      <h3 class="ui dividing header" style="margin-bottom: 2rem !important;">Carica la sorgente (csv o json)</h3>
+      <form class="ui form new-job-form" data-step="2">
+        <div class="field">
+          <input type="file" name="job-source" id="jobSourceFileInput">
+        </div>
+      </form>
+      <div class="submit-buttons">
+        <!-- <button class="ui negative basic button back-button" data-stepcurrent="2" data-stepto="1">
+          <i class="arrow left icon"></i>
+          INDIETRO
+        </button> -->
+        <button class="ui button tertiary-bg border new-job-submit" type="submit">
+          <i class="ui upload icon"></i>
+          CARICA
+        </button>
+        <button
+          class="ui button"
+          data-tooltip="Puoi saltare questo passaggio per ora e caricare un file in seguito dalla pagina del progetto"
+          data-position="top left"
+        > 
+          SALTA
+        </button>
+      </div>
+
+    </div>
+
+
   </div>
 
   <footer id="footer"></footer>
@@ -33,9 +119,10 @@
   <script src="/js/lib/semantic242.js"></script>
 
   <script type="text/javascript" src="/js/utils/request.js"></script>
+  <script type="text/javascript" src="/js/utils/dom.js"></script>
   <script type="text/javascript" src="/js/utils/loader.js"></script>
   <script type="text/javascript" src="/js/new-job.js"></script>
-  
+
 </body>
 
 </html>
