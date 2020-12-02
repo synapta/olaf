@@ -182,6 +182,18 @@ button.tertiary-bg:hover {
   color: var(--tertiary) !important;
 }
 
+.light-color {
+  color: var(--light) !important;
+}
+
+.medium-color {
+  color: var(--medium) !important;
+}
+
+.dark-color {
+  color: var(--dark) !important;
+}
+
 
 .ui.form .field > label.bottom-label {
   font-size: 12.5px !important;

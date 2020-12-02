@@ -1,0 +1,30 @@
+.job-placeholder .line::after {
+  width: 0 !important;
+}
+
+#job-data {
+  display: none;
+}
+
+.job-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 0 !important;
+}
+
+.last-update-span {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin-bottom: 3rem !important;
+}
+
+.source {
+  width: 100%;
+  border: 1px solid rgba(var(--dark-rgb), .1);
+  border-radius: 5px;
+  background-color: var( --light);
+  padding: 1rem;
+}
