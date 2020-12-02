@@ -58,9 +58,16 @@ const completeJobCreation = async e => {
     return;
   }
 
+  const source_config = {
+    path,
+    separator : e.target.querySelector('input[name="job-source-separator"]').value || ',',
+    quote     : e.target.querySelector('input[name="job-source-quote"]').value,
+    escape    : e.target.querySelector('input[name="job-source-escape"]').value
+  };
+
   uploadButton.classList.add('disabled', 'loading');
   skipBtn.classList.add('disabled');
-  await createSource({ job_id, source_type, source_config: { path }});
+  await createSource({ job_id, source_type, source_config });
 
   goToJobPage(job_alias);
 };
@@ -81,7 +88,11 @@ const completeFirstStep = async e => {
 
   const description = e.target.querySelector('textarea[name="job-description"]').value;
   const job_type = e.target.querySelector('select[name="job-type"]').value;
-  const job_config = {};
+
+  const job_config = {
+    item_uri: e.target.querySelector('input[name="job-uri"]').value || 'URI',
+    item_search: e.target.querySelector('input[name="job-search"]').value || 'Search'
+  };
 
   submitButton.classList.add('disabled', 'loading');
   const job = await createJob({ name, alias, description, job_type, job_config });
