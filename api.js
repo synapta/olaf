@@ -2,7 +2,7 @@ const isValidUTF8 = require('utf-8-validate');
 const fs = require('fs');
 const tmp = require('tmp');
 
-const { User, Job, Source, Item, Candidate, Action } = require('./database');
+const { User, Job, Source, Item, Candidate, Action, Log } = require('./database');
 const { JobTypes, SourceTypes } = require('./config');
 
 // Upload
@@ -97,11 +97,30 @@ const deleteSource = async (req, res) => {
     }
 }
 
+// Log
+const getLog = async (req, res) => {
+    const jobId = parseInt(req.params.id);
+    if (isNaN(jobId)) {
+        res.sendStatus(400);
+        return;
+    }
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = parseInt(req.query.offset) || 0;
+    try {
+        const logs = await Log.findAll({ where: { job_id: jobId }, order: [['timestamp', 'DESC']], limit: limit, offset: offset });
+        res.json(logs);
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(400);
+    }
+};
+
 module.exports = {
     uploadFile,
     getJob,
     createJob,
     getSource,
     createSource,
-    deleteSource
+    deleteSource,
+    getLog
 };
