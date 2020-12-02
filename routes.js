@@ -230,6 +230,15 @@ module.exports = function (app, passport = null, driver = null) {
         api.getLog(req, res);
     });
 
+    // Item
+    app.get('/api/v2/item/:alias', (req, res) => {
+        api.getItem(req, res);
+    });
+
+    app.post('/api/v2/item/:alias/:id', (req, res) => {
+        api.saveItem(req, res);
+    });
+
     /*
     // Arco users
     app.post('/api/v1/:token/signup', (request, response) => {
