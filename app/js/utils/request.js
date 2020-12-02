@@ -105,8 +105,8 @@ const createJob = job => {
 const uploadFile = file => {
   return new Promise((resolve, reject) => {
     postCSV('/api/v2/upload', file)
-    .then(res => resolve(res))
-    .catch(err => reject(err));
+      .then(res => resolve(res))
+      .catch(err => reject(err));
   });
 };
 

@@ -1,6 +1,6 @@
 const aliasRegex = new RegExp("^[a-z]+$");
 
-const goToJobPage = jobAlias =>  window.location.href = `/job/${jobAlias}`;
+const goToJobPage = job_id =>  window.location.href = `/job/${job_id}`;
 
 const manageFileUpload = () => {
   const fileInput = document.getElementById('jobSourceFileInput');
@@ -69,7 +69,7 @@ const completeJobCreation = async e => {
   skipBtn.classList.add('disabled');
   await createSource({ job_id, source_type, source_config });
 
-  goToJobPage(job_alias);
+  goToJobPage(job_id);
 };
 
 
@@ -119,7 +119,7 @@ const completeFirstStep = async e => {
   secondStepForm.dataset.job_alias = alias;
 
   const skipBtn =  document.querySelector('.skip-button');
-  if (skipBtn) skipBtn.dataset.job_alias = alias;
+  if (skipBtn) skipBtn.dataset.job_id = job.job_id;
 };
 
 const init = () => {
@@ -164,7 +164,7 @@ const init = () => {
   skipBtn.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
-    goToJobPage(e.target.dataset.job_alias);
+    goToJobPage(e.target.dataset.job_id);
   });
 
   // alias error messages 
