@@ -1,16 +1,19 @@
 const { User, Job, Source, Item, Candidate, Action } = require('../database');
 
 async function loadItem(item_body, source, job) {
+    const item_uri = job.job_config.item_uri || 'URI';
+    const item_search = job.job_config.item_search || 'Search';
+
     let item;
 
-    item = await Item.findOne({ where: { job_id: job.job_id, item_uri: item_body.Uri } });
+    item = await Item.findOne({ where: { job_id: job.job_id, item_uri: item_body[item_uri] } });
 
     if (item == null) {
         item = await Item.create({
             source_id: source.source_id,
             job_id: job.job_id,
-            item_uri: item_body.Uri,
-            item_search: item_body.Search,
+            item_uri: item_body[item_uri],
+            item_search: item_body[item_search],
             item_body: item_body,
             last_update: new Date()
         });
