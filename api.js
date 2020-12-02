@@ -115,6 +115,48 @@ const getLog = async (req, res) => {
     }
 };
 
+// Item
+const getItem = async (req, res) => {
+    const jobAlias = req.params.alias;
+    const job = await Job.findOne({ where: { alias: jobAlias } });
+    if (job == null) {
+        res.sendStatus(400);
+        return;
+    }
+    const itemUri = req.query.uri;
+    if (itemUri != null) {
+        // Get a specific item
+        const item = await Item.findOne({ where: { job_id: job.job_id, item_uri: itemUri }, include: Candidate });
+        if (item == null) {
+            res.sendStatus(404);
+        } else {
+            res.json(item);
+        }
+    } else {
+        // Get the next item
+        const core = require('./cores/' + job.job_type);
+        const nextItem = await core.nextItem(job);
+        if (nextItem == null) {
+            res.sendStatus(404);
+        } else {
+            nextItem.lock_timestamp = new Date();
+            await nextItem.save();
+            res.json(nextItem);
+        }
+    }
+}
+
+const saveItem = async (req, res) => {
+    const jobAlias = req.params.alias;
+    const job = await Job.findOne({ where: { alias: jobAlias } });
+    if (job == null) {
+        res.sendStatus(400);
+        return;
+    }
+    const core = require('./cores/' + job.job_type);
+    core.saveItem(req, res);
+}
+
 module.exports = {
     uploadFile,
     getJob,
@@ -122,5 +164,7 @@ module.exports = {
     getSource,
     createSource,
     deleteSource,
-    getLog
+    getLog,
+    getItem,
+    saveItem
 };

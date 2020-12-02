@@ -1,4 +1,5 @@
-const { User, Job, Source, Item, Candidate, Action } = require('../database');
+const { Op } = require('sequelize');
+const { User, Job, Source, Item, Candidate, Action, sequelize } = require('../database');
 
 async function loadItem(item_body, source, job) {
     const item_uri = job.job_config.item_uri || 'URI';
@@ -44,12 +45,26 @@ async function loadCandidates(item, job) {
     return candidates.length;
 }
 
-function nextItem() {
-
+function nextItem(job) {
+    const lock_limit = new Date();
+    lock_limit.setHours(lock_limit.getHours() - 1);
+    return Item.findOne({
+        where: {
+            job_id: job.job_id,
+            is_processed: false,
+            [Op.or]: [{ lock_timestamp: { [Op.lte]: lock_limit } }, { lock_timestamp: { [Op.is]: null } }]
+        },
+        order: sequelize.random(),
+        include: [{
+            model: Candidate,
+            required: true
+        }]
+    });
 }
 
-function saveItem() {
-
+function saveItem(req, res) {
+    // XXX
+    res.sendStatus(200);
 }
 
 module.exports = {
