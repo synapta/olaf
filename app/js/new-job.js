@@ -1,6 +1,6 @@
 const aliasRegex = new RegExp("^[a-z]+$");
 
-const goToJobPage = jobAlias =>  window.location.href = `/job/${jobAlias}`;
+const goToJobPage = job_id =>  window.location.href = `/job/${job_id}`;
 
 const manageFileUpload = () => {
   const fileInput = document.getElementById('jobSourceFileInput');
@@ -58,11 +58,18 @@ const completeJobCreation = async e => {
     return;
   }
 
+  const source_config = {
+    path,
+    separator : e.target.querySelector('input[name="job-source-separator"]').value || ',',
+    quote     : e.target.querySelector('input[name="job-source-quote"]').value,
+    escape    : e.target.querySelector('input[name="job-source-escape"]').value
+  };
+
   uploadButton.classList.add('disabled', 'loading');
   skipBtn.classList.add('disabled');
-  await createSource({ job_id, source_type, source_config: { path }});
+  await createSource({ job_id, source_type, source_config });
 
-  goToJobPage(job_alias);
+  goToJobPage(job_id);
 };
 
 
@@ -81,7 +88,11 @@ const completeFirstStep = async e => {
 
   const description = e.target.querySelector('textarea[name="job-description"]').value;
   const job_type = e.target.querySelector('select[name="job-type"]').value;
-  const job_config = {};
+
+  const job_config = {
+    item_uri: e.target.querySelector('input[name="job-uri"]').value || 'URI',
+    item_search: e.target.querySelector('input[name="job-search"]').value || 'Search'
+  };
 
   submitButton.classList.add('disabled', 'loading');
   const job = await createJob({ name, alias, description, job_type, job_config });
@@ -108,7 +119,7 @@ const completeFirstStep = async e => {
   secondStepForm.dataset.job_alias = alias;
 
   const skipBtn =  document.querySelector('.skip-button');
-  if (skipBtn) skipBtn.dataset.job_alias = alias;
+  if (skipBtn) skipBtn.dataset.job_id = job.job_id;
 };
 
 const init = () => {
@@ -153,7 +164,7 @@ const init = () => {
   skipBtn.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
-    goToJobPage(e.target.dataset.job_alias);
+    goToJobPage(e.target.dataset.job_id);
   });
 
   // alias error messages 

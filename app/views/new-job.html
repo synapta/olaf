@@ -66,6 +66,16 @@
           <textarea rows="2" name="job-description" placeholder="Se necessario, descrivi brevemente il progetto"></textarea>
         </div>
         <div class="field">
+          <label>Campo URI</label>
+          <input type="text" name="job-uri" placeholder="Inserisci il nome del campo URI" >
+          <label class="bottom-label">Lascia vuoto per usare il valore predefinito <i>URI</i></label>
+        </div>
+        <div class="field">
+          <label>Campo search</label>
+          <input type="text" name="job-search" placeholder="Inserisci il nome del campo search" >
+          <label class="bottom-label">Lascia vuoto per usare il valore predefinito <i>Search</i></label>
+        </div>
+        <div class="field">
           <label>Tipo di progetto</label>
           <select id="job-type-select" class="ui fluid search dropdown" name="job-type"></select>
         </div>
@@ -91,18 +101,18 @@
         </div>
         <div class="field">
           <label>Separatore CSV</label>
-          <input type="text" name="job-source-separator" placeholder="Se necessario, descrivi brevemente il progetto" maxlength="1" value=','>
+          <input type="text" name="job-source-separator" placeholder="Inserisci il carattere separatore" maxlength="1" value=','>
           <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>,</i> o <i>|</i></label>
         </div>
         <div class="field">
           <label>Qualificatore CSV (quote)</label>
-          <input type="text" name="job-source-quote" placeholder="Se necessario, descrivi brevemente il progetto" maxlength="1" value='"'>
-          <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i></label>
+          <input type="text" name="job-source-quote" placeholder="Inserisci il carattere qualificatore" maxlength="1" value='"'>
+          <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i>. Puoi anche lasciare il campo vuoto.</label>
         </div>
         <div class="field">
           <label>Escape CSV</label>
-          <input type="text" name="job-source-quote" placeholder="Se necessario, descrivi brevemente il progetto" maxlength="1" value='"'>
-          <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i></label>
+          <input type="text" name="job-source-escape" placeholder="Inserisci il carattere escape" maxlength="1" value='"'>
+          <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i>. Puoi anche lasciare il campo vuoto.</label>
         </div>
         <div class="submiasfdast-buttons">
           <!-- <button class="ui negative basic button back-button" data-stepcurrent="2" data-stepto="1">
