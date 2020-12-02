@@ -5,7 +5,7 @@ async function runJob(job) {
     const core = require('./cores/' + job.job_type);
 
     for (let source of sources) {
-        await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'start', context: source.source_config } });
+        await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'start', source: source.source_config, job: job.job_config } });
 
         let data = null;
 
@@ -23,7 +23,7 @@ async function runJob(job) {
                 validItems: 0,
                 validCandidates: 0,
                 errorCandidates: 0
-            }
+            };
 
             for await (const item_body of data) {
                 let item = null;
@@ -46,7 +46,7 @@ async function runJob(job) {
                             stats.validCandidates += numCandidates;
                         }
                     } catch (e) {
-                        await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'error', type: 'candidate', message: e.toString(), context: item.dataValues } });
+                        await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'error', type: 'candidate', message: e.toString(), context: item_body } });
                         stats.errorCandidates++;
                     }
                 }
