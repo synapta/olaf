@@ -225,6 +225,11 @@ module.exports = function (app, passport = null, driver = null) {
         api.deleteSource(req, res);
     });
 
+    // Log
+    app.get('/api/v2/log/:id', (req, res) => {
+        api.getLog(req, res);
+    });
+
     /*
     // Arco users
     app.post('/api/v1/:token/signup', (request, response) => {
