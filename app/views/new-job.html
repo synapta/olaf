@@ -26,7 +26,9 @@
 
   <div class="ui container" style="padding-top: 8rem; min-height: 800px;">
 
-    <h1 class="ui dividing header new-job-header">Creazione di un nuovo progetto <i> <span id="new-job-step">1</span>/2</i> </h1>
+    <h1 class="ui dividing header new-job-header">
+      Creazione di un nuovo progetto <i><span id="new-job-step">1</span>/2</i>
+    </h1>
 
     <div class="new-job-placeholder">
       <div class="ui fluid placeholder">
@@ -61,8 +63,7 @@
         </div>
         <div class="field">
           <label>Descrizione</label>
-          <textarea rows="2" name="job-description"
-            placeholder="Se necessario, descrivi brevemente il progetto"></textarea>
+          <textarea rows="2" name="job-description" placeholder="Se necessario, descrivi brevemente il progetto"></textarea>
         </div>
         <div class="field">
           <label>Tipo di progetto</label>
@@ -74,7 +75,7 @@
             <label>I agree to the Terms and Conditions</label>
           </div>
         </div> -->
-        <button class="ui button tertiary-bg border new-job-submit" type="submit">
+        <button class="ui button tertiary-bg border" type="submit">
           AVANTI
           <i class="arrow right icon"></i>
         </button>
@@ -82,34 +83,53 @@
     </div>
 
     <div class="new-job-step step-2">
-      <h3 class="ui dividing header" style="margin-bottom: 2rem !important;">Carica la sorgente (csv o json)</h3>
+      <h3 class="ui dividing header" style="margin-bottom: 2rem !important;">Carica la sorgente (formato csv)</h3>
       <form class="ui form new-job-form" data-step="2">
         <div class="field">
           <input type="file" name="job-source" id="jobSourceFileInput">
+          <label class="error-label file-error">Il file che hai selezionanto non è un CSV</label>
+        </div>
+        <div class="field">
+          <label>Separatore CSV</label>
+          <input type="text" name="job-source-separator" placeholder="Se necessario, descrivi brevemente il progetto" maxlength="1" value=','>
+          <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>,</i> o <i>|</i></label>
+        </div>
+        <div class="field">
+          <label>Qualificatore CSV (quote)</label>
+          <input type="text" name="job-source-quote" placeholder="Se necessario, descrivi brevemente il progetto" maxlength="1" value='"'>
+          <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i></label>
+        </div>
+        <div class="field">
+          <label>Escape CSV</label>
+          <input type="text" name="job-source-quote" placeholder="Se necessario, descrivi brevemente il progetto" maxlength="1" value='"'>
+          <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i></label>
+        </div>
+        <div class="submiasfdast-buttons">
+          <!-- <button class="ui negative basic button back-button" data-stepcurrent="2" data-stepto="1">
+            <i class="arrow left icon"></i>
+            INDIETRO
+          </button> -->
+          <button class="ui button tertiary-bg border disabled upload-button" type="submit">
+            <i class="ui upload icon"></i>
+            CARICA
+          </button>
+          <button class="ui button skip-button"
+            data-tooltip="Puoi saltare questo passaggio per ora e caricare un file in seguito dalla pagina del progetto"
+            data-position="top left">
+            SALTA
+          </button>
+          <button class="ui basic black button borderless csv-help-button d-none">
+            <span style="margin-right: 5px;">Serve aiuto</span> <i class="question circle icon"></i>
+          </button>
         </div>
       </form>
-      <div class="submit-buttons">
-        <!-- <button class="ui negative basic button back-button" data-stepcurrent="2" data-stepto="1">
-          <i class="arrow left icon"></i>
-          INDIETRO
-        </button> -->
-        <button class="ui button tertiary-bg border new-job-submit" type="submit">
-          <i class="ui upload icon"></i>
-          CARICA
-        </button>
-        <button
-          class="ui button"
-          data-tooltip="Puoi saltare questo passaggio per ora e caricare un file in seguito dalla pagina del progetto"
-          data-position="top left"
-        > 
-          SALTA
-        </button>
-      </div>
 
     </div>
 
 
   </div>
+
+  <div class="ui basic modal csv-help-modal"></div>
 
   <footer id="footer"></footer>
 

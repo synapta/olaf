@@ -1,20 +1,70 @@
 const aliasRegex = new RegExp("^[a-z]+$");
 
-const uploadFile = file => {
-  return new Promise((resolve, reject) => {
-    postCSV('/api/v2/upload', file)
-    .then(res => resolve(res))
-    .catch(err => reject(err));
-  });
+const goToJobPage = jobAlias =>  window.location.href = `/job/${jobAlias}`;
+
+const manageFileUpload = () => {
+  const fileInput = document.getElementById('jobSourceFileInput');
+  if (!fileInput) {
+    return;
+  }
+
+  const fileInputError = document.querySelector('.file-error');
+  if (!fileInputError) {
+    return;
+  }
+
+  const uploadButton = document.querySelector('.upload-button');
+  if (!uploadButton) {
+    return;
+  }
+
+  fileInput.addEventListener ('change', e => {
+    const fileType = e.target.files[0].type;
+
+    if (fileType !== 'text/csv') {
+      fileInput.classList.add('wrong');
+      fileInputError.classList.add('d-block');
+      uploadButton.classList.add('disabled');
+    } else {
+      fileInput.classList.remove('wrong');
+      fileInputError.classList.remove('d-block');
+      uploadButton.classList.remove('disabled');
+    }
+  }, false);
 };
 
-const createSource = source => {
-  return new Promise((resolve, reject) => {
-    postJSON('/api/v2/source', source)
-      .then(res => resolve(res))
-      .catch(err => reject(err));
-  });
+const completeJobCreation = async e => {
+  
+  const { job_id, job_alias } = e.target.dataset;
+  const source_type = 'csv'; // TEMP - only allow csv
+
+  const fileInput = document.getElementById('jobSourceFileInput');
+
+  if (!fileInput) {
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const buffer = await file.arrayBuffer();
+  const path = await uploadFile(buffer);
+
+  const uploadButton = document.querySelector('.upload-button');
+  if (!uploadButton) {
+    return;
+  }
+
+  const skipBtn =  document.querySelector('.skip-button');
+  if (!skipBtn) {
+    return;
+  }
+
+  uploadButton.classList.add('disabled', 'loading');
+  skipBtn.classList.add('disabled');
+  await createSource({ job_id, source_type, source_config: { path }});
+
+  goToJobPage(job_alias);
 };
+
 
 const completeFirstStep = async e => {
 
@@ -36,6 +86,8 @@ const completeFirstStep = async e => {
   submitButton.classList.add('disabled', 'loading');
   const job = await createJob({ name, alias, description, job_type, job_config });
 
+  // TODO - manage error when alias is already taken
+
   // hide first step
   const action = await startTransition('.new-job-step.step-1');
 
@@ -43,25 +95,27 @@ const completeFirstStep = async e => {
   if (action !== 'hide') {
     return;
   }
-
+  
   await startTransition('.new-job-step.step-2');
+
   submitButton.classList.remove('disabled', 'loading');
+
   const newJobStep = document.getElementById('new-job-step');
-
   if (newJobStep) newJobStep.innerText = '2';
+
   const secondStepForm = document.querySelector('.new-job-step.step-2 form.new-job-form');
-  secondStepForm.dataset.jobid = job.job_id;
-};
+  secondStepForm.dataset.job_id = job.job_id;
+  secondStepForm.dataset.job_alias = alias;
 
-const completeJobCreation = e => {
-  console.log('complete job creation');
+  const skipBtn =  document.querySelector('.skip-button');
+  if (skipBtn) skipBtn.dataset.job_alias = alias;
 };
-
 
 const init = () => {
   // bind submit forms
   const submitForms = document.querySelectorAll('.new-job-form');
   submitForms.forEach(form => form.addEventListener('submit', e => {
+
     e.preventDefault();
 
     const step = parseInt(e.target.dataset.step);
@@ -73,7 +127,7 @@ const init = () => {
     }
   }));
 
-  // bind back buttons
+  // bind back button
   const backBtns = document.querySelectorAll('.back-button');
   backBtns.forEach(btn => btn.addEventListener('click', async e => {
     const { stepcurrent, stepto } = e.target.dataset;
@@ -87,6 +141,20 @@ const init = () => {
     const newJobStep = document.getElementById('new-job-step');
     if (newJobStep) newJobStep.innerText = stepto;
   }));
+
+  // build CSV help modal
+  buildCsvHelp();
+
+  // manage file upload
+  manageFileUpload();
+
+  // bind skip button
+  const skipBtn =  document.querySelector('.skip-button');
+  skipBtn.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    goToJobPage(e.target.dataset.job_alias);
+  });
 
   // alias error messages 
   const aliasInput = document.querySelector('input[name="job-alias"]');

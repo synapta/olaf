@@ -1,0 +1,36 @@
+<div class="ui icon header">
+  <i class="file alternate outline icon"></i>
+  Come funziona un file CSV
+</div>
+<div class="content">
+  <p>
+    Un flie CSV (comma separated value) è un file di testo che contiene una tabella di dati.
+    Ogni CSV utilizza 3 caratteri speciali, che definiscono come vengono interpretati i dati:
+  </p>
+  <ul>
+    <li>separatore (<i>separator</i>)</li>
+    <li>qualificatore (<i>quote</i>)</li>
+    <li>escape</li>
+  </ul>
+  <p style="margin-bottom: 2rem;">
+    Ad esempio, nella seguente riga di un ipotetico file CSV, abbiamo <code>,</code> come separatore (in rosso) e
+    <code>"</code> sia come qualificatore (in verde) che escape (in blu)
+  </p>
+  <code style="border: 1px dashed; padding: 1rem; font-size: 1.5rem;">
+    pluto<span class="red">,</span> <span class="green">"</span>pippo, paperino
+    <span class="blue">"</span>"duck"<span class="blue">"</span><span class="green">"</span>
+  </code>
+  <p style="margin-top: 2rem;">
+    In questo caso, verranno letti 2 campi:
+  </p>
+  <ol>
+    <li><code>pluto</code></li>
+    <li><code>pippo, paperino "duck"</code></li>
+  </ol>
+</div>
+<div class="actions">
+  <div class="ui red basic cancel inverted button">
+    <i class="checkmark icon"></i>
+    CHIUDI
+  </div>
+</div>

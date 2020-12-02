@@ -54,3 +54,28 @@ const startTransition = (selector, options = {}) => {
     }
   });
 };
+
+/**
+* @function buildCsvHelp
+*/
+const buildCsvHelp = async () => {
+  const helpModalContainer = document.querySelector('.csv-help-modal');
+  if (!helpModalContainer) {
+    return;
+  }
+  const helpBtn = document.querySelector('.csv-help-button');
+  if (!helpBtn) {
+    return;
+  }
+
+  const helpModal = await getText('/views/template/csv-help.html');
+  helpModalContainer.innerHTML = helpModal;
+
+  helpBtn.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    $('.ui.modal').modal('show');
+  });
+  
+  helpBtn.classList.remove('d-none');
+};

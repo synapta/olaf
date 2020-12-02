@@ -101,3 +101,19 @@ const createJob = job => {
       .catch(err => reject(err));
   });
 };
+
+const uploadFile = file => {
+  return new Promise((resolve, reject) => {
+    postCSV('/api/v2/upload', file)
+    .then(res => resolve(res))
+    .catch(err => reject(err));
+  });
+};
+
+const createSource = source => {
+  return new Promise((resolve, reject) => {
+    postJSON('/api/v2/source', source)
+      .then(res => resolve(res))
+      .catch(err => reject(err));
+  });
+};

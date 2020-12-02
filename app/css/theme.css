@@ -71,6 +71,36 @@ body.not-logged .logged-element {
   display: none !important;
 }
 
+.text-center {
+  text-align: center !important;
+}
+
+code {
+  font-family: monospace !important;
+}
+
+code > span.red {
+  color: red !important;
+  font-weight: 900 !important;
+}
+
+code > span.green {
+  color: green !important;
+  font-weight: 900 !important;
+}
+
+code > span.blue {
+  color: dodgerblue !important;
+  font-weight: 900 !important;
+}
+
+.ui.basic.button.borderless {
+  border-width: none !important;
+  border-color: transparent !important;
+  border-image: none !important;
+  box-shadow: none !important;
+}
+
 .primary-bg {
   background-color: var(--primary) !important;
   color: var(--primary-contrast) !important;
@@ -170,6 +200,10 @@ button.tertiary-bg:hover {
 .ui.form .field.field textarea.wrong {
   background-color: rgba(var(--danger-rgb), .1) !important;
   border-color: var(--danger) !important;
+}
+
+.d-none {
+  display: none !important;
 }
 
 .d-block {
