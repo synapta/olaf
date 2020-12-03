@@ -51,6 +51,10 @@
       <h3 class="ui dividing header" style="margin-bottom: 2rem !important;">Inserisci le informazioni di base</h3>
       <form class="ui form new-job-form" data-step="1">
         <div class="field">
+          <label>Tipo di progetto</label>
+          <select id="job-type-select" class="ui fluid search dropdown" name="job-type"></select>
+        </div>
+        <div class="field">
           <label>Nome*</label>
           <input type="text" name="job-name" placeholder="Scegli un nome" required>
           <label class="bottom-label">Ad esempio <i>Il Mio Progetto</i></label>
@@ -74,10 +78,6 @@
           <label>Campo search</label>
           <input type="text" name="job-search" placeholder="Inserisci il nome del campo search" >
           <label class="bottom-label">Lascia vuoto per usare il valore predefinito <i>Search</i></label>
-        </div>
-        <div class="field">
-          <label>Tipo di progetto</label>
-          <select id="job-type-select" class="ui fluid search dropdown" name="job-type"></select>
         </div>
         <!-- <div class="field">
           <div class="ui checkbox">
