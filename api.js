@@ -210,7 +210,7 @@ const verifyEmail = async (req, res) => {
     } else {
         user.is_verified = true;
         await user.save();
-        res.sendStatus(200);
+        res.redirect('/login?verify=true');
     }
 };
 

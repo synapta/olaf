@@ -1,8 +1,7 @@
 const nodemailer = require('nodemailer');
 const config = require('./config')
 
-// Initialize transporter
-const transporter = nodemailer.createTransport(config.mailTransport);
+const transporter = nodemailer.createTransport(config.MailTransport);
 
 function sendVerifyEmail(destination, token) {
     return transporter.sendMail({
