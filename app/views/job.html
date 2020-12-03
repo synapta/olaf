@@ -4,24 +4,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OLAF | Job</title>
+  <title>OLAF | Progetto</title>
+
+  <link rel="icon" sizes="64x64" type="image/png" href="/img/favicon.png" />
 
   <!-- Styles -->
   <link rel="stylesheet" type="text/css" href="/css/lib/semantic242.css" />
-  <link rel="stylesheet" type="text/css" href="/css/main.css" />
+
+  <link rel="stylesheet" type="text/css" href="/css/theme.css" />
+  <link rel="stylesheet" type="text/css" href="/css/navbar.css" />
+  <link rel="stylesheet" type="text/css" href="/css/footer.css" />
+
+  <link rel="stylesheet" type="text/css" href="/css/job.css" />
+
+  <script src="https://kit.fontawesome.com/be7822736c.js"></script>
 </head>
 
 <body>
 
-  <div class="ui fixed borderless huge"></div>
+  <nav id="navbar"></nav>
+
+  <div class="ui container" style="padding-top: 8rem; min-height: 800px; margin-bottom: 5rem;">
+
+    <div class="job-placeholder">
+      <div class="ui fluid placeholder">
+        <div class="header">
+          <div class="line"></div>
+        </div>
+        <div class="header">
+          <div class="line"></div>
+        </div>
+        <div class="header">
+          <div class="line"></div>
+        </div>
+        <div class="header">
+          <div class="line"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="job-data"></div>
+  </div>
+
+  <footer id="footer"></footer>
+
 
   <!-- Libraries -->
   <script type="text/javascript" src="/js/lib/jquery341.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.js"></script>
-  <script src="https://kit.fontawesome.com/be7822736c.js"></script>
   <script src="/js/lib/semantic242.js"></script>
 
+  <script type="text/javascript" src="/js/utils/request.js"></script>
+  <script type="text/javascript" src="/js/utils/dom.js"></script>
   <script type="text/javascript" src="/js/utils/url.js"></script>
+  <script type="text/javascript" src="/js/utils/format.js"></script>
+  <script type="text/javascript" src="/js/utils/loader.js"></script>
+
+  <script type="text/javascript" src="/js/job.js"></script>
+
 </body>
 
 </html>

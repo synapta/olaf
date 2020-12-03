@@ -1,0 +1,164 @@
+<h1 class="ui dividing header job-header">
+  <span>Progetto {{name}} <i class="medium-color">[ID: {{job_id}}]</i></span>
+  {{#is_enabled}}
+  <a class="ui teal tag label">Attivo</a>
+  {{/is_enabled}}
+  {{^is_enabled}}
+  <a class="ui red tag label">Non Attivo</a>
+  {{/is_enabled}}
+</h1>
+
+<span class="last-update-span">
+  {{#lastUpdate}}
+    <i>Ultimo aggiornamento: {{lastUpdate}}</i>
+  {{/lastUpdate}}
+  {{^lastUpdate}}
+    <i>nessun aggiornamento</i>
+  {{/lastUpdate}}
+</span>
+
+<div class="ui grid">
+  <div class="row">
+    <div class="eight wide column">
+
+      {{#description}}
+      <div class="job-desc">
+        <p>{{description}}</p>
+      </div>
+      {{/description}}
+
+      <table class="ui very basic collapsing celled table">
+        <!-- <thead>
+          <tr>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead> -->
+        <tbody>
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="tag icon"></i>
+                <div class="content">
+                  Alias
+                  <!-- <div class="sub header">Human Resources</div> -->
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{alias}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="{{typeIcon}} icon"></i>
+                <div class="content">
+                  Tipo
+                  <!-- <div class="sub header">Entertainment</div> -->
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{type}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="globe icon"></i>
+                <div class="content">
+                  Campo "URI"
+                  <!-- <div class="sub header">Executive</div> -->
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{job_config.item_uri}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="search icon"></i>
+                <div class="content">
+                  Campo "search"
+                  <!-- <div class="sub header">Executive</div> -->
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{job_config.item_search}}
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <div style="margin-top: 3rem;">
+        {{#hasSource}}
+        <button class="ui button secondary-bg start-task">
+          INIZIA IL TASK
+        </button>
+        {{/hasSource}}
+        {{^hasSource}}
+        <div data-tooltip="Per poter inziare il task devi aggiungere una sorgente" data-position="top left">
+          <button class="ui button secondary-bg start-task disabled">
+            INIZIA IL TASK
+          </button>
+        </div>
+        {{/hasSource}}
+      </div>
+    </div>
+    <div class="six wide right floated column">
+      <div class="source">
+        <h3 class="ui dividing header">SORGENTE</h3>
+        {{#hasSource}}
+        {{/hasSource}}
+        {{^hasSource}}
+        <p>Aggiungi una sorgente</p>
+        <div class="source-upload">
+          <form class="ui form new-job-form" data-step="2">
+            <div class="field">
+              <input type="file" name="job-source" id="jobSourceFileInput">
+              <label class="error-label file-error">Il file che hai selezionanto non è un CSV</label>
+            </div>
+            <div class="field">
+              <label>Separatore CSV</label>
+              <input type="text" name="job-source-separator" placeholder="Inserisci il carattere separatore" maxlength="1" value=','>
+              <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>,</i> o <i>|</i></label>
+            </div>
+            <div class="field">
+              <label>Qualificatore CSV (quote)</label>
+              <input type="text" name="job-source-quote" placeholder="Inserisci il carattere qualificatore" maxlength="1" value='"'>
+              <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i>. Puoi anche lasciare il campo vuoto.</label>
+            </div>
+            <div class="field">
+              <label>Escape CSV</label>
+              <input type="text" name="job-source-escape" placeholder="Inserisci il carattere escape" maxlength="1" value='"'>
+              <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i>. Puoi anche lasciare il campo vuoto.</label>
+            </div>
+            <div class="submiasfdast-buttons">
+              <!-- <button class="ui negative basic button back-button" data-stepcurrent="2" data-stepto="1">
+                <i class="arrow left icon"></i>
+                INDIETRO
+              </button> -->
+              <button class="ui button tertiary-bg border disabled upload-button" type="submit">
+                <i class="ui upload icon"></i>
+                CARICA
+              </button>
+              <button class="ui basic black button borderless csv-help-button d-none">
+                <span style="margin-right: 5px;">Serve aiuto</span> <i class="question circle icon"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+        {{/hasSource}}
+      </div>
+    </div>
+  </div>
+
+</div>
