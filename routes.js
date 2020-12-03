@@ -1,6 +1,9 @@
-// Requirements
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
+const LocalStrategy = require('passport-local').Strategy;
+
 const api = require('./api');
+const { User } = require('./database');
 
 const rawParser = bodyParser.raw({ type: '*/*', limit: '100mb' });
 
@@ -102,7 +105,42 @@ function setupRoutines(driver) {
 }
 */
 
-module.exports = function (app, passport = null, driver = null) {
+module.exports = function (app, passport) {
+
+    passport.serializeUser((user, done) => {
+        done(null, user.user_id);
+    });
+
+    passport.deserializeUser((user_id, done) => {
+        User.findOne({ where: { user_id: user_id } }).then((user) => done(null, user));
+    });
+
+    passport.use(new LocalStrategy({
+        usernameField: 'email',
+        passwordField: 'password'
+    }, (email, password, done) => {
+        User.findOne({ where: { email: email } }).then(async (user) => {
+            if (user === null) {
+                return done(null, false);
+            } else if (await bcrypt.compare(password, user.password) == false) {
+                return done(null, false);
+            } else if (!user.is_verified) {
+                return done(null, false);
+            }
+            return done(null, user);
+        }).catch((e) => {
+            return done(e);
+        });
+    }));
+
+    // TODO
+    app.all(['/api/v2/*'], (req, res, next) => {
+        if (req.path == '/api/v2/user' && !req.user) {
+            res.sendStatus(403);
+        } else {
+            next();
+        }
+    })
 
     /*
     // Token middleware
@@ -264,12 +302,25 @@ module.exports = function (app, passport = null, driver = null) {
         api.checkEmail(req, res);
     });
 
-    app.post('/api/v2/user/login', (req, res) => {
+    app.post('/api/v2/user/login', passport.authenticate('local', { failureRedirect: '/login?error=true' }), (req, res) => {
+        res.redirect('/');
+    });
 
+    app.post('/api/v2/user/logout', (req, res) => {
+        req.logout();
+        res.redirect('/');
     });
 
     app.get('/api/v2/user', (req, res) => {
-
+        if (req.user) {
+            res.json({
+                "email": req.user.email,
+                "display_name": req.user.display_name,
+                "role": req.user.role
+            });
+        } else {
+            res.sendStatus(404);
+        }
     });
 
     /*

@@ -1,5 +1,7 @@
+require('dotenv').config();
+
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('sqlite:db.sqlite');
+const sequelize = new Sequelize(process.env.DATABASE_URI || 'sqlite:db.sqlite');
 
 const { JobTypes, SourceTypes } = require('./config');
 
@@ -87,7 +89,7 @@ const User = sequelize.define('User', {
         defaultValue: DataTypes.NOW
     }
 }, {
-    tableName: 'users',
+    tableName: 'Users',
     timestamps: false
 });
 
@@ -136,7 +138,7 @@ const Job = sequelize.define('Job', {
         type: DataTypes.DATE
     }
 }, {
-    tableName: 'jobs',
+    tableName: 'Jobs',
     timestamps: false
 });
 
@@ -179,7 +181,7 @@ const Source = sequelize.define('Source', {
         type: DataTypes.DATE
     }
 }, {
-    tableName: 'sources',
+    tableName: 'Sources',
     timestamps: false
 });
 
@@ -235,7 +237,7 @@ const Item = sequelize.define('Item', {
         type: DataTypes.DATE
     }
 }, {
-    tableName: 'items',
+    tableName: 'Items',
     timestamps: false,
     indexes: [
         {
@@ -303,7 +305,7 @@ const Candidate = sequelize.define('Candidate', {
         type: DataTypes.DATE
     }
 }, {
-    tableName: 'candidates',
+    tableName: 'Candidates',
     timestamps: false,
     indexes: [
         {
@@ -359,7 +361,7 @@ const Action = sequelize.define('Action', {
         defaultValue: DataTypes.NOW
     }
 }, {
-    tableName: 'actions',
+    tableName: 'Actions',
     timestamps: false
 });
 
@@ -420,7 +422,7 @@ const Log = sequelize.define('Log', {
         defaultValue: DataTypes.NOW
     }
 }, {
-    tableName: 'logs',
+    tableName: 'Logs',
     timestamps: false
 });
 
