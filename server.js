@@ -10,7 +10,7 @@ const SessionStore = require('express-session-sequelize')(expressSession.Store);
 const { sequelize } = require('./database');
 
 const sequelizeSessionStore = new SessionStore({
-    db: sequelize,
+    db: sequelize
 });
 
 // Setting up express
@@ -24,7 +24,7 @@ app.use(expressSession({
     secret: process.env.SESSION_SECRET || 'secret',
     store: sequelizeSessionStore,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: false
 }));
 app.use(passport.initialize());
 app.use(passport.session());
