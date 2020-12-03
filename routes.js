@@ -239,6 +239,39 @@ module.exports = function (app, passport = null, driver = null) {
         api.saveItem(req, res);
     });
 
+    // User
+    app.post('/api/v2/user/signup', (req, res) => {
+        api.createUser(req, res);
+    });
+
+    app.post('/api/v2/user/verify', (req, res) => {
+        api.sendVerifyEmail(req, res);
+    });
+
+    app.get('/api/v2/user/verify/:token', (req, res) => {
+        api.verifyEmail(req, res);
+    });
+
+    app.post('/api/v2/user/reset', (req, res) => {
+        api.sendResetEmail(req, res);
+    });
+
+    app.post('/api/v2/user/reset/:token', (req, res) => {
+        api.resetPassword(req, res);
+    });
+
+    app.get('/api/v2/user/:email', (req, res) => {
+        api.checkEmail(req, res);
+    });
+
+    app.post('/api/v2/user/login', (req, res) => {
+
+    });
+
+    app.get('/api/v2/user', (req, res) => {
+
+    });
+
     /*
     // Arco users
     app.post('/api/v1/:token/signup', (request, response) => {

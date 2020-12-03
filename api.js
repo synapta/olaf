@@ -1,9 +1,13 @@
 const isValidUTF8 = require('utf-8-validate');
 const fs = require('fs');
 const tmp = require('tmp');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const { Op } = require('sequelize');
 
 const { User, Job, Source, Item, Candidate, Action, Log } = require('./database');
 const { JobTypes, SourceTypes } = require('./config');
+const mailer = require('./mailer');
 
 // Upload
 const uploadFile = async (req, res) => {
@@ -19,7 +23,7 @@ const uploadFile = async (req, res) => {
     } else {
         res.sendStatus(412);
     }
-}
+};
 
 // Job
 const getJob = async (req, res) => {
@@ -41,7 +45,7 @@ const getJob = async (req, res) => {
             res.json(job);
         }
     }
-}
+};
 
 const createJob = async (req, res) => {
     try {
@@ -51,7 +55,7 @@ const createJob = async (req, res) => {
         console.error(e);
         res.sendStatus(400);
     }
-}
+};
 
 // Source
 const getSource = async (req, res) => {
@@ -70,7 +74,7 @@ const getSource = async (req, res) => {
             res.json(source);
         }
     }
-}
+};
 
 const createSource = async (req, res) => {
     try {
@@ -80,7 +84,7 @@ const createSource = async (req, res) => {
         console.error(e);
         res.sendStatus(400);
     }
-}
+};
 
 const deleteSource = async (req, res) => {
     const sourceId = parseInt(req.params.id);
@@ -89,13 +93,14 @@ const deleteSource = async (req, res) => {
         return;
     }
     try {
+        // TODO
         await Source.destroy({ where: { source_id: sourceId } });
         res.sendStatus(200);
     } catch (e) {
         console.error(e);
         res.sendStatus(400);
     }
-}
+};
 
 // Log
 const getLog = async (req, res) => {
@@ -144,7 +149,7 @@ const getItem = async (req, res) => {
             res.json(nextItem);
         }
     }
-}
+};
 
 const saveItem = async (req, res) => {
     const jobAlias = req.params.alias;
@@ -155,7 +160,108 @@ const saveItem = async (req, res) => {
     }
     const core = require('./cores/' + job.job_type);
     core.saveItem(req, res);
-}
+};
+
+// User
+const createUser = async (req, res) => {
+    // Password must be valid
+    if (!req.body.password || req.body.password == '') {
+        res.sendStatus(400);
+        return;
+    }
+    const hash = await bcrypt.hash(req.body.password, 10);
+    const token = crypto.randomBytes(64).toString('hex');
+    try {
+        await User.create({
+            email: req.body.email,
+            password: hash,
+            token: token,
+            display_name: req.body.display_name
+        });
+        // Do not await this
+        mailer.sendVerifyEmail(req.body.email, token).catch((e) => { console.error(e); });
+        res.sendStatus(200);
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(400);
+    }
+};
+
+const sendVerifyEmail = async (req, res) => {
+    // Email must be valid
+    if (!req.body.email || req.body.email == '') {
+        res.sendStatus(400);
+        return;
+    }
+    const user = await User.findOne({ where: { email: req.body.email, is_verified: false } });
+    if (user == null) {
+        res.sendStatus(404);
+    } else {
+        // Do not await this
+        mailer.sendVerifyEmail(user.email, user.token).catch((e) => { console.error(e); });
+        res.sendStatus(200);
+    }
+};
+
+const verifyEmail = async (req, res) => {
+    const user = await User.findOne({ where: { token: req.params.token, is_verified: false } });
+    if (user == null) {
+        res.sendStatus(404);
+    } else {
+        user.is_verified = true;
+        await user.save();
+        res.sendStatus(200);
+    }
+};
+
+const checkEmail = async (req, res) => {
+    const user = await User.findOne({ where: { email: req.params.email } });
+    if (user == null) {
+        res.sendStatus(200);
+    } else {
+        res.sendStatus(410);
+    }
+};
+
+const sendResetEmail = async (req, res) => {
+    // Email must be valid
+    if (!req.body.email || req.body.email == '') {
+        res.sendStatus(400);
+        return;
+    }
+    const user = await User.findOne({ where: { email: req.body.email, is_verified: true } });
+    if (user == null) {
+        res.sendStatus(404);
+    } else {
+        user.token = crypto.randomBytes(64).toString('hex');
+        user.is_password_reset = true;
+        user.last_password_update = new Date();
+        await user.save();
+        // Do not await this
+        mailer.sendResetEmail(user.email, user.token).catch((e) => { console.error(e); });
+        res.sendStatus(200);
+    }
+};
+
+const resetPassword = async (req, res) => {
+    // Password must be valid
+    if (!req.body.password || req.body.password == '') {
+        res.sendStatus(400);
+        return;
+    }
+    const token_limit = new Date();
+    token_limit.setHours(token_limit.getHours() - 1);
+    const user = await User.findOne({ where: { token: req.params.token, is_password_reset: true, last_password_update: { [Op.gt]: token_limit } } });
+    if (user == null) {
+        res.sendStatus(404);
+    } else {
+        user.password = await bcrypt.hash(req.body.password, 10);
+        user.is_password_reset = false;
+        user.last_password_update = new Date();
+        await user.save();
+        res.sendStatus(200);
+    }
+};
 
 module.exports = {
     uploadFile,
@@ -166,5 +272,11 @@ module.exports = {
     deleteSource,
     getLog,
     getItem,
-    saveItem
+    saveItem,
+    createUser,
+    sendVerifyEmail,
+    verifyEmail,
+    sendResetEmail,
+    resetPassword,
+    checkEmail
 };

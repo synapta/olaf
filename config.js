@@ -1,15 +1,27 @@
+require('dotenv').config();
+
 const JobTypes = [
-    { alias: "authors", description: "Autori" },
-    { alias: "monuments", description: "Monumenti" }
+    { alias: "main", description: "Autori" },
+    { alias: "main", description: "Monumenti" }
 ];
 
 const SourceTypes = [
     { alias: "csv", description: "Upload a CSV file" }
 ];
 
+const mailTransport = {
+    service: 'Gmail',
+    secure: true,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+    }
+};
+
 module.exports = {
     JobTypes,
-    SourceTypes
+    SourceTypes,
+    mailTransport
 };
 
 /**
