@@ -14,18 +14,87 @@ const enrichJobInfo = info => {
 
   const lastUpdate = formatDate(info.last_update);
 
-  const hasSource = Boolean(Array.isArray(info.Source) && info.Source.length > 0);
+  const hasSource = Boolean(Array.isArray(info.Sources) && info.Sources.length > 0);
+  console.log(info.Sources)
 
-  return { ...info, type, typeIcon, lastUpdate, hasSource };
+  
+  const sources = info.Sources.map(source => ({
+    name: source.name,
+    path: source.source_config.path.path,
+    id  : source.source_id,
+    type: source.source_type,
+    icon: source.source_type === 'json' ? 'file code outline' : 'file alternate outline'
+  }));
+
+  console.log(sources);
+  
+
+  return { ...info, type, typeIcon, lastUpdate, hasSource, sources };
+};
+
+const bindDeleteSourceInterface = () => {
+  const confirmDel = document.querySelector('.confirm-delete-source');
+  console.log('confirmDel.dataset', confirmDel.dataset);
+
+  const cancelDel = document.querySelector('.cancel-delete-source');
+  cancelDel.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    $('.delete-source-modal').modal('hide');
+  });
+
+  const delButtons = document.querySelectorAll('.delete-source-button');
+  delButtons.forEach(btn => btn.addEventListener('click', e => {
+    const source_id = e.target.dataset.source_id;
+    console.log('delButtons source id', source_id);
+    $('.delete-source-modal').modal('show');   
+    confirmDel.dataset.source_id = source_id;
+  }));
+  
+  confirmDel.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const source_id = e.target.dataset.source_id;
+    console.log(e.target.dataset);
+    e.target.classList.add('disabled', 'loading');
+    // TODO - solve async issue - sometimes source_id is undefined
+    deleteResource(`/api/v2/source/${source_id}`)
+      .then(res => {
+        location.reload();
+      }).catch(err => {
+        // TODO better alert "non è stato possibile eliminare la sorgente"
+        alert("Non è stato possibile eliminare la sorgente");
+        e.target.classList.remove('disabled', 'loading');
+      });
+  });
+};
+
+const addSourceForm = async (container, job_id, hasSource) => {
+  
+  const formContainer = container.querySelector('.source-upload');
+  if (!formContainer) {
+    return;
+  }
+
+  const formTemplate = await getText('/views/template/source-form.html');
+  const form = Mustache.render(formTemplate, { skipButton: false });
+
+  formContainer.innerHTML = form;
+
+  // if job already has a source, form comes into a closed accordion
+  if (hasSource) { $('.ui.accordion.source-accordion').accordion(); }
+
+  SourceForm.setup({ job_id, afterUpload: 'reload' });
 };
 
 const init = async () => {
   const id = getUrlParam(1);
+
   const jobInfo = await getJSON(`/api/v2/job/${id}`);
-
+  const enrichedInfo =  enrichJobInfo(jobInfo);
+  
   const template = await getText('/views/template/job-body.html');
-
-  const content = Mustache.render(template, enrichJobInfo(jobInfo));
+  const content = Mustache.render(template, enrichedInfo);
 
   const jobContainer = document.getElementById('job-data');
   if (!jobContainer) {
@@ -34,6 +103,8 @@ const init = async () => {
 
   jobContainer.innerHTML = content;
 
+  addSourceForm(jobContainer, id, enrichedInfo.hasSource);
+
   const action = await startTransition('.job-placeholder');
 
   if (action !== 'hide') {
@@ -41,6 +112,8 @@ const init = async () => {
   }
 
   startTransition('#job-data');
+
+  bindDeleteSourceInterface();
 
   const jobLog = await getJSON(`/api/v2/log/${id}`);
 

@@ -78,6 +78,29 @@ const getJSON = async (url = '') => {
 };
 
 /**
+ * @function deleteResource DELETE request using Fetch API 
+ * @param  {String}  [url=''] API URL where to delete
+ * @return {Promise} pending promise
+ */
+const deleteResource = async (url = '') => {
+  try {
+    const response = await fetch(url, {
+      method      : 'DELETE', // *GET, POST, PUT, DELETE, etc.
+      mode        : 'cors', // no-cors, *cors, same-origin
+      cache       : 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      credentials : 'same-origin', // include, *same-origin, omit
+      redirect    : 'follow' // manual, *follow, error
+    });
+    // check if okay
+    if (!response.ok) { return Promise.reject(response); }
+    // parses JSON response into native JavaScript objects
+    return Promise.resolve(response);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+/**
  * @function getText GET request using Fetch API for text data
  * @param  {String}  [url=''] API URL where to post
  * @return {Promise} pending promise

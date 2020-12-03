@@ -10,10 +10,10 @@
 
 <span class="last-update-span">
   {{#lastUpdate}}
-    <i>Ultimo aggiornamento: {{lastUpdate}}</i>
+  <i>Ultimo aggiornamento: {{lastUpdate}}</i>
   {{/lastUpdate}}
   {{^lastUpdate}}
-    <i>nessun aggiornamento</i>
+  <i>nessun aggiornamento</i>
   {{/lastUpdate}}
 </span>
 
@@ -115,50 +115,88 @@
     </div>
     <div class="six wide right floated column">
       <div class="source">
-        <h3 class="ui dividing header">SORGENTE</h3>
+        <h3 class="ui dividing header">SORGENTI</h3>
         {{#hasSource}}
-        {{/hasSource}}
-        {{^hasSource}}
-        <p>Aggiungi una sorgente</p>
-        <div class="source-upload">
-          <form class="ui form new-job-form" data-step="2">
-            <div class="field">
-              <input type="file" name="job-source" id="jobSourceFileInput">
-              <label class="error-label file-error">Il file che hai selezionanto non è un CSV</label>
+        <div class="ui tiny middle aligned divided list sources-list">
+        {{#sources}}
+          <div class="item">
+            <div class="right floated content">
+              <div class="ui icon red basic button delete-source-button" data-source_id="{{id}}">
+                <i class="trash icon"></i>
+              </div>
             </div>
-            <div class="field">
-              <label>Separatore CSV</label>
-              <input type="text" name="job-source-separator" placeholder="Inserisci il carattere separatore" maxlength="1" value=','>
-              <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>,</i> o <i>|</i></label>
+            
+            <div class="content">                         
+              <h3 style="padding-top:.5rem;">
+                <i class="{{icon}} icon"></i>                         
+                <a href="{{path}}">
+                  {{#name}}
+                    {{name}}
+                  {{/name}}
+                  {{^name}}
+                    file
+                  {{/name}}
+                </a>
+              </h3>
             </div>
-            <div class="field">
-              <label>Qualificatore CSV (quote)</label>
-              <input type="text" name="job-source-quote" placeholder="Inserisci il carattere qualificatore" maxlength="1" value='"'>
-              <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i>. Puoi anche lasciare il campo vuoto.</label>
+          </div>
+        {{/sources}}
+        </div>
+
+        <div class="ui accordion source-accordion">
+          <div class="title">
+            <div class="ui button">
+              <i class="ui icon plus"></i>
+              Aggiungi sorgente
             </div>
-            <div class="field">
-              <label>Escape CSV</label>
-              <input type="text" name="job-source-escape" placeholder="Inserisci il carattere escape" maxlength="1" value='"'>
-              <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i>. Puoi anche lasciare il campo vuoto.</label>
+          </div>
+          <div class="content">
+            <div class="source-upload">
+              <div class="ui placeholder source-placeholder">
+                <div class="header">
+                  <div class="full line"></div>
+                  <div class="full line"></div>
+                  <div class="full line"></div>
+                  <div class="full line"></div>
+                </div>
+              </div>
             </div>
-            <div class="submiasfdast-buttons">
-              <!-- <button class="ui negative basic button back-button" data-stepcurrent="2" data-stepto="1">
-                <i class="arrow left icon"></i>
-                INDIETRO
-              </button> -->
-              <button class="ui button tertiary-bg border disabled upload-button" type="submit">
-                <i class="ui upload icon"></i>
-                CARICA
-              </button>
-              <button class="ui basic black button borderless csv-help-button d-none">
-                <span style="margin-right: 5px;">Serve aiuto</span> <i class="question circle icon"></i>
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
         {{/hasSource}}
+
+        {{^hasSource}}
+        <h4>Aggiungi una sorgente</h4>
+        <div class="source-upload">
+          <div class="ui placeholder source-placeholder">
+            <div class="header">
+              <div class="full line"></div>
+              <div class="full line"></div>
+              <div class="full line"></div>
+              <div class="full line"></div>
+            </div>
+          </div>
+        </div>
+        {{/hasSource}}
+
       </div>
     </div>
   </div>
 
 </div>
+
+<div class="ui mini modal delete-source-modal">
+  <div class="header">Elimina sorgente</div>
+  <div class="content">
+    <p>Sicuro di voler eliminare questa sorgente dal progetto?</p>
+  </div>
+  <div class="actions">
+    <div class="ui green button confirm-delete-source">
+      <i class="checkmark icon"></i>
+      Si
+    </div>
+    <div class="ui red button cancel-delete-source">Annulla</div>
+  </div>
+</div>
+
+<div class="ui basic modal csv-help-modal"></div>

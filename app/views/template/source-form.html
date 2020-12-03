@@ -1,0 +1,45 @@
+<form class="ui form add-source-form {{classes}}">
+  <div class="field">
+    <input type="file" name="job-source" id="jobSourceFileInput">
+    <label class="error-label file-error">Il file che hai selezionanto non è un CSV</label>
+  </div>
+  <div class="field">
+    <label>Separatore CSV</label>
+    <input type="text" name="job-source-separator" placeholder="Inserisci il carattere separatore" maxlength="1"
+      value=','>
+    <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>,</i> o <i>|</i></label>
+  </div>
+  <div class="field">
+    <label>Qualificatore CSV (quote)</label>
+    <input type="text" name="job-source-quote" placeholder="Inserisci il carattere qualificatore" maxlength="1"
+      value='"'>
+    <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i>. Puoi anche
+      lasciare il campo vuoto.</label>
+  </div>
+  <div class="field">
+    <label>Escape CSV</label>
+    <input type="text" name="job-source-escape" placeholder="Inserisci il carattere escape" maxlength="1" value='"'>
+    <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i>. Puoi anche
+      lasciare il campo vuoto.</label>
+  </div>
+  <div class="submiasfdast-buttons">
+    <!-- <button class="ui negative basic button back-button" data-stepcurrent="2" data-stepto="1">
+      <i class="arrow left icon"></i>
+      INDIETRO
+    </button> -->
+    <button class="ui button tertiary-bg border disabled upload-button" type="submit">
+      <i class="ui upload icon"></i>
+      CARICA
+    </button>
+    {{#skipButton}}
+    <button class="ui button skip-button"
+      data-tooltip="Puoi saltare questo passaggio per ora e caricare un file in seguito dalla pagina del progetto"
+      data-position="top left">
+      SALTA
+    </button>
+    {{/skipButton}}
+    <button class="ui basic black button borderless csv-help-button d-none">
+      <span style="margin-right: 5px;">Serve aiuto</span> <i class="question circle icon"></i>
+    </button>
+  </div>
+</form>
