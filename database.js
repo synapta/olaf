@@ -150,6 +150,10 @@ const Source = sequelize.define('Source', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     source_type: {
         type: DataTypes.STRING,
         allowNull: false,
