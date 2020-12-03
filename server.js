@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 
 const express = require('express');
@@ -30,27 +29,10 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
-/*
-// Get routes
-MongoClient.connect("mongodb://localhost:27017/", (err, client) => {
-
-    if(err)
-        require('./routes.js')(app, passport);
-    else
-        require('./routes.js')(app, passport, client.db('arco'));
-
-    // Notify server uptime
-    let server = app.listen(3646, () => {
-        console.log('Server listening at http://localhost:%s', 3646);
-    });
-
-});
-*/
-
 require('./routes.js')(app, passport);
 
 const server = app.listen(3646, 'localhost', () => {
     const host = server.address().address;
-    const usesPort = server.address().port;
-    console.log('Server listening at http://%s:%s', host, usesPort);
+    const port = server.address().port;
+    console.log('Server listening at http://%s:%s', host, port);
 });
