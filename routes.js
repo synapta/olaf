@@ -48,7 +48,7 @@ module.exports = function (app, passport) {
             // Always return the frontend
             next();
         }
-    })
+    });
 
     // Frontend
     app.get('/', (request, response) => {
