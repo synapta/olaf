@@ -1,11 +1,17 @@
 const nodemailer = require('nodemailer');
-const config = require('./config')
+const mg = require('nodemailer-mailgun-transport');
 
-const transporter = nodemailer.createTransport(config.MailTransport);
+const transporter = nodemailer.createTransport(mg({
+    auth: {
+        api_key: process.env.MAILGUN_KEY,
+        domain: 'synapta.io'
+    },
+    host: 'api.eu.mailgun.net'
+}));
 
 function sendVerifyEmail(destination, token) {
     return transporter.sendMail({
-        from: 'olaf@synapta.io',
+        from: { name: 'OLAF', address: 'olaf@synapta.io' },
         to: destination,
         subject: 'Attiva il tuo account su OLAF',
         html: `<p>Benvenuto in OLAF!</p>
