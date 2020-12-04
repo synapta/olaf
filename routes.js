@@ -33,14 +33,21 @@ module.exports = function (app, passport) {
         });
     }));
 
-    // TODO
-    app.all(['/api/v2/*'], (req, res, next) => {
-        // if (req.path == '/api/v2/user' && !req.user) {
-        //     res.sendStatus(403);
-        // } else {
-        //     next();
-        // }
-        next();
+    app.all('*', (req, res, next) => {
+        if (req.path.startsWith('/api/v2/user')) {
+            // No need to authenticate
+            next();
+        } else if (req.path.startsWith('/api/')) {
+            // All other APIs require a verified user
+            if (req.user && req.user.is_verified) {
+                next();
+            } else {
+                res.sendStatus(403);
+            }
+        } else {
+            // Always return the frontend
+            next();
+        }
     })
 
     // Frontend
@@ -92,12 +99,20 @@ module.exports = function (app, passport) {
 
     // Upload
     app.post('/api/v2/upload', rawParser, (req, res) => {
-        api.uploadFile(req, res);
+        if (req.user.role == 'admin') {
+            api.uploadFile(req, res);
+        } else {
+            res.sendStatus(403);
+        }
     });
 
     // Job
     app.post('/api/v2/job', (req, res) => {
-        api.createJob(req, res);
+        if (req.user.role == 'admin') {
+            api.createJob(req, res);
+        } else {
+            res.sendStatus(403);
+        }
     });
 
     app.get('/api/v2/job/:id', (req, res) => {
@@ -106,7 +121,11 @@ module.exports = function (app, passport) {
 
     // Source
     app.post('/api/v2/source', (req, res) => {
-        api.createSource(req, res);
+        if (req.user.role == 'admin') {
+            api.createSource(req, res);
+        } else {
+            res.sendStatus(403);
+        }
     });
 
     app.get('/api/v2/source/:id', (req, res) => {
@@ -114,12 +133,20 @@ module.exports = function (app, passport) {
     });
 
     app.delete('/api/v2/source/:id', (req, res) => {
-        api.deleteSource(req, res);
+        if (req.user.role == 'admin') {
+            api.deleteSource(req, res);
+        } else {
+            res.sendStatus(403);
+        }
     });
 
     // Log
     app.get('/api/v2/log/:id', (req, res) => {
-        api.getLog(req, res);
+        if (req.user.role == 'admin') {
+            api.getLog(req, res);
+        } else {
+            res.sendStatus(403);
+        }
     });
 
     // Item
@@ -175,7 +202,7 @@ module.exports = function (app, passport) {
                 "email": req.user.email,
                 "display_name": req.user.display_name,
                 "role": req.user.role,
-                "is_verified": req.user.is_verified 
+                "is_verified": req.user.is_verified
             });
         } else {
             res.json(null);
