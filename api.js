@@ -214,13 +214,28 @@ const verifyEmail = async (req, res) => {
     }
 };
 
-const checkEmail = async (req, res) => {
-    const user = await User.findOne({ where: { email: req.params.email } });
-    if (user == null) {
-        res.sendStatus(200);
-    } else {
-        res.sendStatus(410);
+const updateUser = async (req, res) => {
+    if (!req.user) {
+        res.sendStatus(403);
+        return;
     }
+    if (!req.body.old || req.body.old == '') {
+        res.sendStatus(400);
+        return;
+    }
+    if (!req.body.new || req.body.new == '') {
+        res.sendStatus(400);
+        return;
+    }
+    const user = await User.findOne({ where: { user_id: req.user.user_id } });
+    // Check old password
+    if (await bcrypt.compare(req.body.old, user.password) == false) {
+        res.sendStatus(403);
+        return;
+    }
+    user.password = await bcrypt.hash(req.body.new, 10);
+    await user.save();
+    res.sendStatus(200);
 };
 
 const sendResetEmail = async (req, res) => {
@@ -263,6 +278,15 @@ const resetPassword = async (req, res) => {
     }
 };
 
+const checkEmail = async (req, res) => {
+    const user = await User.findOne({ where: { email: req.params.email } });
+    if (user == null) {
+        res.sendStatus(200);
+    } else {
+        res.sendStatus(410);
+    }
+};
+
 module.exports = {
     uploadFile,
     getJob,
@@ -276,6 +300,7 @@ module.exports = {
     createUser,
     sendVerifyEmail,
     verifyEmail,
+    updateUser,
     sendResetEmail,
     resetPassword,
     checkEmail

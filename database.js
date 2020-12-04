@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize(process.env.DATABASE_URI || 'sqlite:db.sqlite');
+const sequelize = new Sequelize(process.env.DATABASE_URI || 'sqlite:db.sqlite', { logging: false });
 
 const { JobTypes, SourceTypes } = require('./config');
 
@@ -241,10 +241,10 @@ const Item = sequelize.define('Item', {
     timestamps: false,
     indexes: [
         {
-          unique: true,
-          fields: ['job_id', 'item_uri']
+            unique: true,
+            fields: ['job_id', 'item_uri']
         }
-      ]
+    ]
 });
 
 Source.hasMany(Item, {
@@ -309,10 +309,10 @@ const Candidate = sequelize.define('Candidate', {
     timestamps: false,
     indexes: [
         {
-          unique: true,
-          fields: ['item_id', 'candidate_uri']
+            unique: true,
+            fields: ['item_id', 'candidate_uri']
         }
-      ]
+    ]
 });
 
 Item.hasMany(Candidate, {
