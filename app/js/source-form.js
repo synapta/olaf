@@ -16,8 +16,6 @@ class SourceForm {
       return;
     }
 
-    console.log(this.options);
-
     // SKIP BUTTON
     this.skipBtn = document.querySelector('.skip-button');
     if (!this.skipBtn) {
@@ -26,7 +24,6 @@ class SourceForm {
       this.skipBtn.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
-        console.log(this.options);
         this.goToJobPage();
       });
     }

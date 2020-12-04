@@ -188,12 +188,12 @@ module.exports = function (app, passport) {
     });
 
     app.post('/api/v2/user/login', passport.authenticate('local'), (req, res) => {
-        res.sendStatus(200);
+        res.status(200).json({ redirect: '/' });
     });
 
     app.get('/api/v2/user/logout', (req, res) => {
         req.logout();
-        res.redirect('/');
+        res.status(200).json({ redirect: '/' });
     });
 
     app.get('/api/v2/user', (req, res) => {

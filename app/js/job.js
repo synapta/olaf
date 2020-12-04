@@ -6,8 +6,12 @@ const enrichJobInfo = info => {
       type = 'Monumenti';
       typeIcon = 'university';
       break;
-    default:
+    case 'author':
       type = 'Autori';
+      typeIcon = 'user';
+      break;
+    default:
+      type = 'Main';
       typeIcon = 'user';
       break;
   }
@@ -15,8 +19,6 @@ const enrichJobInfo = info => {
   const lastUpdate = formatDate(info.last_update);
 
   const hasSource = Boolean(Array.isArray(info.Sources) && info.Sources.length > 0);
-  console.log(info.Sources)
-
   
   const sources = info.Sources.map(source => ({
     name: source.name,
@@ -26,15 +28,11 @@ const enrichJobInfo = info => {
     icon: source.source_type === 'json' ? 'file code outline' : 'file alternate outline'
   }));
 
-  console.log(sources);
-  
-
   return { ...info, type, typeIcon, lastUpdate, hasSource, sources };
 };
 
 const bindDeleteSourceInterface = () => {
   const confirmDel = document.querySelector('.confirm-delete-source');
-  console.log('confirmDel.dataset', confirmDel.dataset);
 
   const cancelDel = document.querySelector('.cancel-delete-source');
   cancelDel.addEventListener('click', e => {
@@ -57,7 +55,9 @@ const bindDeleteSourceInterface = () => {
     const source_id = e.target.dataset.source_id;
     console.log(e.target.dataset);
     e.target.classList.add('disabled', 'loading');
+
     // TODO - solve async issue - sometimes source_id is undefined
+    
     deleteResource(`/api/v2/source/${source_id}`)
       .then(res => {
         location.reload();
@@ -116,9 +116,6 @@ const init = async () => {
   bindDeleteSourceInterface();
 
   const jobLog = await getJSON(`/api/v2/log/${id}`);
-
-  console.log(jobInfo);
-  console.log('log', jobLog);
 };
 
 init();

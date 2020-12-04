@@ -236,7 +236,7 @@ const saveItem = async (req, res) => {
 const createUser = async (req, res) => {
     // Password must be valid
     if (!req.body.password || req.body.password == '') {
-        res.sendStatus(400);
+        res.status(400).json({ error: 'empty-password' });
         return;
     }
     const hash = await bcrypt.hash(req.body.password, 10);
@@ -250,10 +250,10 @@ const createUser = async (req, res) => {
         });
         // Do not await this
         mailer.sendVerifyEmail(req.body.email, token).catch((e) => { console.error(e); });
-        res.sendStatus(200);
+        res.status(200).json({ redirect: '/confirm-email'});
     } catch (e) {
         console.error(e);
-        res.sendStatus(400);
+        res.status(400).json({ error: 'user-creation-error' });
     }
 };
 
