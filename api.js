@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { Op } = require('sequelize');
 
-const { User, Job, Source, Item, Candidate, Action, Log } = require('./database');
+const { sequelize, User, Job, Source, Item, Candidate, Action, Log } = require('./database');
 const { JobTypes, SourceTypes } = require('./config');
 const mailer = require('./mailer');
 
@@ -152,14 +152,84 @@ const getItem = async (req, res) => {
 };
 
 const saveItem = async (req, res) => {
-    const jobAlias = req.params.alias;
-    const job = await Job.findOne({ where: { alias: jobAlias } });
-    if (job == null) {
+    if (!Array.isArray(req.body)) {
         res.sendStatus(400);
         return;
     }
-    const core = require('./cores/' + job.job_type);
-    core.saveItem(req, res);
+
+    // Create a transaction
+    const t = await sequelize.transaction();
+
+    try {
+        const jobAlias = req.params.alias;
+        const job = await Job.findOne({ where: { alias: jobAlias } }, { transaction: t });
+        if (job == null) {
+            res.sendStatus(400);
+            return;
+        }
+        const core = require('./cores/' + job.job_type);
+
+        const itemId = parseInt(req.params.id);
+        if (isNaN(itemId)) {
+            res.sendStatus(400);
+            return;
+        }
+        const item = await Item.findOne({ where: { item_id: itemId, job_id: job.job_id } }, { transaction: t });
+        if (item == null || item.is_processed) {
+            await t.rollback();
+            res.sendStatus(400);
+            return;
+        }
+
+        if (req.body.length == 0) {
+            // No candidates found
+            await Action.create({
+                item_id: item.item_id,
+                user_id: req.user.user_id,
+                is_orphan: true
+            }, { transaction: t });
+        } else {
+            // For all the candidates
+            for (let candidateId of req.body) {
+                // Update the candidate
+                const candidate = await Candidate.findOne({ where: { candidate_id: candidateId, item_id: item.item_id } }, { transaction: t });
+
+                // Invalid candidate
+                if (candidate == null) {
+                    await t.rollback();
+                    res.sendStatus(400);
+                    return;
+                }
+
+                candidate.is_selected = true;
+                candidate.last_update = new Date();
+                await candidate.save({ transaction: t });
+
+                // Create the action
+                await Action.create({
+                    item_id: item.item_id,
+                    candidate_id: candidate.candidate_id,
+                    user_id: req.user.user_id,
+                }, { transaction: t });
+
+                core.saveCandidate(job, item, candidate);
+            }
+        }
+
+        // Update the item
+        item.is_processed = true;
+        item.lock_timestamp = null;
+        item.last_update = new Date();
+        await item.save({ transaction: t });
+
+        // Commit transaction
+        await t.commit();
+        res.sendStatus(200);
+    } catch (e) {
+        console.error(e);
+        await t.rollback();
+        res.sendStatus(400);
+    }
 };
 
 // User

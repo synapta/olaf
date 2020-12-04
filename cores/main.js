@@ -62,14 +62,13 @@ function nextItem(job) {
     });
 }
 
-function saveItem(req, res) {
-    // XXX
-    res.sendStatus(200);
+function saveCandidate(job, item, candidate) {
+    // Pass
 }
 
 module.exports = {
     loadItem,
     loadCandidates,
     nextItem,
-    saveItem
+    saveCandidate
 };
