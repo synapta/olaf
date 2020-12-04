@@ -51,6 +51,10 @@
       <h3 class="ui dividing header" style="margin-bottom: 2rem !important;">Inserisci le informazioni di base</h3>
       <form class="ui form new-job-form" data-step="1">
         <div class="field">
+          <label>Tipo di progetto</label>
+          <select id="job-type-select" class="ui fluid search dropdown" name="job-type"></select>
+        </div>
+        <div class="field">
           <label>Nome*</label>
           <input type="text" name="job-name" placeholder="Scegli un nome" required>
           <label class="bottom-label">Ad esempio <i>Il Mio Progetto</i></label>
@@ -75,10 +79,6 @@
           <input type="text" name="job-search" placeholder="Inserisci il nome del campo search" >
           <label class="bottom-label">Lascia vuoto per usare il valore predefinito <i>Search</i></label>
         </div>
-        <div class="field">
-          <label>Tipo di progetto</label>
-          <select id="job-type-select" class="ui fluid search dropdown" name="job-type"></select>
-        </div>
         <!-- <div class="field">
           <div class="ui checkbox">
             <input type="checkbox" tabindex="0" class="hidden">
@@ -94,7 +94,18 @@
 
     <div class="new-job-step step-2">
       <h3 class="ui dividing header" style="margin-bottom: 2rem !important;">Carica la sorgente (formato csv)</h3>
-      <form class="ui form new-job-form" data-step="2">
+      <div class="source-upload">
+        <div class="ui fluid placeholder">
+          <div class="header">
+            <div class="full line"></div>
+            <div class="full line"></div>
+            <div class="full line"></div>
+            <div class="full line"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- <form class="ui form new-job-form" data-step="2">
         <div class="field">
           <input type="file" name="job-source" id="jobSourceFileInput">
           <label class="error-label file-error">Il file che hai selezionanto non è un CSV</label>
@@ -115,10 +126,10 @@
           <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i>. Puoi anche lasciare il campo vuoto.</label>
         </div>
         <div class="submiasfdast-buttons">
-          <!-- <button class="ui negative basic button back-button" data-stepcurrent="2" data-stepto="1">
+          <button class="ui negative basic button back-button" data-stepcurrent="2" data-stepto="1">
             <i class="arrow left icon"></i>
             INDIETRO
-          </button> -->
+          </button>
           <button class="ui button tertiary-bg border disabled upload-button" type="submit">
             <i class="ui upload icon"></i>
             CARICA
@@ -132,7 +143,7 @@
             <span style="margin-right: 5px;">Serve aiuto</span> <i class="question circle icon"></i>
           </button>
         </div>
-      </form>
+      </form> -->
 
     </div>
 
@@ -151,6 +162,8 @@
   <script type="text/javascript" src="/js/utils/request.js"></script>
   <script type="text/javascript" src="/js/utils/dom.js"></script>
   <script type="text/javascript" src="/js/utils/loader.js"></script>
+
+  <script type="text/javascript" src="/js/source-form.js"></script>
   <script type="text/javascript" src="/js/new-job.js"></script>
 
 </body>
