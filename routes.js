@@ -187,8 +187,8 @@ module.exports = function (app, passport) {
         api.checkEmail(req, res);
     });
 
-    app.post('/api/v2/user/login', passport.authenticate('local', { failureRedirect: '/login?error=true' }), (req, res) => {
-        res.redirect('/');
+    app.post('/api/v2/user/login', passport.authenticate('local'), (req, res) => {
+        res.sendStatus(200);
     });
 
     app.get('/api/v2/user/logout', (req, res) => {
