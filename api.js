@@ -3,6 +3,7 @@ const fs = require('fs');
 const tmp = require('tmp');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const stringify = require('csv-stringify');
 const { Op } = require('sequelize');
 
 const { sequelize, User, Job, Source, Item, Candidate, Action, Log } = require('./database');
@@ -26,6 +27,16 @@ const uploadFile = async (req, res) => {
 };
 
 // Job
+const createJob = async (req, res) => {
+    try {
+        const job = await Job.create(req.body);
+        res.json(job);
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(400);
+    }
+};
+
 const getJob = async (req, res) => {
     if (req.params.id === '_all') {
         const jobs = await Job.findAll();
@@ -47,15 +58,48 @@ const getJob = async (req, res) => {
     }
 };
 
-const createJob = async (req, res) => {
+const downloadJob = async (req, res) => {
+    const jobId = parseInt(req.params.id);
+    if (isNaN(jobId)) {
+        res.sendStatus(400);
+        return;
+    }
+
     try {
-        const job = await Job.create(req.body);
-        res.json(job);
+        const job = await Job.findOne({ where: { job_id: jobId } });
+        if (job === null) {
+            res.sendStatus(404);
+            return;
+        }
+
+        const items = await Item.findAll({
+            where: { job_id: job.job_id, is_processed: true, is_deleted: false },
+            include: [{ model: Candidate, where: { is_selected: true, is_deleted: false } }]
+        });
+
+        const stringifier = stringify({
+            delimiter: ',',
+            header: true
+        });
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=\"' + job.alias + '-' + Date.now() + '.csv\"');
+
+        stringifier.pipe(res);
+
+        for (let item of items) {
+            for (let candidate of item.Candidates) {
+                let row = { item_uri: item.item_uri, candidate_uri: candidate.candidate_uri, last_update: candidate.last_update.toISOString() };
+                stringifier.write(row);
+            }
+        }
+
+        stringifier.end();
     } catch (e) {
         console.error(e);
-        res.sendStatus(400);
+        res.sendStatus(500);
     }
-};
+}
 
 // Source
 const getSource = async (req, res) => {
@@ -232,6 +276,50 @@ const saveItem = async (req, res) => {
     }
 };
 
+const skipItem = async (req, res) => {
+    // Create a transaction
+    const t = await sequelize.transaction();
+
+    try {
+        const jobAlias = req.params.alias;
+        const job = await Job.findOne({ where: { alias: jobAlias } }, { transaction: t });
+        if (job == null) {
+            res.sendStatus(400);
+            return;
+        }
+
+        const itemId = parseInt(req.params.id);
+        if (isNaN(itemId)) {
+            res.sendStatus(400);
+            return;
+        }
+        const item = await Item.findOne({ where: { item_id: itemId, job_id: job.job_id } }, { transaction: t });
+        if (item == null || item.is_processed) {
+            await t.rollback();
+            res.sendStatus(400);
+            return;
+        }
+
+        await Action.create({
+            item_id: item.item_id,
+            user_id: req.user.user_id,
+            is_skipped: true
+        }, { transaction: t });
+
+        // Update the item
+        item.lock_timestamp = null;
+        await item.save({ transaction: t });
+
+        // Commit transaction
+        await t.commit();
+        res.sendStatus(200);
+    } catch (e) {
+        console.error(e);
+        await t.rollback();
+        res.sendStatus(400);
+    }
+};
+
 // User
 const createUser = async (req, res) => {
     // Password must be valid
@@ -359,14 +447,16 @@ const checkEmail = async (req, res) => {
 
 module.exports = {
     uploadFile,
-    getJob,
     createJob,
+    getJob,
+    downloadJob,
     getSource,
     createSource,
     deleteSource,
     getLog,
     getItem,
     saveItem,
+    skipItem,
     createUser,
     sendVerifyEmail,
     verifyEmail,

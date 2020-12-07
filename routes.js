@@ -131,6 +131,14 @@ module.exports = function (app, passport) {
         api.getJob(req, res);
     });
 
+    app.get('/api/v2/job/:id/download', (req, res) => {
+        if (req.user.role == 'admin') {
+            api.downloadJob(req, res);
+        } else {
+            res.sendStatus(403);
+        }
+    });
+
     // Source
     app.post('/api/v2/source', (req, res) => {
         if (req.user.role == 'admin') {
@@ -168,6 +176,10 @@ module.exports = function (app, passport) {
 
     app.post('/api/v2/item/:alias/:id', (req, res) => {
         api.saveItem(req, res);
+    });
+
+    app.post('/api/v2/item/:alias/:id/skip', (req, res) => {
+        api.skipItem(req, res);
     });
 
     // User
