@@ -158,6 +158,10 @@ module.exports = function (app, passport) {
         api.saveItem(req, res);
     });
 
+    app.post('/api/v2/item/:alias/:id/skip', (req, res) => {
+        api.skipItem(req, res);
+    });
+
     // User
     app.post('/api/v2/user/signup', (req, res) => {
         api.createUser(req, res);

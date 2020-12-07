@@ -232,6 +232,50 @@ const saveItem = async (req, res) => {
     }
 };
 
+const skipItem = async (req, res) => {
+    // Create a transaction
+    const t = await sequelize.transaction();
+
+    try {
+        const jobAlias = req.params.alias;
+        const job = await Job.findOne({ where: { alias: jobAlias } }, { transaction: t });
+        if (job == null) {
+            res.sendStatus(400);
+            return;
+        }
+
+        const itemId = parseInt(req.params.id);
+        if (isNaN(itemId)) {
+            res.sendStatus(400);
+            return;
+        }
+        const item = await Item.findOne({ where: { item_id: itemId, job_id: job.job_id } }, { transaction: t });
+        if (item == null || item.is_processed) {
+            await t.rollback();
+            res.sendStatus(400);
+            return;
+        }
+
+        await Action.create({
+            item_id: item.item_id,
+            user_id: req.user.user_id,
+            is_skipped: true
+        }, { transaction: t });
+
+        // Update the item
+        item.lock_timestamp = null;
+        await item.save({ transaction: t });
+
+        // Commit transaction
+        await t.commit();
+        res.sendStatus(200);
+    } catch (e) {
+        console.error(e);
+        await t.rollback();
+        res.sendStatus(400);
+    }
+};
+
 // User
 const createUser = async (req, res) => {
     // Password must be valid
@@ -367,6 +411,7 @@ module.exports = {
     getLog,
     getItem,
     saveItem,
+    skipItem,
     createUser,
     sendVerifyEmail,
     verifyEmail,
