@@ -119,6 +119,14 @@ module.exports = function (app, passport) {
         api.getJob(req, res);
     });
 
+    app.get('/api/v2/job/:id/download', (req, res) => {
+        if (req.user.role == 'admin') {
+            api.downloadJob(req, res);
+        } else {
+            res.sendStatus(403);
+        }
+    });
+
     // Source
     app.post('/api/v2/source', (req, res) => {
         if (req.user.role == 'admin') {
