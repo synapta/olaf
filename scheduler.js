@@ -70,7 +70,7 @@ function parseSource(source) {
     return parser.parse(source.source_config);
 }
 
-(async () => {
+async function run() {
     const jobs = await Job.findAll({ where: { is_enabled: true } });
 
     for (let job of jobs) {
@@ -81,4 +81,10 @@ function parseSource(source) {
             console.error(job.dataValues);
         }
     }
-})();
+
+    return Promise.resolve();
+}
+
+module.exports = {
+    run
+};

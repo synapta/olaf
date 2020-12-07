@@ -1,5 +1,14 @@
 require('dotenv').config();
 
+const scheduler = require('./scheduler');
+
+async function runScheduler() {
+    await scheduler.run();
+    setTimeout(runScheduler, 60000);
+}
+
+setTimeout(runScheduler, 10000);
+
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
