@@ -110,7 +110,7 @@ class SourceForm {
 
     const name = file.name;
     const buffer = await file.arrayBuffer();
-    const path = await uploadFile(buffer);
+    const { path } = await uploadFile(buffer);
 
     const source_config = {
       path,

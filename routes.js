@@ -72,7 +72,11 @@ module.exports = function (app, passport) {
     });
 
     app.get('/new-job', (request, response) => {
+      if (request.user && request.user.role === 'admin') {
         response.sendFile('new-job.html', { root: __dirname + '/app/views' });
+      } else {
+        response.redirect('/');
+      }        
     });
 
     app.get('/verify', (request, response) => {
