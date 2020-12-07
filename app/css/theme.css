@@ -61,6 +61,13 @@
   --light-contrast-rgb: 0,0,0;
   --light-shade: #d7d8da;
   --light-tint: #f5f6f9;
+
+  --footer-h: 231px;
+}
+
+.use-available-space {
+  /* no need to remove navbar height because is position: fixed */
+  min-height: calc(100vh - var(--footer-h)) !important;
 }
 
 body.logged .not-logged-element {
@@ -180,6 +187,18 @@ button.tertiary-bg:hover {
 
 .tertiary-color {
   color: var(--tertiary) !important;
+}
+
+.success-color {
+  color: var(--success) !important;
+}
+
+.warning-color {
+  color: var(--warning) !important;
+}
+
+.danger-color {
+  color: var(--danger) !important;
 }
 
 .light-color {
