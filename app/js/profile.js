@@ -19,6 +19,10 @@ const init = async () => {
     user.logout()
   });
 
+  // change password
+  const changePwd = document.querySelector('.reset-password');
+  changePwd.addEventListener('click', e => window.location.href = '/password-reset?action=change');
+
   const action = await startTransition('.profile-placeholder');
 
   if (action !== 'hide') {

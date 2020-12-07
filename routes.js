@@ -91,6 +91,10 @@ module.exports = function (app, passport) {
         response.sendFile('profile.html', { root: __dirname + '/app/views' });
     });
 
+    app.get('/password-reset', (request, response) => {
+        response.sendFile('password-reset.html', { root: __dirname + '/app/views' });
+    });
+
     app.get('/job/:alias', (request, response) => {
         response.sendFile('job.html', { root: __dirname + '/app/views' });
     });

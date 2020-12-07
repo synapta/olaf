@@ -348,7 +348,7 @@ const createUser = async (req, res) => {
 const sendVerifyEmail = async (req, res) => {
     // Email must be valid
     if (!req.body.email || req.body.email == '') {
-        res.status(400).json({ error: 'missing-email-in-body' });
+        res.status(400).json({ error: 'missing-email' });
         return;
     }
     const user = await User.findOne({ where: { email: req.body.email, is_verified: false } });
@@ -399,12 +399,12 @@ const updateUser = async (req, res) => {
 const sendResetEmail = async (req, res) => {
     // Email must be valid
     if (!req.body.email || req.body.email == '') {
-        res.sendStatus(400);
+        res.status(400).json({ error: 'missing-email' });
         return;
     }
     const user = await User.findOne({ where: { email: req.body.email, is_verified: true } });
     if (user == null) {
-        res.sendStatus(404);
+        res.status(404).json({ error: 'user-not-found '});
     } else {
         user.token = crypto.randomBytes(64).toString('hex');
         user.is_password_reset = true;
@@ -412,36 +412,36 @@ const sendResetEmail = async (req, res) => {
         await user.save();
         // Do not await this
         mailer.sendResetEmail(user.email, user.token).catch((e) => { console.error(e); });
-        res.sendStatus(200);
+        res.status(200).json({});
     }
 };
 
 const resetPassword = async (req, res) => {
     // Password must be valid
     if (!req.body.password || req.body.password == '') {
-        res.sendStatus(400);
+        res.status(400).json({ error: 'missing-password' });
         return;
     }
     const token_limit = new Date();
     token_limit.setHours(token_limit.getHours() - 1);
     const user = await User.findOne({ where: { token: req.params.token, is_password_reset: true, last_password_update: { [Op.gt]: token_limit } } });
     if (user == null) {
-        res.sendStatus(404);
+        res.status(404).json({ error: 'user-not-found' });
     } else {
         user.password = await bcrypt.hash(req.body.password, 10);
         user.is_password_reset = false;
         user.last_password_update = new Date();
         await user.save();
-        res.sendStatus(200);
+        res.status(200).json({});
     }
 };
 
 const checkEmail = async (req, res) => {
     const user = await User.findOne({ where: { email: req.params.email } });
     if (user == null) {
-        res.sendStatus(200);
+        res.status(200).json({});
     } else {
-        res.sendStatus(410);
+        res.status(410).json({ error: 'mail-not-found' });
     }
 };
 

@@ -1,9 +1,3 @@
-const init = async () => {
-  const userStatus = await USER.getStatus();
-  console.log('user get status', userStatus);
-};
-
-
 // LOGIN
 document.getElementById('login-form').addEventListener('submit', e => {
   e.preventDefault();
@@ -33,7 +27,6 @@ document.getElementById('signup-form').addEventListener('submit', e => {
   e.preventDefault();
   e.stopPropagation();
 
-  // const inputs = [...e.target.querySelectorAll('input')].map(field => ({ name: field.name, value: field.value }));
   const inputs = [...e.target.querySelectorAll('input')].reduce((acc, curr) => {
     acc[curr.name] = curr.value;
     return acc;

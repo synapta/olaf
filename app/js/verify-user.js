@@ -2,6 +2,7 @@ const btn = document.querySelector('.new-verification');
 
 btn.addEventListener('click', async e => {
   toggleLoading(e.target);
+  [...document.querySelectorAll('.status-msg')].forEach(btn => btn.classList.add('d-none'));
 
   const user = await USER.getStatus();
 
@@ -15,7 +16,7 @@ btn.addEventListener('click', async e => {
     if (newToken) newToken.classList.add('d-none');
 
   }).catch(err => {
-    console.log(err);
+
     const msg = document.querySelector('.status-msg.negative');
     if (msg) msg.classList.remove('d-none');
     toggleLoading(e.target);
