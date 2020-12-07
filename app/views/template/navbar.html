@@ -20,7 +20,7 @@
         <a class="ui dropdown item">
 
           {{#admin}}
-          <i class="superpowers icon" data-tooltip="ADMIN" data-position="bottom-left"></i>
+          <i class="chess queen icon"></i>
           {{/admin}}
           
           {{name}}
@@ -32,6 +32,12 @@
               <i class="user outline icon"></i>
               profilo
             </div>
+            {{#admin}}
+            <div class="item new-job-button">
+              <i class="plus icon"></i>
+              nuovo progetto
+            </div>
+            {{/admin}}
             <div class="item logout-button">
               <i class="sign-out icon"></i>
               esci
@@ -73,6 +79,12 @@
           <i class="user outline icon"></i>
           profilo
         </a>
+        {{#admin}}
+        <a class="item new-job-button">
+          <i class="plus icon"></i>
+          nuovo progetto
+        </a>
+        {{/admin}}
         <a class="item logout-button">
           <i class="sign-out icon"></i>
           esci
