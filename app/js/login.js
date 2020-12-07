@@ -24,6 +24,7 @@ document.getElementById('login-form').addEventListener('submit', e => {
     }
   }).catch(err => {
     console.error('login error', err);
+    // TODO - show error message
   });
 });
 
@@ -49,8 +50,11 @@ document.getElementById('signup-form').addEventListener('submit', e => {
     display_name: inputs.display_name,
     password: inputs.password
   }).then(user => {
-    console.log('registration success!', user);
+    if (user.redirect) {
+      window.location.href = user.redirect;
+    }
   }).catch(err => {
     console.error('registration error', err);
+    // TODO - show error message
   });
 });

@@ -9,6 +9,10 @@ getText('/views/template/navbar.html').then(async template => {
   }
   
   const user = await USER.getStatus();
+
+  const bodyClass = user.status === 'anonymous' ? 'not-logged' : 'logged';
+  document.body.classList.add(bodyClass);
+  
   console.log('loader.js - userStaus', user);
 
   // redirect to verify account page if necessary
@@ -16,7 +20,6 @@ getText('/views/template/navbar.html').then(async template => {
     window.location.href = '/verify';
   }
 
-  
   // console.log({ logged: user.isLogged(), admin: user.isAdmin() });
 
   // TODO - use user status to render navbar
