@@ -54,3 +54,17 @@ const startTransition = (selector, options = {}) => {
     }
   });
 };
+
+/**
+* @function toggleLoading toggles Semantic UI classes "loading" and "disabled" - useful for API buttons while waiting for response
+* @param  {el} Element
+*/
+const toggleLoading = el => {
+  if (el.classList.contains('loading') && el.classList.contains('disabled')) {
+    el.classList.remove('loading');
+    el.classList.remove('disabled');
+  } else {
+    el.classList.add('loading');
+    el.classList.add('disabled');
+  }
+};

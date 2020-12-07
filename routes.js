@@ -75,6 +75,14 @@ module.exports = function (app, passport) {
         response.sendFile('new-job.html', { root: __dirname + '/app/views' });
     });
 
+    app.get('/verify', (request, response) => {
+        response.sendFile('verify-user.html', { root: __dirname + '/app/views' });
+    });
+
+    app.get('/verified', (request, response) => {
+        response.sendFile('verified-user.html', { root: __dirname + '/app/views' });
+    });
+
     app.get('/job/:alias', (request, response) => {
         response.sendFile('job.html', { root: __dirname + '/app/views' });
     });
