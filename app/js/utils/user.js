@@ -8,6 +8,7 @@ class User {
 
   getStatus() {
     return new Promise((resolve, reject) => {
+
       if (this.status !== 'pending') {
         // already have status
         return resolve(this);
@@ -70,6 +71,18 @@ class User {
     });
   }
 
+  getEmail() {
+    return this.user_data.email;
+  }
+
+  getDisplayName() {
+    return this.user_data.display_name;
+  }
+
+  getRole() {
+    return this.user_data.role;
+  }
+
   getUserData() {
     return this.user_data;
   }
@@ -80,6 +93,10 @@ class User {
 
   isAdmin() {
     return this.user_data.role === 'admin';
+  }
+
+  isVerified() {
+    return this.user_data.is_verified;
   }
 
 }

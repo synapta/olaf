@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OLAF | Verifca Account</title>
+
+  <link rel="icon" sizes="64x64" type="image/png" href="/img/favicon.png" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/lib/semantic242.css" />
+
+  <link rel="stylesheet" type="text/css" href="/css/theme.css" />
+  <link rel="stylesheet" type="text/css" href="/css/navbar.css" />
+  <link rel="stylesheet" type="text/css" href="/css/footer.css" />
+
+  <style></style>
+
+  <script src="https://kit.fontawesome.com/be7822736c.js"></script>
+</head>
+
+<body>
+
+  <nav id="navbar"></nav>
+
+  <div class="ui container use-available-space" style="padding-top: 8rem;">
+    <h1 class="ui dividing header">Ci siamo quasi!</h1>
+
+    <div class="ui success message status-msg d-none">
+      <div class="header">
+        Mail inviata!
+      </div>
+      <p>Ricontrolla la tua casella di posta e clicca sul link per verificare il tuo account</p>
+    </div>
+
+    <div class="ui negative message status-msg d-none">
+      <div class="header">
+        Ops! Qualcosa è andato storto
+      </div>
+      <p>
+        Qualcosa non ha funzionato nella procedura. Riprova più tardi
+      </p>
+    </div>
+
+    <div style="margin-top:3rem; font-size:17px;">
+
+      <h2>
+        <i class="certificate icon secondary-color"></i> Verifca il tuo account! <i class="certificate icon secondary-color"></i>
+      </h2>
+      
+      <p>
+        Cliccando sul link che hai ricevuto per mail potrai confermare il tuo account ed iniziare ad utilizzare OLAF
+      </p>
+
+      <div class="ui divider"></div>
+
+      <div class="ask-new-token">
+        <p>
+          <i>
+            Non hai ricevuto la mail?
+            Prova a controllare la tua cartella dello spam, altrimenti clicca sul pulsante qui sotto
+          </i>
+        </p>
+        <p>
+          <button class="ui button tertiary-bg border new-verification">RICHIEDI UNA NUOVA MAIL DI VERIFICA</button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <footer id="footer"></footer>
+
+
+  <!-- Libraries -->
+  <!-- Libraries -->
+  <script type="text/javascript" src="/js/lib/jquery341.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.js"></script>
+  <script src="/js/lib/semantic242.js"></script>
+
+  <script type="text/javascript" src="/js/utils/request.js"></script>
+  <script type="text/javascript" src="/js/utils/dom.js"></script>
+  <script type="text/javascript" src="/js/utils/user.js"></script>
+  <script type="text/javascript" src="/js/utils/loader.js"></script>
+
+  <script type="text/javascript" src="/js/verify-user.js"></script>
+
+</body>
+
+</html>

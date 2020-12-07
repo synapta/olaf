@@ -250,7 +250,7 @@ const createUser = async (req, res) => {
         });
         // Do not await this
         mailer.sendVerifyEmail(req.body.email, token).catch((e) => { console.error(e); });
-        res.status(200).json({ redirect: '/confirm-email'});
+        res.status(200).json({ redirect: '/verify' });
     } catch (e) {
         console.error(e);
         res.status(400).json({ error: 'user-creation-error' });
@@ -260,16 +260,16 @@ const createUser = async (req, res) => {
 const sendVerifyEmail = async (req, res) => {
     // Email must be valid
     if (!req.body.email || req.body.email == '') {
-        res.sendStatus(400);
+        res.status(400).json({ error: 'missing-email-in-body' });
         return;
     }
     const user = await User.findOne({ where: { email: req.body.email, is_verified: false } });
     if (user == null) {
-        res.sendStatus(404);
+        res.status(404).json({ error: 'user-error' });
     } else {
         // Do not await this
         mailer.sendVerifyEmail(user.email, user.token).catch((e) => { console.error(e); });
-        res.sendStatus(200);
+        res.status(200).json({});
     }
 };
 
@@ -280,7 +280,7 @@ const verifyEmail = async (req, res) => {
     } else {
         user.is_verified = true;
         await user.save();
-        res.redirect('/login?verify=true');
+        res.redirect('/verified');
     }
 };
 

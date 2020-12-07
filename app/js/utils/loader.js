@@ -9,7 +9,14 @@ getText('/views/template/navbar.html').then(async template => {
   }
   
   const user = await USER.getStatus();
-  // console.log('loader.js - userStaus', user);
+  console.log('loader.js - userStaus', user);
+
+  // redirect to verify account page if necessary
+  if (user.status !== 'anonymous' && !user.isVerified() && window.location.pathname !== '/verify') {
+    window.location.href = '/verify';
+  }
+
+  
   // console.log({ logged: user.isLogged(), admin: user.isAdmin() });
 
   // TODO - use user status to render navbar
@@ -24,7 +31,7 @@ getText('/views/template/footer.html').then(template => {
     return;
   }
 
-  const out = Mustache.render(template, { currentYear: new Date().getFullYear() })
+  const out = Mustache.render(template, { currentYear: new Date().getFullYear() });
   footerContainer.innerHTML = out;  
 });
 
