@@ -83,6 +83,10 @@ module.exports = function (app, passport) {
         response.sendFile('verified-user.html', { root: __dirname + '/app/views' });
     });
 
+    app.get('/profile', (request, response) => {
+        response.sendFile('profile.html', { root: __dirname + '/app/views' });
+    });
+
     app.get('/job/:alias', (request, response) => {
         response.sendFile('job.html', { root: __dirname + '/app/views' });
     });

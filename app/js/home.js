@@ -1,4 +1,15 @@
-getJSON('/api/v2/job/_all').then(async jobs => {
+const init = async () => {
+  const user = await USER.getStatus();
+  console.log('user', user);
+
+  if (user.status === 'anonymous') {
+    document.body.classList.add('not-logged');
+    return;
+  } 
+
+  document.body.classList.add('logged');
+
+  const jobs = await getJSON('/api/v2/job/_all');
 
   if (!Array.isArray(jobs)) {
     return;
@@ -11,4 +22,8 @@ getJSON('/api/v2/job/_all').then(async jobs => {
   const jobsContainer = document.getElementById('jobs');
 
   if (jobsContainer) jobsContainer.innerHTML = out;
-});
+};
+
+// go!
+init();
+

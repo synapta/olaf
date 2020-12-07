@@ -85,11 +85,11 @@ body > .ui.container {
   border-bottom: 1px solid #fff;
 }
 
-#navbar .ui.vertical.menu > .item:hover {
+/* #navbar .ui.vertical.menu > .item:hover {
   padding-left: 1.428em;
   background-color: var(--primary-shade) !important;
   color: #fff !important;
-}
+} */
 
 #navbar .ui.vertical.menu .item .title {
   color: #fff;

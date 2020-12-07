@@ -1,0 +1,46 @@
+#profile-data {
+  display: none;
+}
+
+.job-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 0 !important;
+}
+
+.last-update-span {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin-bottom: 3rem !important;
+}
+
+.job-desc {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(var(--dark-rgb), .1);
+}
+
+.source {
+  width: 100%;
+  border: 1px solid rgba(var(--dark-rgb), .1);
+  border-radius: 5px;
+  background-color: var( --light);
+  padding: 1rem;
+}
+
+.sources-list {
+  border-bottom: 1px solid rgba(var(--dark-rgb), .1);
+  padding: .5rem 0 !important;
+  margin-bottom: .5rem;
+}
+
+.ui.placeholder.source-placeholder,
+.ui.placeholder.source-placeholder .image.header:after,
+.ui.placeholder.source-placeholder .line,
+.ui.placeholder.source-placeholder .line:after,
+.ui.placeholder.source-placeholder > :before {
+  background-color: var( --light);
+}

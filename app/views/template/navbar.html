@@ -10,14 +10,41 @@
         <!-- <i class="book icon"></i> -->
         <img class="navbar-logo" src="/img/logo_white.png" alt="OLAF Logo">
         OLAF</a>
-      
+
       <a class="item" href="/info">Info</a>
       <a class="item" href="/how-to">How To</a>
 
       <div class="right menu">
+
+        {{#logged}}
+        <a class="ui dropdown item">
+
+          {{#admin}}
+          <i class="superpowers icon" data-tooltip="ADMIN" data-position="bottom-left"></i>
+          {{/admin}}
+          
+          {{name}}
+
+          <i class="dropdown icon"></i>
+
+          <div class="menu">
+            <div class="item profile-button">
+              <i class="user outline icon"></i>
+              profilo
+            </div>
+            <div class="item logout-button">
+              <i class="sign-out icon"></i>
+              esci
+            </div>
+          </div>
+        </a>
+        {{/logged}}
+        {{^logged}}
         <a class="item login-btn" href="/login">
           ENTRA
         </a>
+        {{/logged}}
+
       </div>
     </div>
     <!--End: Desktop Nav-->
@@ -35,12 +62,29 @@
 
       <div class="ui vertical accordion borderless fluid menu">
 
-        <a class="item"> Info</a>
-        <a class="item"> How To</a>
+        <a class="item" href="/info"> Info</a>
+        <a class="item" href="/how-to"> How To</a>
 
         <div class="ui divider"></div>
 
+        {{#logged}}
+        <span class="item active">{{name}}</span>
+        <a class="item profile-button">
+          <i class="user outline icon"></i>
+          profilo
+        </a>
+        <a class="item logout-button">
+          <i class="sign-out icon"></i>
+          esci
+        </a>
+        {{/logged}}
+
+        {{^logged}}
         <a class="active item" href="/login">ENTRA</a>
+        {{/logged}}
+
+        
+        
       </div>
     </div>
     <!--End: Mobile Nav-->

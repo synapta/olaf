@@ -20,8 +20,20 @@ getText('/views/template/navbar.html').then(async template => {
   // console.log({ logged: user.isLogged(), admin: user.isAdmin() });
 
   // TODO - use user status to render navbar
-  const out = Mustache.render(template, { logged: user.isLogged(), admin: user.isAdmin() });
+  const out = Mustache.render(template, { logged: user.isLogged(), admin: user.isAdmin(), name: user.getName(), email: user.getEmail() });
   navbarContainer.innerHTML = out;
+
+  $('.ui.dropdown').dropdown();
+
+  $('.ui.toggle.button').click(() => $('.ui.vertical.menu').toggle("250", "linear"));
+
+  // logout
+  const logoutBtns = document.querySelectorAll('.logout-button');
+  logoutBtns.forEach(btn => btn.addEventListener('click', e => user.logout()));
+
+  // go to profile
+  const profileBtns = document.querySelectorAll('.profile-button');
+  profileBtns.forEach(btn => btn.addEventListener('click', e => window.location.href = '/profile'));
 });
 
 getText('/views/template/footer.html').then(template => {

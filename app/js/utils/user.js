@@ -33,16 +33,23 @@ class User {
     });
   }
 
+  // logout() {
+  //   return new Promise((resolve, reject) => {
+  //     this.status = 'pending';
+  //     getJSON('/api/v2/user/logout')
+  //       .then(res => {
+  //         this.getStatus()
+  //           .then(user => resolve({...user, redirect: res.redirect }))
+  //           .catch(err => reject(err));
+  //       }).catch(err => reject(err));
+  //   });
+  // }
+  
   logout() {
-    return new Promise((resolve, reject) => {
-      this.status = 'pending';
-      getJSON('/api/v2/user/logout')
-        .then(res => {
-          this.getStatus()
-            .then(user => resolve({...user, redirect: res.redirect }))
-            .catch(err => reject(err));
-        }).catch(err => reject(err));
-    });
+    console.log('louggingaou')
+    getJSON('/api/v2/user/logout')
+    .then(res => window.location.href = res.redirect)
+    .catch(err => { console.error('logout error', err); alert('Ops! Qualcosa è andato storto nella procedura di logout'); });
   }
 
   login(data) {
@@ -75,7 +82,7 @@ class User {
     return this.user_data.email;
   }
 
-  getDisplayName() {
+  getName() {
     return this.user_data.display_name;
   }
 

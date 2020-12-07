@@ -1,0 +1,88 @@
+<h1 class="ui dividing header job-header">
+  <span>I tuoi dati</span>
+</h1>
+
+<div class="ui grid" style="margin-top: 3rem;">
+  <div class="row">
+    <div class="eight wide column">
+
+      <table class="ui very basic collapsing celled table">
+        <tbody>
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="user outline icon"></i>
+                <div class="content">
+                  Nome
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{name}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="envelope outline icon"></i>
+                <div class="content">
+                  Email
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{email}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="key icon"></i>
+                <div class="content">
+                  Password
+                </div>
+              </h4>
+            </td>
+            <td>
+              <button class="ui button secondary-bg reset-password">
+                RESETTA LA PASSWORD
+              </button>
+            </td>
+          </tr>
+
+          {{#admin}}
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="superpowers icon"></i>
+                <div class="content">
+                  Admin
+                </div>
+              </h4>
+            </td>
+            <td>
+              <i class="check icon"></i>
+            </td>
+          </tr>
+          {{/admin}}
+
+        </tbody>
+      </table>
+      
+      <div class="ui divider" style="margin: 3rem 0;"></div>
+      
+      <div>
+
+        <button class="ui button tertiary-bg bottom-logout-button">
+          <i class="sign-out icon"></i>
+          ESCI
+        </button>
+      </div>
+
+
+    </div>
+  </div>
+
+</div>
