@@ -12,6 +12,7 @@ async function runJob(job) {
         try {
             data = parseSource(source);
         } catch (e) {
+            console.error(e);
             await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'error', type: 'source', message: e.toString() } });
         }
 
@@ -32,6 +33,7 @@ async function runJob(job) {
                     item = await core.loadItem(item_body, source, job);
                     stats.totalItems++;
                 } catch (e) {
+                    console.error(e);
                     await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'error', type: 'item', message: e.toString(), context: item_body } });
                     stats.errorItems++;
                 }
@@ -46,6 +48,7 @@ async function runJob(job) {
                             stats.validCandidates += numCandidates;
                         }
                     } catch (e) {
+                        console.error(e);
                         await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'error', type: 'candidate', message: e.toString(), context: item_body } });
                         stats.errorCandidates++;
                     }

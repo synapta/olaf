@@ -118,4 +118,6 @@ async function getCandidates(search) {
     }
 }
 
-module.exports = { getCandidates };
+module.exports = {
+    getCandidates
+};
