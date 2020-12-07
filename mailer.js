@@ -1,12 +1,12 @@
 const nodemailer = require('nodemailer');
-const mg = require('nodemailer-mailgun-transport');
+const { MailgunTransport } = require('mailgun-nodemailer-transport');
 
-const transporter = nodemailer.createTransport(mg({
+const transporter = nodemailer.createTransport(new MailgunTransport({
     auth: {
-        api_key: process.env.MAILGUN_KEY,
+        apiKey: process.env.MAILGUN_KEY,
         domain: 'synapta.io'
     },
-    host: 'api.eu.mailgun.net'
+    hostname: 'api.eu.mailgun.net'
 }));
 
 function sendVerifyEmail(destination, token) {
