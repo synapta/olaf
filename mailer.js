@@ -4,14 +4,14 @@ const { MailgunTransport } = require('mailgun-nodemailer-transport');
 const transporter = nodemailer.createTransport(new MailgunTransport({
     auth: {
         apiKey: process.env.MAILGUN_KEY,
-        domain: 'synapta.io'
+        domain: 'olaf.link'
     },
     hostname: 'api.eu.mailgun.net'
 }));
 
 function sendVerifyEmail(destination, token) {
     return transporter.sendMail({
-        from: { name: 'OLAF', address: 'olaf@synapta.io' },
+        from: { name: 'OLAF', address: 'account@olaf.link' },
         to: destination,
         subject: 'Attiva il tuo account su OLAF',
         html: `<p>Benvenuto in OLAF!</p>
@@ -33,7 +33,7 @@ function sendVerifyEmail(destination, token) {
 
 function sendResetEmail(destination, token) {
     return transporter.sendMail({
-        from: { name: 'OLAF', address: 'olaf@synapta.io' },
+        from: { name: 'OLAF', address: 'account@olaf.link' },
         to: destination,
         subject: 'Reimposta la tua password su OLAF',
         html: `<p>Clicca sul bottone sottostante per modificare la password del tuo account su OLAF:</p>
