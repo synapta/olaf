@@ -228,11 +228,6 @@ const Item = sequelize.define('Item', {
         allowNull: false,
         defaultValue: false
     },
-    is_deleted: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-    },
     last_update: {
         type: DataTypes.DATE
     }
@@ -281,6 +276,10 @@ const Candidate = sequelize.define('Candidate', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
+    source_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
     candidate_uri: {
         type: DataTypes.STRING,
         allowNull: false
@@ -292,11 +291,6 @@ const Candidate = sequelize.define('Candidate', {
         defaultValue: 1
     },
     is_selected: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-    },
-    is_deleted: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
@@ -324,6 +318,18 @@ Item.hasMany(Candidate, {
 Candidate.belongsTo(Item, {
     foreignKey: {
         name: 'item_id'
+    }
+});
+
+Source.hasMany(Candidate, {
+    foreignKey: {
+        name: 'source_id'
+    }
+});
+
+Candidate.belongsTo(Source, {
+    foreignKey: {
+        name: 'source_id'
     }
 });
 
@@ -411,10 +417,6 @@ const Log = sequelize.define('Log', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    source_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
     description: getJsonDataType('description'),
     timestamp: {
         type: DataTypes.DATE,
@@ -425,13 +427,6 @@ const Log = sequelize.define('Log', {
     tableName: 'Logs',
     timestamps: false
 });
-
-(async () => {
-    if (require.main === module) {
-        // Create the database
-        await sequelize.sync();
-    }
-})();
 
 Job.hasMany(Log, {
     foreignKey: {
@@ -445,17 +440,12 @@ Log.belongsTo(Job, {
     }
 });
 
-Source.hasMany(Log, {
-    foreignKey: {
-        name: 'source_id'
+(async () => {
+    if (require.main === module) {
+        // Create the database
+        await sequelize.sync();
     }
-});
-
-Log.belongsTo(Source, {
-    foreignKey: {
-        name: 'source_id'
-    }
-});
+})();
 
 module.exports = {
     sequelize,

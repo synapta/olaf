@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { User, Job, Source, Item, Candidate, Action, sequelize } = require('../database');
+const { Item, Candidate, sequelize } = require('../database');
 
 async function loadItem(item_body, source, job) {
     const item_uri = job.job_config.item_uri || 'URI';
@@ -35,6 +35,7 @@ async function loadCandidates(item, job) {
     for (let candidate_body of candidates) {
         await Candidate.create({
             item_id: item.item_id,
+            source_id: item.source_id,
             candidate_uri: candidate_body.id.value,
             candidate_body: candidate_body,
             score: 1,

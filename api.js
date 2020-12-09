@@ -73,8 +73,8 @@ const downloadJob = async (req, res) => {
         }
 
         const items = await Item.findAll({
-            where: { job_id: job.job_id, is_processed: true, is_deleted: false },
-            include: [{ model: Candidate, where: { is_selected: true, is_deleted: false } }]
+            where: { job_id: job.job_id, is_processed: true },
+            include: [{ model: Candidate, where: { is_selected: true } }]
         });
 
         const stringifier = stringify({
@@ -136,13 +136,26 @@ const deleteSource = async (req, res) => {
         res.sendStatus(400);
         return;
     }
+
+    const t = await sequelize.transaction();
+
     try {
-        // TODO
-        await Source.destroy({ where: { source_id: sourceId } });
-        res.sendStatus(200);
+        // Delete only if there are no actions
+        const actions = await Action.findAll({ include: { model: Item, where: { source_id: sourceId } } }, { transaction: t });
+        if (actions.length === 0) {
+            await Candidate.destroy({ where: { source_id: sourceId } }, { transaction: t });
+            await Item.destroy({ where: { source_id: sourceId } }, { transaction: t });
+            await Source.destroy({ where: { source_id: sourceId } }, { transaction: t });
+            await t.commit();
+            res.sendStatus(200);
+        } else {
+            await t.rollback();
+            res.sendStatus(422);
+        }
     } catch (e) {
+        await t.rollback();
         console.error(e);
-        res.sendStatus(400);
+        res.sendStatus(500);
     }
 };
 
@@ -404,7 +417,7 @@ const sendResetEmail = async (req, res) => {
     }
     const user = await User.findOne({ where: { email: req.body.email, is_verified: true } });
     if (user == null) {
-        res.status(404).json({ error: 'user-not-found '});
+        res.status(404).json({ error: 'user-not-found' });
     } else {
         user.token = crypto.randomBytes(64).toString('hex');
         user.is_password_reset = true;

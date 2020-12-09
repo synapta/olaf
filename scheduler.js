@@ -5,7 +5,7 @@ async function runJob(job) {
     const core = require('./cores/' + job.job_type);
 
     for (let source of sources) {
-        await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'start', source: source.source_config, job: job.job_config } });
+        await Log.create({ job_id: job.job_id, description: { status: 'start', source: source.source_config, job: job.job_config } });
 
         let data = null;
 
@@ -13,7 +13,7 @@ async function runJob(job) {
             data = parseSource(source);
         } catch (e) {
             console.error(e);
-            await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'error', type: 'source', message: e.toString() } });
+            await Log.create({ job_id: job.job_id, description: { status: 'error', type: 'source', message: e.toString() } });
         }
 
         if (data) {
@@ -34,7 +34,7 @@ async function runJob(job) {
                     stats.totalItems++;
                 } catch (e) {
                     console.error(e);
-                    await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'error', type: 'item', message: e.toString(), context: item_body } });
+                    await Log.create({ job_id: job.job_id, description: { status: 'error', type: 'item', message: e.toString(), context: item_body } });
                     stats.errorItems++;
                 }
 
@@ -49,13 +49,13 @@ async function runJob(job) {
                         }
                     } catch (e) {
                         console.error(e);
-                        await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'error', type: 'candidate', message: e.toString(), context: item_body } });
+                        await Log.create({ job_id: job.job_id, description: { status: 'error', type: 'candidate', message: e.toString(), context: item_body } });
                         stats.errorCandidates++;
                     }
                 }
             }
 
-            await Log.create({ job_id: job.job_id, source_id: source.source_id, description: { status: 'end', stats: stats } });
+            await Log.create({ job_id: job.job_id, description: { status: 'end', stats: stats } });
         }
 
         // Update source
