@@ -69,7 +69,7 @@ const bindDeleteSourceInterface = () => {
   });
 };
 
-const addSourceForm = async (container, job_id, hasSource) => {
+const addSourceForm = async (container, job_alias, job_id, hasSource) => {
   
   const formContainer = container.querySelector('.source-upload');
   if (!formContainer) {
@@ -84,38 +84,43 @@ const addSourceForm = async (container, job_id, hasSource) => {
   // if job already has a source, form comes into a closed accordion
   if (hasSource) { $('.ui.accordion.source-accordion').accordion(); }
 
-  SourceForm.setup({ job_id, afterUpload: 'reload' });
+  SourceForm.setup({ job_alias, job_id, afterUpload: 'reload' });
 };
 
 const init = async () => {
   const alias = getUrlParam(1);
 
-  const jobInfo = await getJSON(`/api/v2/job/${alias}`);
-  const enrichedInfo =  enrichJobInfo(jobInfo);
+  try {
+    const jobInfo = await getJSON(`/api/v2/job/${alias}`);
+    const enrichedInfo =  enrichJobInfo(jobInfo);
+    
+    const template = await getText('/views/template/job-body.html');
+    const content = Mustache.render(template, enrichedInfo);
   
-  const template = await getText('/views/template/job-body.html');
-  const content = Mustache.render(template, enrichedInfo);
-
-  const jobContainer = document.getElementById('job-data');
-  if (!jobContainer) {
-    return;
+    const jobContainer = document.getElementById('job-data');
+    if (!jobContainer) {
+      return;
+    }
+  
+    jobContainer.innerHTML = content;
+  
+    addSourceForm(jobContainer, alias, enrichedInfo.job_id, enrichedInfo.hasSource);
+  
+    const action = await startTransition('.job-placeholder');
+  
+    if (action !== 'hide') {
+      return;
+    }
+  
+    startTransition('#job-data');
+  
+    bindDeleteSourceInterface();
+  
+    const jobLog = await getJSON(`/api/v2/job/${alias}/log`);
+    console.log('job log', jobLog)
+  } catch (error) {
+    window.location.href = '/404';
   }
-
-  jobContainer.innerHTML = content;
-
-  addSourceForm(jobContainer, id, enrichedInfo.hasSource);
-
-  const action = await startTransition('.job-placeholder');
-
-  if (action !== 'hide') {
-    return;
-  }
-
-  startTransition('#job-data');
-
-  bindDeleteSourceInterface();
-
-  const jobLog = await getJSON(`/api/v2/log/${id}`);
 };
 
 init();

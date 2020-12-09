@@ -240,12 +240,7 @@ module.exports = function (app, passport) {
         }
     });
 
-    app.get('/404', (req, res) => {
-      res.status(404).sendFile('404.html', { root: __dirname + '/app' });
-    });
-
     app.use((req, res) => {
       res.status(404).sendFile('404.html', { root: __dirname + '/app' });
     });
-
 };

@@ -1,6 +1,6 @@
 class SourceForm {
   static goToJobPage() {
-    window.location.href = `/job/${this.options.job_id}`
+    window.location.href = `/job/${this.options.job_alias}`
   }
 
   static reloadPage() {
@@ -8,7 +8,7 @@ class SourceForm {
   }
 
   static setup(options = {}) {
-
+    
     // OPTIONS
     this.options = options;
     if (!this.options.job_id) {

@@ -27,11 +27,9 @@ const completeFirstStep = async e => {
 
   try {
     const job = await createJob({ name, alias, description, job_type, job_config });
-
-    // TODO - manage error when alias is already taken
   
     // setup second step form
-    setupSecondStep(job.job_id);
+    setupSecondStep(job.alias, job.job_id);
   
     // hide first step
     const action = await startTransition('.new-job-step.step-1');
@@ -56,7 +54,7 @@ const completeFirstStep = async e => {
   }
 };
 
-const setupSecondStep = async job_id => {
+const setupSecondStep = async (job_alias, job_id) => {
 
   const formContainer = document.querySelector('.source-upload');
   if (!formContainer) {
@@ -68,7 +66,7 @@ const setupSecondStep = async job_id => {
 
   formContainer.innerHTML = form;
 
-  SourceForm.setup({ job_id, afterUpload: 'redirect' });
+  SourceForm.setup({ job_alias, job_id, afterUpload: 'redirect' });
 };
 
 const init = () => {
