@@ -9,6 +9,9 @@ document.getElementById('login-form').addEventListener('submit', e => {
     return acc;
   }, {});
 
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  toggleLoading(submitBtn);
+
   USER.login({
     email: inputs.email,
     password: inputs.password
@@ -17,8 +20,9 @@ document.getElementById('login-form').addEventListener('submit', e => {
       window.location.href = user.redirect;
     }
   }).catch(err => {
-    console.error('login error', err);
-    // TODO - show error message
+    const errMsg = e.target.querySelector('.negative.status-msg');
+    if (errMsg) errMsg.classList.add('d-block');
+    toggleLoading(submitBtn);
   });
 });
 
@@ -47,7 +51,8 @@ document.getElementById('signup-form').addEventListener('submit', e => {
       window.location.href = user.redirect;
     }
   }).catch(err => {
-    console.error('registration error', err);
-    // TODO - show error message
+    const errMsg = e.target.querySelector('.negative.status-msg');
+    if (errMsg) errMsg.classList.add('d-block');
+    toggleLoading(submitBtn);
   });
 });

@@ -48,8 +48,6 @@ const insertNew = (token) => {
     return;
   }
 
-  console.log(token);
-
   const newPasswordForm = document.getElementById('new-password-form');
   newPasswordForm.addEventListener('submit', e => {
     e.preventDefault();
@@ -72,21 +70,14 @@ const insertNew = (token) => {
 
     postJSON(`/api/v2/user/reset/${token}`, inputs)
     .then(res => {
-
       const msg = e.target.querySelector('.status-msg.success');
       if (msg) msg.classList.add('d-block');
-
       const toHide = e.target.querySelectorAll('.hide-when-finished');
       toHide.forEach(el => el.classList.add('d-none'));
-
-      toggleLoading(submitButton);
     }).catch(err => {
-
       const msg = e.target.querySelector('.status-msg.negative');
       if (msg) msg.classList.add('d-block');
-      toggleLoading(submitButton);
-
-    });
+    }).finally(() => toggleLoading(submitButton));
   });
 
   // show form
@@ -116,6 +107,17 @@ const changePwd = () => {
   
     const submitButton = e.target.querySelector('button[type="submit"]');
     toggleLoading(submitButton);
+
+    postJSON('/api/v2/user/update', inputs)
+      .then(res => {
+        const msg = e.target.querySelector('.status-msg.success');
+        if (msg) msg.classList.add('d-block');
+        const toHide = e.target.querySelectorAll('.hide-when-finished');
+        toHide.forEach(el => el.classList.add('d-none'));
+      }).catch(err => {
+        const msg = e.target.querySelector('.status-msg.negative');
+        if (msg) msg.classList.add('d-block');
+      }).finally(() => toggleLoading(submitButton));
   });
 
   // show form
