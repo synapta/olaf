@@ -105,7 +105,7 @@
         </button>
         {{/hasSource}}
         {{^hasSource}}
-        <div data-tooltip="Per poter inziare il task devi aggiungere una sorgente" data-position="top left">
+        <div data-tooltip="Per poter inziare il task è necessario che un admin aggiunga una sorgente" data-position="top left">
           <button class="ui button secondary-bg start-task disabled">
             INIZIA IL TASK
           </button>
@@ -113,6 +113,8 @@
         {{/hasSource}}
       </div>
     </div>
+
+    {{#admin}}
     <div class="six wide right floated column">
       <div class="source">
         <h3 class="ui dividing header">SORGENTI</h3>
@@ -166,7 +168,7 @@
         {{^hasSource}}
         <h4>Aggiungi una sorgente</h4>
         <div class="source-upload">
-          <div class="ui placeholder source-placeholder">
+          <div class="ui placeholder transp-placeholder">
             <div class="header">
               <div class="full line"></div>
               <div class="full line"></div>
@@ -178,7 +180,22 @@
         {{/hasSource}}
 
       </div>
+      <div class="log">
+        <h3 class="ui dividing header">SCHEDULER LOG</h3>
+        <div class="scheduler-log">
+          <div class="ui placeholder transp-placeholder">
+            <div class="header">
+              <div class="full line"></div>
+              <div class="full line"></div>
+              <div class="full line"></div>
+              <div class="full line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+    {{/admin}}
+
   </div>
 
 </div>
