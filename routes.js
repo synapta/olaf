@@ -135,13 +135,21 @@ module.exports = function (app, passport) {
         }
     });
 
-    app.get('/api/v2/job/:id', (req, res) => {
+    app.get('/api/v2/job/:alias', (req, res) => {
         api.getJob(req, res);
     });
 
-    app.get('/api/v2/job/:id/download', (req, res) => {
+    app.get('/api/v2/job/:alias/download', (req, res) => {
         if (req.user.role == 'admin') {
             api.downloadJob(req, res);
+        } else {
+            res.sendStatus(403);
+        }
+    });
+
+    app.get('/api/v2/job/:alias/log', (req, res) => {
+        if (req.user.role == 'admin') {
+            api.getLog(req, res);
         } else {
             res.sendStatus(403);
         }
@@ -163,15 +171,6 @@ module.exports = function (app, passport) {
     app.delete('/api/v2/source/:id', (req, res) => {
         if (req.user.role == 'admin') {
             api.deleteSource(req, res);
-        } else {
-            res.sendStatus(403);
-        }
-    });
-
-    // Log
-    app.get('/api/v2/log/:id', (req, res) => {
-        if (req.user.role == 'admin') {
-            api.getLog(req, res);
         } else {
             res.sendStatus(403);
         }

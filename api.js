@@ -38,18 +38,13 @@ const createJob = async (req, res) => {
 };
 
 const getJob = async (req, res) => {
-    if (req.params.id === '_all') {
+    if (req.params.alias === '_all') {
         const jobs = await Job.findAll();
         res.json(jobs);
-    } else if (req.params.id === '_types') {
+    } else if (req.params.alias === '_types') {
         res.json(JobTypes);
     } else {
-        const jobId = parseInt(req.params.id);
-        if (isNaN(jobId)) {
-            res.sendStatus(400);
-            return;
-        }
-        const job = await Job.findOne({ where: { job_id: jobId }, include: Source });
+        const job = await Job.findOne({ where: { alias: req.params.alias }, include: Source });
         if (job === null) {
             res.sendStatus(404);
         } else {
@@ -59,14 +54,8 @@ const getJob = async (req, res) => {
 };
 
 const downloadJob = async (req, res) => {
-    const jobId = parseInt(req.params.id);
-    if (isNaN(jobId)) {
-        res.sendStatus(400);
-        return;
-    }
-
     try {
-        const job = await Job.findOne({ where: { job_id: jobId } });
+        const job = await Job.findOne({ where: { alias: req.params.alias } });
         if (job === null) {
             res.sendStatus(404);
             return;
@@ -99,7 +88,20 @@ const downloadJob = async (req, res) => {
         console.error(e);
         res.sendStatus(500);
     }
-}
+};
+
+const getLog = async (req, res) => {
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = parseInt(req.query.offset) || 0;
+    try {
+        const job = await Job.findOne({ where: { alias: req.params.alias } });
+        const logs = await Log.findAll({ where: { job_id: job.job_id }, order: [['timestamp', 'DESC']], limit: limit, offset: offset });
+        res.json(logs);
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(400);
+    }
+};
 
 // Source
 const getSource = async (req, res) => {
@@ -156,24 +158,6 @@ const deleteSource = async (req, res) => {
         await t.rollback();
         console.error(e);
         res.sendStatus(500);
-    }
-};
-
-// Log
-const getLog = async (req, res) => {
-    const jobId = parseInt(req.params.id);
-    if (isNaN(jobId)) {
-        res.sendStatus(400);
-        return;
-    }
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = parseInt(req.query.offset) || 0;
-    try {
-        const logs = await Log.findAll({ where: { job_id: jobId }, order: [['timestamp', 'DESC']], limit: limit, offset: offset });
-        res.json(logs);
-    } catch (e) {
-        console.error(e);
-        res.sendStatus(400);
     }
 };
 
@@ -463,10 +447,10 @@ module.exports = {
     createJob,
     getJob,
     downloadJob,
+    getLog,
     getSource,
     createSource,
     deleteSource,
-    getLog,
     getItem,
     saveItem,
     skipItem,
