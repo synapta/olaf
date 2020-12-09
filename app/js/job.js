@@ -88,9 +88,9 @@ const addSourceForm = async (container, job_id, hasSource) => {
 };
 
 const init = async () => {
-  const id = getUrlParam(1);
+  const alias = getUrlParam(1);
 
-  const jobInfo = await getJSON(`/api/v2/job/${id}`);
+  const jobInfo = await getJSON(`/api/v2/job/${alias}`);
   const enrichedInfo =  enrichJobInfo(jobInfo);
   
   const template = await getText('/views/template/job-body.html');
