@@ -42,6 +42,14 @@
             <input type="password" name="password" autocomplete="current-password" placeholder="Inserisci la tua password" required>
           </div>
         </div>
+        <div class="ui negative message status-msg d-none">
+          <div class="header">
+            Login non riuscito
+          </div>
+          <p>
+            Ricontrolla le tue credenziali e riprova. Se invece non hai ancora un account puoi crearne uno nuovo usanto il form qui sotto.
+          </p>
+        </div>
         <div class="field">
           <button class="ui button tertiary-bg border" type="submit">ACCEDI</button>
           <a href="/password-reset">Password dimenticata?</a>
@@ -50,7 +58,7 @@
     </div>
 
     <div class="form-container signup-container">
-      <h2 class="ui dividing header">Registra un nuovo account</h2>
+      <h2 class="ui dividing header">Crea un nuovo account</h2>
 
       <form id="signup-form" class="ui form">
         <div class="field">
@@ -77,6 +85,14 @@
                   <label>I agree to the Terms and Conditions</label>
               </div>
           </div>-->
+          <div class="ui negative message status-msg d-none">
+            <div class="header">
+              Registrazione non riuscita
+            </div>
+            <p>
+              La mail che hai utilizzato risulta già nel nostro sistema. Prova ad effettuare il login con il form qui sopra.
+            </p>
+          </div>
         <button class="ui button tertiary-bg border" type="submit">CREA</button>
         <div class="ui error message"></div>
       </form>
@@ -91,6 +107,7 @@
   <script src="/js/lib/semantic242.js"></script>
 
   <script type="text/javascript" src="/js/utils/request.js"></script>
+  <script type="text/javascript" src="/js/utils/dom.js"></script>
   <script type="text/javascript" src="/js/utils/user.js"></script>
   <script type="text/javascript" src="/js/utils/loader.js"></script>
 
