@@ -149,10 +149,14 @@ module.exports = function (app, passport) {
 
     app.get('/api/v2/job/:alias/log', (req, res) => {
         if (req.user.role == 'admin') {
-            api.getLog(req, res);
+            api.getJobLog(req, res);
         } else {
             res.sendStatus(403);
         }
+    });
+
+    app.get('/api/v2/job/:alias/stats', (req, res) => {
+        api.getJobStats(req, res);
     });
 
     // Source
@@ -237,6 +241,14 @@ module.exports = function (app, passport) {
             });
         } else {
             res.json(null);
+        }
+    });
+
+    app.get('/api/v2/user/stats', (req, res) => {
+        if (req.user) {
+            api.getUserStats(req, res);
+        } else {
+            res.sendStatus(403);
         }
     });
 

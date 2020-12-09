@@ -90,16 +90,54 @@ const downloadJob = async (req, res) => {
     }
 };
 
-const getLog = async (req, res) => {
+const getJobLog = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = parseInt(req.query.offset) || 0;
     try {
         const job = await Job.findOne({ where: { alias: req.params.alias } });
+        if (job === null) {
+            res.sendStatus(404);
+            return;
+        }
         const logs = await Log.findAll({ where: { job_id: job.job_id }, order: [['timestamp', 'DESC']], limit: limit, offset: offset });
         res.json(logs);
     } catch (e) {
         console.error(e);
-        res.sendStatus(400);
+        res.sendStatus(500);
+    }
+};
+
+const getJobStats = async (req, res) => {
+    try {
+        const job = await Job.findOne({ where: { alias: req.params.alias } });
+        if (job === null) {
+            res.sendStatus(404);
+            return;
+        }
+        const totalItems = await Item.count({ where: { job_id: job.job_id } });
+        const todoItems = await Item.count({
+            where: { job_id: job.job_id, is_processed: false },
+            include: [{
+                model: Candidate,
+                where: { is_selected: false }
+            }], distinct: true, col: 'item_id'
+        });
+        const processedItems = await Item.count({ where: { job_id: job.job_id, is_processed: true } });
+        const totalCandidates = await Candidate.count({ include: { model: Item, where: { job_id: job.job_id } } });
+        const selectedCandidates = await Candidate.count({
+            where: { is_selected: true },
+            include: { model: Item, where: { job_id: job.job_id } }
+        });
+        res.json({
+            totalItems: totalItems,
+            todoItems: todoItems,
+            processedItems: processedItems,
+            totalCandidates: totalCandidates,
+            selectedCandidates: selectedCandidates
+        });
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
     }
 };
 
@@ -442,12 +480,29 @@ const checkEmail = async (req, res) => {
     }
 };
 
+const getUserStats = async (req, res) => {
+    try {
+        const validActions = await Action.count({ where: { user_id: req.user.user_id, candidate_id: { [Op.not]: null } } });
+        const orphanActions = await Action.count({ where: { user_id: req.user.user_id, is_orphan: true } });
+        const skipActions = await Action.count({ where: { user_id: req.user.user_id, is_skipped: true } });
+        res.json({
+            validActions: validActions,
+            orphanActions: orphanActions,
+            skipActions: skipActions
+        });
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
+    }
+};
+
 module.exports = {
     uploadFile,
     createJob,
     getJob,
     downloadJob,
-    getLog,
+    getJobLog,
+    getJobStats,
     getSource,
     createSource,
     deleteSource,
@@ -460,5 +515,6 @@ module.exports = {
     updateUser,
     sendResetEmail,
     resetPassword,
-    checkEmail
+    checkEmail,
+    getUserStats
 };
