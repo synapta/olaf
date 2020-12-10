@@ -1,5 +1,5 @@
-const csv = require('csv-parser')
-const fs = require('fs')
+const csv = require('csv-parser');
+const fs = require('fs');
 
 function parse(config) {
     if (config == undefined || config.path == undefined) {
