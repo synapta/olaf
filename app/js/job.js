@@ -1,4 +1,4 @@
-const enrichJobInfo = info => {
+const enrichJobInfo = (info, user) => {
   let type;
   let typeIcon;
   switch (info.job_type) {
@@ -28,7 +28,7 @@ const enrichJobInfo = info => {
     icon: source.source_type === 'json' ? 'file code outline' : 'file alternate outline'
   }));
 
-  return { ...info, type, typeIcon, lastUpdate, hasSource, sources };
+  return { ...info, type, typeIcon, lastUpdate, hasSource, sources, admin: user.isAdmin() };
 };
 
 const bindDeleteSourceInterface = () => {
@@ -44,7 +44,6 @@ const bindDeleteSourceInterface = () => {
   const delButtons = document.querySelectorAll('.delete-source-button');
   delButtons.forEach(btn => btn.addEventListener('click', e => {
     const source_id = e.target.dataset.source_id;
-    console.log('delButtons source id', source_id);
     $('.delete-source-modal').modal('show');   
     confirmDel.dataset.source_id = source_id;
   }));
@@ -53,7 +52,6 @@ const bindDeleteSourceInterface = () => {
     e.preventDefault();
     e.stopPropagation();
     const source_id = e.target.dataset.source_id;
-    console.log(e.target.dataset);
     e.target.classList.add('disabled', 'loading');
 
     // TODO - solve async issue - sometimes source_id is undefined
@@ -69,7 +67,7 @@ const bindDeleteSourceInterface = () => {
   });
 };
 
-const addSourceForm = async (container, job_id, hasSource) => {
+const addSourceForm = async (container, job_alias, job_id, hasSource) => {
   
   const formContainer = container.querySelector('.source-upload');
   if (!formContainer) {
@@ -84,38 +82,77 @@ const addSourceForm = async (container, job_id, hasSource) => {
   // if job already has a source, form comes into a closed accordion
   if (hasSource) { $('.ui.accordion.source-accordion').accordion(); }
 
-  SourceForm.setup({ job_id, afterUpload: 'reload' });
+  SourceForm.setup({ job_alias, job_id, afterUpload: 'reload' });
 };
 
 const init = async () => {
-  const id = getUrlParam(1);
+  const alias = getUrlParam(1);
 
-  const jobInfo = await getJSON(`/api/v2/job/${id}`);
-  const enrichedInfo =  enrichJobInfo(jobInfo);
+  const user = await USER.getStatus();
+
+  try {
+    const jobInfo = await getJSON(`/api/v2/job/${alias}`);
+    const enrichedInfo =  enrichJobInfo(jobInfo, user);
+    
+    const template = await getText('/views/template/job-body.html');
+    const content = Mustache.render(template, enrichedInfo);
   
-  const template = await getText('/views/template/job-body.html');
-  const content = Mustache.render(template, enrichedInfo);
+    const jobContainer = document.getElementById('job-data');
+    if (!jobContainer) {
+      return;
+    }
+  
+    jobContainer.innerHTML = content;
+  
+    addSourceForm(jobContainer, alias, enrichedInfo.job_id, enrichedInfo.hasSource);
+  
+    const action = await startTransition('.job-placeholder');
+  
+    if (action !== 'hide') {
+      return;
+    }
+  
+    startTransition('#job-data');
+  
+    bindDeleteSourceInterface();
 
-  const jobContainer = document.getElementById('job-data');
-  if (!jobContainer) {
-    return;
+
+    if (user.isAdmin()) {
+      const jobLog = await getJSON(`/api/v2/job/${alias}/log`);
+
+      const logContainer = document.querySelector('.scheduler-log');
+
+      if (!logContainer) {
+        return;
+      }
+
+      if (Array.isArray(jobLog) && jobLog.length === 0) {
+        logContainer.innerHTML = '<h4><i>nessun log disponibile</i></h4>';
+        return;
+      }
+
+      const logTemplate = await getText('/views/template/job-log.html');
+
+      const logContent = jobLog.map(log => {
+        const out = Mustache.render(logTemplate, {
+          ...log,
+          time   : formatDateAndTime(log.timestamp).trim(),
+          startLog: Boolean(log.description.status === 'start'),
+          endLog: Boolean(log.description.status === 'end'),
+          errorLog: Boolean(log.description.status === 'error')
+        });
+        return out;
+      }).join('');
+
+      logContainer.innerHTML = logContent;
+    }
+
+  } catch (error) {
+    console.error(error);
+    if (error.status === 404) {
+      window.location.href = '/404';
+    }    
   }
-
-  jobContainer.innerHTML = content;
-
-  addSourceForm(jobContainer, id, enrichedInfo.hasSource);
-
-  const action = await startTransition('.job-placeholder');
-
-  if (action !== 'hide') {
-    return;
-  }
-
-  startTransition('#job-data');
-
-  bindDeleteSourceInterface();
-
-  const jobLog = await getJSON(`/api/v2/log/${id}`);
 };
 
 init();

@@ -23,12 +23,17 @@
   border-bottom: 1px solid rgba(var(--dark-rgb), .1);
 }
 
-.source {
+.source,
+.log {
   width: 100%;
   border: 1px solid rgba(var(--dark-rgb), .1);
   border-radius: 5px;
   background-color: var( --light);
   padding: 1rem;
+}
+
+.log {
+  margin-top: 3rem;
 }
 
 .sources-list {
@@ -37,10 +42,41 @@
   margin-bottom: .5rem;
 }
 
-.ui.placeholder.source-placeholder,
-.ui.placeholder.source-placeholder .image.header:after,
-.ui.placeholder.source-placeholder .line,
-.ui.placeholder.source-placeholder .line:after,
-.ui.placeholder.source-placeholder > :before {
+.ui.placeholder.transp-placeholder,
+.ui.placeholder.transp-placeholder .image.header:after,
+.ui.placeholder.transp-placeholder .line,
+.ui.placeholder.transp-placeholder .line:after,
+.ui.placeholder.transp-placeholder > :before {
   background-color: var( --light);
 }
+
+.scheduler-log pre {
+  position: relative;
+  width: 100%;
+  padding: 1.3rem;
+  background-color: rgba(var(--dark-rgb), .8);
+  border-radius: 5px;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  color: var(--light);
+}
+
+.scheduler-log pre.start,
+.scheduler-log pre.end {
+  color: var(--success);
+}
+
+.scheduler-log pre.warning {
+  color: var(--warning);
+}
+
+.scheduler-log pre.error {
+  color: var(--danger-tint);
+}
+
+/* .scheduler-log pre:not(:last-child)::after {
+  display :block;
+  content: '';
+  width: 100%;
+  border-bottom: 1px solid rgba(var(--dark-rgb), .1);
+} */
