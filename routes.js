@@ -99,6 +99,10 @@ module.exports = function (app, passport) {
         response.sendFile('job.html', { root: __dirname + '/app/views' });
     });
 
+    app.get('/match/:alias', (request, response) => {
+        response.sendFile('match.html', { root: __dirname + '/app/views' });
+    });
+
     app.get(['/get/:token/author/', '/get/:token/authorityfile/', '/get/:token/author/:authorId', '/get/:token/authorityfile/:authorId'], (request, response) => {
         response.sendFile('author.html', { root: __dirname + '/app/views' });
     });
