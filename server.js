@@ -40,7 +40,7 @@ app.use(passport.session());
 
 require('./routes.js')(app, passport);
 
-const server = app.listen(3646, 'localhost', () => {
+const server = app.listen(process.env.PORT || 3646, 'localhost', () => {
     const host = server.address().address;
     const port = server.address().port;
     console.log('Server listening at http://%s:%s', host, port);
