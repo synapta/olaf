@@ -19,6 +19,6 @@ In alternativa a SQLite è possibile utilizzare PostgreSQL:
 DATABASE_URI=postgres://user:password@localhost:5432/database
 ```
 
-Per installare: `npm ci`
-Per creare il database: `npm run db`
-Per avviare: `npm start`   
+- Per installare: `npm ci`
+- Per creare il database: `npm run db`
+- Per avviare: `npm start`   
