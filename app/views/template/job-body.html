@@ -70,7 +70,7 @@
               <h4 class="ui image header">
                 <i class="globe icon"></i>
                 <div class="content">
-                  Campo "URI"
+                  Campo URI
                   <!-- <div class="sub header">Executive</div> -->
                 </div>
               </h4>
@@ -85,7 +85,7 @@
               <h4 class="ui image header">
                 <i class="search icon"></i>
                 <div class="content">
-                  Campo "search"
+                  Campo search
                   <!-- <div class="sub header">Executive</div> -->
                 </div>
               </h4>
@@ -114,6 +114,17 @@
         </div>
         {{/hasSource}}
       </div>
+
+      {{#admin}}
+      <div style="margin-top: 1rem;">
+        <a href="/api/v2/job/{{alias}}/download">
+          <button class="ui button secondary-bg download-job">
+            SCARICA GLI ABBINAMENTI
+          </button>
+        </a>
+      </div>
+      {{/admin}}
+
     </div>
 
     {{#admin}}
