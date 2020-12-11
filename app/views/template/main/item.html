@@ -1,0 +1,69 @@
+<h2 class="ui header">OGGETTO</h2>
+
+<div class="ui raised segment">
+
+    <a class="ui blue ribbon label"> <i class="book icon"></i> Nome</a>
+
+    <p class="item-name">
+      <a target="_blank" href="{{url_scheda}}">
+        <i class="fas fa-external-link-alt"></i> {{titolo}}
+      </a>
+    </p>
+
+    {{#url_immagine}}
+    <a href="{{url_immagine}}" target="_blank">
+      <div style="background-image: url({{url_immagine}});" class="author-image"></div>
+    </a>
+    {{/url_immagine}}
+
+    {{#subject}}<p><b>Soggetto:</b> {{subject}}</p>{{/subject}}
+    {{#description}}<p><b>Descrizione:</b> {{description}}</p>{{/description}}
+    {{#type}}<p><b>Tipologia:</b> {{type}}</p>{{/type}}
+
+    <a class="ui blue ribbon label"> <i class="paragraph icon"></i> Descrizione</a>
+    <div class="card-box">
+      {{descrizione}}
+    </div>
+
+    <!-- <a class="ui blue ribbon label"> <i class="fas fa-calendar"></i> Date relative all'opera</a>
+    <p class="card-box">Date inizio</p>
+    <div class="ui bulleted list">
+      {{#startingDates}}
+      <div class="item">{{.}}</div>
+      {{/startingDates}}
+    </div>
+    <p class="card-box">Date fine</p>
+    <div class="ui bulleted list">
+      {{#endingDates}}
+      <div class="item">{{.}}</div>
+      {{/endingDates}}
+    </div>
+
+    {{#contributors.length}}
+    <a class="ui blue ribbon label"> <i class="fas fa-user"></i> Autori</a>
+    <ul class="ui bulleted list card-box">
+      {{#contributors}}
+      <li>
+        <div class="item title">{{.}}</div>
+      </li>
+      {{/contributors}}
+    </ul>
+    {{/contributors.length}}
+
+    {{#material.length}}
+    <a class="ui blue ribbon label"> <i class="fas fa-wrench"></i> Materiali opera</a>
+    <ul class="ui bulleted list card-box">
+      {{#material}}
+      <li>
+        <div class="item title">{{.}}</div>
+      </li>
+      {{/material}}
+    </ul>
+    {{/material.length}}
+
+    {{#place}}
+    <a class="ui blue ribbon label"> <i class="fas fa-map-marker-alt"></i> Luoghi opera</a>
+    <p class="card-box">{{place}}</p>
+    {{/place}} -->
+
+</div>

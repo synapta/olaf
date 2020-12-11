@@ -100,9 +100,11 @@
 
       <div style="margin-top: 3rem;">
         {{#hasSource}}
-        <button class="ui button secondary-bg start-task">
-          INIZIA IL TASK
-        </button>
+        <a href="/match/{{alias}}">
+          <button class="ui button secondary-bg start-task">
+            INIZIA IL TASK
+          </button>
+        </a>
         {{/hasSource}}
         {{^hasSource}}
         <div data-tooltip="Per poter inziare il task è necessario che un admin aggiunga una sorgente" data-position="top left">

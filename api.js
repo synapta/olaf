@@ -232,7 +232,7 @@ const getItem = async (req, res) => {
 
 const saveItem = async (req, res) => {
     if (!Array.isArray(req.body)) {
-        res.sendStatus(400);
+        res.status(400).json({ error: '' });
         return;
     }
 
@@ -243,20 +243,20 @@ const saveItem = async (req, res) => {
         const jobAlias = req.params.alias;
         const job = await Job.findOne({ where: { alias: jobAlias } }, { transaction: t });
         if (job == null) {
-            res.sendStatus(400);
+            res.status(400).json({ error: 'job-not-found' });
             return;
         }
         const core = require('./cores/' + job.job_type);
 
         const itemId = parseInt(req.params.id);
         if (isNaN(itemId)) {
-            res.sendStatus(400);
+            res.status(400).json({ error: 'invalid-idem_id' });
             return;
         }
         const item = await Item.findOne({ where: { item_id: itemId, job_id: job.job_id } }, { transaction: t });
         if (item == null || item.is_processed) {
             await t.rollback();
-            res.sendStatus(400);
+            res.status(400).json({ error: 'item-not-found-or-processed' });
             return;
         }
 
@@ -276,7 +276,7 @@ const saveItem = async (req, res) => {
                 // Invalid candidate
                 if (candidate == null) {
                     await t.rollback();
-                    res.sendStatus(400);
+                    res.status(400).json({ error: 'invalid-candidate' });
                     return;
                 }
 
@@ -303,11 +303,11 @@ const saveItem = async (req, res) => {
 
         // Commit transaction
         await t.commit();
-        res.sendStatus(200);
+        res.status(200).json({});
     } catch (e) {
         console.error(e);
         await t.rollback();
-        res.sendStatus(400);
+        res.status(400).json({ error: e });
     }
 };
 
@@ -319,19 +319,19 @@ const skipItem = async (req, res) => {
         const jobAlias = req.params.alias;
         const job = await Job.findOne({ where: { alias: jobAlias } }, { transaction: t });
         if (job == null) {
-            res.sendStatus(400);
+            res.status(400).json({ error: 'job-not-found' });
             return;
         }
 
         const itemId = parseInt(req.params.id);
         if (isNaN(itemId)) {
-            res.sendStatus(400);
+            res.status(400).json({  error: 'not-valid-item_id' });
             return;
         }
         const item = await Item.findOne({ where: { item_id: itemId, job_id: job.job_id } }, { transaction: t });
         if (item == null || item.is_processed) {
             await t.rollback();
-            res.sendStatus(400);
+            res.status(400).json({ error: 'item-not-found-or-processed' });
             return;
         }
 
@@ -347,11 +347,11 @@ const skipItem = async (req, res) => {
 
         // Commit transaction
         await t.commit();
-        res.sendStatus(200);
+        res.status(200).json({});
     } catch (e) {
         console.error(e);
         await t.rollback();
-        res.sendStatus(400);
+        res.status(400).json({ error: e });
     }
 };
 

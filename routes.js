@@ -75,7 +75,7 @@ module.exports = function (app, passport) {
       if (request.user && request.user.role === 'admin') {
         response.sendFile('new-job.html', { root: __dirname + '/app/views' });
       } else {
-        response.redirect('/');
+        response.redirect('/login');
       }        
     });
 
@@ -100,7 +100,11 @@ module.exports = function (app, passport) {
     });
 
     app.get('/match/:alias', (request, response) => {
-        response.sendFile('match.html', { root: __dirname + '/app/views' });
+        if (request.user) {
+          response.sendFile('match.html', { root: __dirname + '/app/views' });
+        } else {
+          response.redirect('/login');
+        }        
     });
 
     app.get(['/get/:token/author/', '/get/:token/authorityfile/', '/get/:token/author/:authorId', '/get/:token/authorityfile/:authorId'], (request, response) => {

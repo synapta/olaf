@@ -63,11 +63,63 @@
   --light-tint: #f5f6f9;
 
   --footer-h: 231px;
+  --navbar-h: 60px;
+  --match-navbar-h: 60px;
 }
 
 .use-available-space {
   /* no need to remove navbar height because is position: fixed */
   min-height: calc(100vh - var(--footer-h)) !important;
+}
+
+.large-container {
+  display: block;
+  max-width: 100% !important;
+}
+
+/* Mobile */
+@media only screen and (max-width: 767px) {
+  .large-container {
+    width: auto !important;
+    margin-left: 1em !important;
+    margin-right: 1em !important;
+  }
+}
+
+/* Tablet */
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .large-container {
+    width: 723px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* Small Monitor */
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+  .large-container {
+    width: 933px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* Large Monitor */
+@media only screen and (min-width: 1200px) {
+  .large-container {
+    width: 1127px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* FullHD Monitor */
+@media only screen and (min-width: 1500px) {
+  .large-container {
+    width: 1440px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
 }
 
 body.logged .not-logged-element {
@@ -189,12 +241,81 @@ button.tertiary-bg:hover {
   color: var(--tertiary) !important;
 }
 
+.success-bg {
+  background-color: var(--success) !important;
+  color: var(--success-contrast) !important;
+}
+
+button.success-bg:hover {
+  background-color: var(--success-shade) !important;
+}
+
+.success-bg.border {
+  border: 1px solid var(--success-shade) !important;
+}
+
+.success-bg h1,
+.success-bg h2,
+.success-bg h3,
+.success-bg h4,
+.success-bg h5,
+.success-bg p,
+.success-bg a {
+  color: var(--success-contrast) !important;
+}
+
 .success-color {
   color: var(--success) !important;
 }
 
+.warning-bg {
+  background-color: var(--warning) !important;
+  color: var(--warning-contrast) !important;
+}
+
+button.warning-bg:hover {
+  background-color: var(--warning-shade) !important;
+}
+
+.warning-bg.border {
+  border: 1px solid var(--warning-shade) !important;
+}
+
+.warning-bg h1,
+.warning-bg h2,
+.warning-bg h3,
+.warning-bg h4,
+.warning-bg h5,
+.warning-bg p,
+.warning-bg a {
+  color: var(--warning-contrast) !important;
+}
+
 .warning-color {
   color: var(--warning) !important;
+}
+
+.danger-bg {
+  background-color: var(--danger) !important;
+  color: var(--danger-contrast) !important;
+}
+
+button.danger-bg:hover {
+  background-color: var(--danger-shade) !important;
+}
+
+.danger-bg.border {
+  border: 1px solid var(--danger-shade) !important;
+}
+
+.danger-bg h1,
+.danger-bg h2,
+.danger-bg h3,
+.danger-bg h4,
+.danger-bg h5,
+.danger-bg p,
+.danger-bg a {
+  color: var(--danger-contrast) !important;
 }
 
 .danger-color {

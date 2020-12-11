@@ -1,0 +1,26 @@
+<div class="info">
+  <button class="ui vertical animated tertiary-bg border button info-button">
+    <div class="hidden content">Aiuto</div>
+    <div class="visible content">
+      <i class="help icon"></i>
+    </div>
+  </button>
+</div>
+
+<div class="actions">
+  {{#singleItem}}
+  <a href="/match/{{alias}}">
+    <button class="ui button success-bg border">RICOMINCIA</button>
+  </a>
+  {{/singleItem}}
+
+  {{^singleItem}}
+  {{#selectedCandidates.length}}
+  <button class="ui button success-bg border confirm-match-button" data-item_id="{{item_id}}">CONFERMA MATCH</button>
+  {{/selectedCandidates.length}}
+
+  {{^selectedCandidates.length}}
+  <button class="ui button warning-bg border skip-button" data-item_id="{{item_id}}">SALTA ELEMENTO</button>
+  {{/selectedCandidates.length}}
+  {{/singleItem}}
+</div>

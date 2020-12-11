@@ -11,6 +11,7 @@ body > .ui.container {
 /* Nav */
 #navbar .ui.fixed.borderless.menu {
   background-color: var(--primary);
+  height: var(--navbar-h);
 }
 
 #navbar .ui .computer.only .item {
