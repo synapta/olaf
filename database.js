@@ -212,11 +212,11 @@ const Item = sequelize.define('Item', {
         allowNull: false
     },
     item_uri: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     item_search: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     item_body: getJsonDataType('item_body'),
@@ -281,7 +281,7 @@ const Candidate = sequelize.define('Candidate', {
         allowNull: false
     },
     candidate_uri: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     candidate_body: getJsonDataType('candidate_body'),
