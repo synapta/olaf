@@ -98,14 +98,16 @@
         </tbody>
       </table>
 
-      <div style="margin-top: 3rem;">
+      <div class="commands">
+
         {{#hasSource}}
         <a href="/match/{{alias}}">
-          <button class="ui button secondary-bg start-task">
+          <button class="ui button secondary-bg border start-task">
             INIZIA IL TASK
           </button>
         </a>
         {{/hasSource}}
+
         {{^hasSource}}
         <div data-tooltip="Per poter inziare il task è necessario che un admin aggiunga una sorgente" data-position="top left">
           <button class="ui button secondary-bg start-task disabled">
@@ -113,17 +115,18 @@
           </button>
         </div>
         {{/hasSource}}
-      </div>
 
-      {{#admin}}
-      <div style="margin-top: 1rem;">
+        {{#admin}}
         <a href="/api/v2/job/{{alias}}/download">
-          <button class="ui button secondary-bg download-job">
+          <button class="ui button tertiary-bg border download-job">
+            <i class="download icon"></i>
             SCARICA GLI ABBINAMENTI
           </button>
         </a>
+        {{/admin}}
       </div>
-      {{/admin}}
+
+
 
     </div>
 

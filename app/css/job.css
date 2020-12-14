@@ -74,6 +74,15 @@
   color: var(--danger-tint);
 }
 
+.commands {
+  margin-top: 3rem;
+  display: flex;
+}
+
+.commands a {
+  margin-right: 1.5rem;
+}
+
 /* .scheduler-log pre:not(:last-child)::after {
   display :block;
   content: '';
