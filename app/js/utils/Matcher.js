@@ -111,10 +111,11 @@ class Matcher {
   render(data) {
     return new Promise(async (resolve, reject) => {
       try {
+        console.log('item data', data);
         this.currentItemId = data.item_id; 
-        this.renderNavbar();
-        this.renderItem(data.item_body);
-        this.renderCandidates(data.Candidates);
+        this.renderNavbar(data.is_processed);
+        this.renderItem(data.item_body, data.is_processed);
+        this.renderCandidates(data.Candidates, data.is_processed);
         await this.showContainers();
         resolve();
       } catch (error) {
@@ -124,12 +125,13 @@ class Matcher {
     });
   }
 
-  renderNavbar() {
+  renderNavbar(is_processed) {
     this.options.navbarContainer.innerHTML = Mustache.render(this.navbarTemplate, {
-      item_id: this.currentItemId,
-      singleItem: this.singleItem,
-      alias: this.options.alias,      
-      selectedCandidates: this.selectedCandidates
+      is_processed,
+      item_id            : this.currentItemId,
+      singleItem         : this.singleItem,
+      alias              : this.options.alias,      
+      selectedCandidates : this.selectedCandidates
     });
 
     const skipButton = this.options.navbarContainer.querySelector('.skip-button');
@@ -147,9 +149,17 @@ class Matcher {
         this.confirmMatch(item_id, this.selectedCandidates);
       });
     }
+
+    const noMatchButton = this.options.navbarContainer.querySelector('.no-match-button');
+    if (noMatchButton) {
+      noMatchButton.addEventListener('click', e => {
+        const item_id = e.target.dataset.item_id;
+        this.confirmMatch(item_id, []);
+      });
+    }
   }
 
-  renderItem(itemData) {
+  renderItem(itemData, is_processed) {
     if (!this.itemTemplate) {
       console.error('[Matcher] Missing Item template - abording render');
       return;
@@ -157,16 +167,18 @@ class Matcher {
 
     // parse and clean data
     const cleanData = this.objectKeysMap(itemData, key => key.replace(/ /g, '_'));
-    this.itemContainer.innerHTML = Mustache.render(this.itemTemplate, cleanData);
+    this.itemContainer.innerHTML = Mustache.render(this.itemTemplate, { ...cleanData, is_processed });
   }
 
-  renderCandidates(candidatesData) {
+  renderCandidates(candidatesData, is_processed) {
     if (!this.candidateTemplate) {
       console.error('[Matcher] Missing Candidate template - abording render');
       return;
     }
 
-    this.candidatesContainer.innerHTML = Mustache.render(this.candidateTemplate, { candidates: candidatesData });
+    console.log(candidatesData)
+
+    this.candidatesContainer.innerHTML = Mustache.render(this.candidateTemplate, { candidates: candidatesData, is_processed });
 
     const selectItemButtons = this.candidatesContainer.querySelectorAll('.select-candidate-button');
     selectItemButtons.forEach(btn => btn.addEventListener('click', e => {
@@ -207,12 +219,12 @@ class Matcher {
         this.options.navbarContainer.innerHTML = this.navbarPlacheolder;
 
         // item and candidates
-        const t1 = startTransition(this.itemContainer);
-        const t2 = startTransition(this.candidatesContainer);
+        const t1 = startTransition(this.itemContainer, { duration: '300ms' });
+        const t2 = startTransition(this.candidatesContainer, { duration: '300ms' });
 
         Promise.all([t1, t2]).then(() => {
-          const t3 = startTransition(this.itemPlaceholder);
-          const t4 = startTransition(this.candidatesPlaceholder);
+          const t3 = startTransition(this.itemPlaceholder, { duration: '300ms' });
+          const t4 = startTransition(this.candidatesPlaceholder, { duration: '300ms' });
           Promise.all([t3, t4]).then(() => resolve());
         });
       } catch (error) {
@@ -226,12 +238,12 @@ class Matcher {
     return new Promise(async (resolve, reject) => {
       try {
         // item and candidates
-        const t1 = startTransition(this.itemPlaceholder);
-        const t2 = startTransition(this.candidatesPlaceholder);
+        const t1 = startTransition(this.itemPlaceholder, { duration: '300ms' });
+        const t2 = startTransition(this.candidatesPlaceholder, { duration: '300ms' });
 
         Promise.all([t1, t2]).then(() => {
-          const t3 = startTransition(this.itemContainer);
-          const t4 = startTransition(this.candidatesContainer);
+          const t3 = startTransition(this.itemContainer, { duration: '300ms' });
+          const t4 = startTransition(this.candidatesContainer, { duration: '300ms' });
           Promise.all([t3, t4]).then(() => resolve());
         });
       } catch (error) {

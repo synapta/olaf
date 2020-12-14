@@ -3,7 +3,8 @@
 <div class="ui two column grid">
   {{#candidates}}
   <div class="column">
-    <div class="ui raised segment">
+
+    <div class="ui raised segment {{#is_selected}}selected-candidate{{/is_selected}}">
   
       <a class="ui red ribbon label">Label</a>
       <div class="card-box">
@@ -16,9 +17,9 @@
         {{candidate_body.description.value}}
       </div>
 
-      <button class="ui fluid button select-candidate-button" data-candidate_id={{candidate_id}}>
-        
-      </button>
+      {{^is_processed}}    
+      <button class="ui fluid button select-candidate-button" data-candidate_id={{candidate_id}}></button>
+      {{/is_processed}}
       
     </div>
   </div>

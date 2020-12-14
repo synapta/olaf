@@ -1,26 +1,62 @@
-<div class="info">
+<div class="nack">
+  <a href="/job/{{alias}}">
+    <button class="ui vertical animated button">
+      <div class="hidden content">Indietro</div>
+      <div class="visible content">
+        <i class="left arrow icon"></i>
+      </div>
+    </button>
+  </a>
+
+  <!-- {{#is_processed}}
+  <span class="already-processed">ELEMENTO GIÀ PROCESSATO</span>
+  {{/is_processed}} -->
+
+</div>
+
+<div class="actions">
+
   <button class="ui vertical animated tertiary-bg border button info-button">
     <div class="hidden content">Aiuto</div>
     <div class="visible content">
       <i class="help icon"></i>
     </div>
   </button>
-</div>
 
-<div class="actions">
-  {{#singleItem}}
+  {{#is_processed}}
   <a href="/match/{{alias}}">
-    <button class="ui button success-bg border">RICOMINCIA</button>
+    <button class="ui button success-bg border">
+      VAI AD UN NUOVO ELEMENTO
+    </button>
   </a>
-  {{/singleItem}}
+  {{/is_processed}}
 
-  {{^singleItem}}
+  {{^is_processed}}
+
+  <button
+    class="ui button danger-bg border no-match-button {{#selectedCandidates.length}}disabled{{/selectedCandidates.length}}"
+    data-item_id="{{item_id}}"
+    data-tooltip="Nessuno dei candidati corrisponde all'elemento"
+    data-position="bottom left"
+  >
+    NESSUN MATCH
+  </button>
+
   {{#selectedCandidates.length}}
-  <button class="ui button success-bg border confirm-match-button" data-item_id="{{item_id}}">CONFERMA MATCH</button>
+  <button
+    class="ui button success-bg border confirm-match-button"
+    data-item_id="{{item_id}}"
+    data-tooltip="Conferma gli elementi scelti"
+    data-position="bottom left"
+  >
+    CONFERMA MATCH
+  </button>
   {{/selectedCandidates.length}}
 
   {{^selectedCandidates.length}}
-  <button class="ui button warning-bg border skip-button" data-item_id="{{item_id}}">SALTA ELEMENTO</button>
+  <button class="ui button warning-bg border skip-button" data-item_id="{{item_id}}">
+    SALTA ELEMENTO
+  </button>
   {{/selectedCandidates.length}}
-  {{/singleItem}}
+  {{/is_processed}}
 </div>
