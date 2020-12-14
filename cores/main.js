@@ -26,7 +26,7 @@ async function loadItem(item_body, source, job) {
 async function loadCandidates(item, job) {
     // Check there are not candidates
     if (await Candidate.findOne({ where: { item_id: item.item_id } })) {
-        return -1;
+        throw new Error('Item is duplicated in source');
     }
 
     const query = require('../queries/wikidata');
