@@ -1,4 +1,4 @@
-const aliasRegex = new RegExp("^[a-z]+$");
+const aliasRegex = /^[a-z0-9\-]+$/i;
 
 const completeFirstStep = async e => {
 

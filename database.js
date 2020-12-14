@@ -108,8 +108,7 @@ const Job = sequelize.define('Job', {
         allowNull: false,
         unique: true,
         validate: {
-            isAlpha: true,
-            isLowercase: true
+            is: /^[a-z0-9\-]+$/i
         }
     },
     description: {
