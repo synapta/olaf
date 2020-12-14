@@ -23,6 +23,11 @@
     </div>
   </button>
 
+  {{#task_finished}}
+    <span style="margin: 0 1rem">TASK COMPLETATO!</span>
+  {{/task_finished}}
+    
+  {{^task_finished}}
   {{#is_processed}}
   <a href="/match/{{alias}}">
     <button class="ui button success-bg border">
@@ -59,4 +64,6 @@
   </button>
   {{/selectedCandidates.length}}
   {{/is_processed}}
+
+  {{/task_finished}}
 </div>

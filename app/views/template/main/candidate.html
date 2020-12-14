@@ -1,3 +1,12 @@
+{{#task_finished}}
+<h2>
+  <i class="flag checkered icon"></i>
+  IL TASK È CONCLUSO
+</h2>
+<p>Non ci sono più elementi da processare. Puoi dare un'occhiata alle statistiche dalla <a href="/job/{{alias}}">pagina del progetto</a> </p>
+{{/task_finished}}
+
+{{^task_finished}}
 <h2 class="ui header">CANDIDATI</h2>
 
 <div class="ui two column grid">
@@ -25,7 +34,7 @@
   </div>
   {{/candidates}}
 </div>
-
+{{/task_finished}}
 
 <!-- 
 <div class="ui two column grid">
