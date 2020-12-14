@@ -1,6 +1,5 @@
 const init = async () => {
   const user = await USER.getStatus();
-  console.log('user', user);
 
   if (user.status === 'anonymous') {
     document.body.classList.add('not-logged');
