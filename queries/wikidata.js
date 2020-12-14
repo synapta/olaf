@@ -9,34 +9,35 @@ function getSparql(values) {
         ?description
         (SAMPLE(?immagine) as ?immagine)
         (SAMPLE(?itwikipedia) as ?itwikipedia)
-
+        (SAMPLE(?luogo) as ?luogo)
+        (SAMPLE(?indirizzo) as ?indirizzo)
     WHERE {
-
         # Setting up services
         SERVICE wikibase:label {
             bd:serviceParam wikibase:language "it,en" .
             ?id rdfs:label ?label .
             ?id schema:description ?description .
         }
-
         VALUES ?id {
             ${values.join(' ')}
         }
-
         OPTIONAL {
-            ?id wdt:P18 ?immagine .
+            ?id wdt:P18 ?immagine
         }
-
         OPTIONAL {
             ?itwikipedia schema:about ?id .
             FILTER(CONTAINS(STR(?itwikipedia), 'it.wikipedia.org'))
         }
-
+        OPTIONAL {
+            ?id wdt:P6375 ?indirizzo
+        }
+        OPTIONAL {
+            ?id wdt:P131 ?luogoEntity .
+            ?luogoEntity rdfs:label ?luogo .
+            FILTER (lang(?luogo) = 'it')
+        }
     }
-
-    GROUP BY ?id ?label ?description
-    LIMIT 10`;
-
+    GROUP BY ?id ?label ?description`;
 }
 
 async function runSearch(search) {
@@ -67,7 +68,7 @@ async function runSparql(values) {
       'sec-fetch-mode': 'cors',
       'sec-fetch-site': 'same-origin',
       'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      'user-agent': 'Olaf/1.0 (https://synapta.it/; info@synapta.it)',
+      'user-agent': 'OLAF/1.0 (https://synapta.it/; info@synapta.it)',
       'x-requested-with': 'XMLHttpRequest',
       origin: 'https://query.wikidata.org',
       accept: 'application/sparql-results+json',
