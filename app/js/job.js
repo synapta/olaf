@@ -11,7 +11,7 @@ const enrichJobInfo = (info, user) => {
       typeIcon = 'user';
       break;
     default:
-      type = 'Main';
+      type = 'Progetto generico';
       typeIcon = 'user';
       break;
   }
@@ -136,10 +136,10 @@ const init = async () => {
       const logContent = jobLog.map(log => {
         const out = Mustache.render(logTemplate, {
           ...log,
-          time   : formatDateAndTime(log.timestamp).trim(),
-          startLog: Boolean(log.description.status === 'start'),
-          endLog: Boolean(log.description.status === 'end'),
-          errorLog: Boolean(log.description.status === 'error')
+          time     : formatDateAndTime(log.timestamp).trim(),
+          startLog : Boolean(log.description.status === 'start'),
+          endLog   : Boolean(log.description.status === 'end'),
+          errorLog : Boolean(log.description.status === 'error')
         });
         return out;
       }).join('');

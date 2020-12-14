@@ -30,9 +30,8 @@ const init = async () => {
 
   // instantiate matcher
   const matcher = new Matcher(matcherOptions);
-  window.matcher = matcher;
 
-  // init and render first it
+  // init and render first item
   matcher.init();
 };
 

@@ -111,7 +111,6 @@ class Matcher {
   render(data) {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('item data', data);
         this.currentItemId = data.item_id; 
         this.renderNavbar(data.is_processed);
         this.renderItem(data.item_body, data.is_processed);
@@ -175,8 +174,6 @@ class Matcher {
       console.error('[Matcher] Missing Candidate template - abording render');
       return;
     }
-
-    console.log(candidatesData)
 
     this.candidatesContainer.innerHTML = Mustache.render(this.candidateTemplate, { candidates: candidatesData, is_processed });
 
