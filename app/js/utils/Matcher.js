@@ -73,7 +73,7 @@ class Matcher {
           this.updateBrowserHistory(item.item_uri);
           await this.render(item);
           resolve(item);      
-        }).catch(err => {
+        }).catch(async err => {
           if (err.status === 404) {
             await this.renderNoItems();
           }
@@ -124,6 +124,7 @@ class Matcher {
   }
 
   render(data) {
+    console.log('rendering data', data);
     return new Promise(async (resolve, reject) => {
       try {
         this.currentItemId = data.item_id; 

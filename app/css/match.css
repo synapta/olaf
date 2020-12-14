@@ -59,6 +59,10 @@
   overflow-y: auto;
 }
 
+.link-box {
+  word-break: break-all;
+}
+
 .button-placeholder {
   width: 130px;
   height: 36px;

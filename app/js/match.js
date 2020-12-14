@@ -17,6 +17,7 @@ const init = async () => {
 
   // get job info
   const jobInfo = await getJSON(`/api/v2/job/${alias}`);
+  console.log('jobInfo', jobInfo);
 
   // compose options
   const matcherOptions = {
@@ -24,8 +25,9 @@ const init = async () => {
     navbarContainer,
     placeholders,
     containers,
-    job_type: jobInfo.job_type,
-    uriQueryString: queryStrings.uri,
+    fileds         : jobInfo.job_config.fields,
+    job_type       : jobInfo.job_type,
+    uriQueryString : queryStrings.uri,
   };
 
   // instantiate matcher
