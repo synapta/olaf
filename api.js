@@ -126,7 +126,7 @@ const getJobStats = async (req, res) => {
             where: { job_id: job.job_id },
             include: [{
                 model: Candidate,
-                where: { is_selected: false }
+                where: { is_selected: { [Op.ne]: null } }
             }], distinct: true, col: 'item_id'
         });
         const processedItems = await Item.count({ where: { job_id: job.job_id, is_processed: true } });
@@ -333,7 +333,7 @@ const skipItem = async (req, res) => {
 
         const itemId = parseInt(req.params.id);
         if (isNaN(itemId)) {
-            res.status(400).json({  error: 'not-valid-item_id' });
+            res.status(400).json({ error: 'not-valid-item_id' });
             return;
         }
         const item = await Item.findOne({ where: { item_id: itemId, job_id: job.job_id } }, { transaction: t });
