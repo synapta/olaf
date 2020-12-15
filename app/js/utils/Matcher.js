@@ -68,7 +68,9 @@ class Matcher {
       //   return reject({ error: 'single-item-no-next' });
       // }
 
-      getJSON(this.getItemURL)
+      const url = first ? this.getItemURL : `/api/v2/item/${this.options.alias}`;
+
+      getJSON(url)
         .then(async item => {
           this.updateBrowserHistory(item.item_uri);
           await this.render(item);
