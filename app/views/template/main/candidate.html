@@ -46,10 +46,12 @@
       </div>
       {{/candidate_body.description.value}}
 
+      {{#candidate_body.luogo.value}}
       <a class="ui red ribbon label"><i class="map marker alternate icon"></i> Indirizzo</a>
       <div class="card-box">
-        {{candidate_body.indirizzo.value}}, {{candidate_body.luogo.value}}
+        {{#candidate_body.indirizzo.value}}{{candidate_body.indirizzo.value}}, {{/candidate_body.indirizzo.value}}{{candidate_body.luogo.value}}
       </div>
+      {{/candidate_body.luogo.value}}
 
       {{^is_processed}}    
       <button class="ui fluid button select-candidate-button" data-candidate_id={{candidate_id}}></button>

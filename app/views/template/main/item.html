@@ -5,28 +5,30 @@
 
 <div class="ui raised segment {{#is_processed}}processed-item{{/is_processed}}">
 
-    <a class="ui blue ribbon label"><i class="tag icon"></i> Label</a>
+    <a class="ui blue ribbon label"><i class="tag icon"></i> Nome</a>
 
     <p class="item-name">
-      <a target="_blank" href="{{url_scheda}}">
-        <i class="fas fa-external-link-alt"></i> {{titolo}}
+      {{#URI}}
+      <a target="_blank" href="{{URI}}">
+        <i class="fas fa-external-link-alt"></i> {{Nome}}
       </a>
+      {{/URI}}
+      {{^URI}}
+      {{Nome}}
+      {{/URI}}
     </p>
 
-    {{#url_immagine}}
-    <a href="{{url_immagine}}" target="_blank">
-      <div style="background-image: url({{url_immagine}});" class="author-image"></div>
-    </a>
-    {{/url_immagine}}
-
-
+    {{#Descrizione}}
     <a class="ui blue ribbon label"><i class="paragraph icon"></i> Descrizione</a>
     <div class="card-box">
-      {{descrizione}}
+      {{Descrizione}}
     </div>
+    {{/Descrizione}}
     
+    {{#Comune}}
     <a class="ui blue ribbon label"><i class="map marker alternate icon"></i> Indirizzo</a>
     <div class="card-box">
-      {{descrizione}}
+      {{#Indirizzo}}{{Indirizzo}}, {{/Indirizzo}}{{Comune}}
     </div>
+    {{/Comune}}
 </div>

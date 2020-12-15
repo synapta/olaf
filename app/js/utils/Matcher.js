@@ -145,7 +145,8 @@ class Matcher {
       ...options,
       item_id            : this.currentItemId,
       singleItem         : this.singleItem,
-      alias              : this.options.alias,      
+      alias              : this.options.alias,
+      job_name           : this.options.job_name,
       selectedCandidates : this.selectedCandidates
     });
 
@@ -185,10 +186,13 @@ class Matcher {
       return;
     }
 
-    console.log('fields', this.options.fields);
+    const cleanData = Object.entries(this.options.fields).reduce((acc, curr) => {
+      acc[curr[1].label] = itemData[curr[0]]
+      return acc;
+      }, {});
 
     // parse and clean data
-    const cleanData = this.objectKeysMap(itemData, key => key.replace(/ /g, '_'));
+    // const cleanData = this.objectKeysMap(itemData, key => key.replace(/ /g, '_'));
     this.itemContainer.innerHTML = Mustache.render(this.itemTemplate, { ...cleanData, is_processed });
   }
 
