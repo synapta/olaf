@@ -25,10 +25,17 @@
     </div>
     {{/Descrizione}}
     
-    {{#Comune}}
+    {{#Indirizzo}}
     <a class="ui blue ribbon label"><i class="map marker alternate icon"></i> Indirizzo</a>
     <div class="card-box">
-      {{#Indirizzo}}{{Indirizzo}}, {{/Indirizzo}}{{Comune}}
+      {{Indirizzo}}
+    </div>
+    {{/Indirizzo}}
+
+    {{#Comune}}
+    <a class="ui blue ribbon label"><i class="dot circle icon"></i> Comune</a>
+    <div class="card-box">
+      {{Comune}}
     </div>
     {{/Comune}}
 </div>
