@@ -24,15 +24,15 @@ const init = async () => {
     navbarContainer,
     placeholders,
     containers,
-    job_type: jobInfo.job_type,
-    uriQueryString: queryStrings.uri,
+    fields         : jobInfo.job_config.fields,
+    job_type       : jobInfo.job_type,
+    uriQueryString : queryStrings.uri,
   };
 
   // instantiate matcher
   const matcher = new Matcher(matcherOptions);
-  window.matcher = matcher;
 
-  // init and render first it
+  // init and render first item
   matcher.init();
 };
 

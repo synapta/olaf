@@ -1,30 +1,65 @@
+{{#task_finished}}
+<h2>
+  <i class="flag checkered icon"></i>
+  IL TASK È CONCLUSO
+</h2>
+<p>Non ci sono più elementi da processare. Puoi dare un'occhiata alle statistiche dalla <a href="/job/{{alias}}">pagina del progetto</a> </p>
+{{/task_finished}}
+
+{{^task_finished}}
 <h2 class="ui header">CANDIDATI</h2>
 
 <div class="ui two column grid">
   {{#candidates}}
   <div class="column">
-    <div class="ui raised segment">
+
+    <div class="ui raised segment {{#is_selected}}selected-candidate{{/is_selected}}">
   
-      <a class="ui red ribbon label">Label</a>
+      <a class="ui red ribbon label"><i class="tag icon"></i> Label</a>
+      
       <div class="card-box">
-        {{candidate_body.label.value}}
+        <p class="item-name">
+          {{#candidate_body.id.value}}
+          <a target="_blank" href="{{candidate_body.id.value}}">
+            <i class="external alternate icon"></i> {{candidate_body.label.value}}
+          </a>
+          {{/candidate_body.id.value}}
+          {{^candidate_body.id.value}}
+            {{candidate_body.label.value}}
+          {{/candidate_body.id.value}}
+        </p>
       </div>
+ 
+      {{#candidate_body.itwikipedia.value}}
+      <a class="ui red ribbon label"><i class="wikipedia w icon"></i> Wikipedia</a>
+      <div class="card-box link-box">
+        <a target="_blank" href="{{candidate_body.itwikipedia.value}}">
+          <i class="external alternate icon"></i> {{candidate_body.itwikipedia.value}}
+        </a>
+      </div>
+      {{/candidate_body.itwikipedia.value}}
     
-    
-      <a class="ui red ribbon label">Descrizione</a>
+      {{#candidate_body.description.value}}
+      <a class="ui red ribbon label"><i class="paragraph icon"></i> Descrizione</a>
       <div class="card-box">
         {{candidate_body.description.value}}
       </div>
+      {{/candidate_body.description.value}}
 
-      <button class="ui fluid button select-candidate-button" data-candidate_id={{candidate_id}}>
-        
-      </button>
+      <a class="ui red ribbon label"><i class="map marker alternate icon"></i> Indirizzo</a>
+      <div class="card-box">
+        {{candidate_body.indirizzo.value}}, {{candidate_body.luogo.value}}
+      </div>
+
+      {{^is_processed}}    
+      <button class="ui fluid button select-candidate-button" data-candidate_id={{candidate_id}}></button>
+      {{/is_processed}}
       
     </div>
   </div>
   {{/candidates}}
 </div>
-
+{{/task_finished}}
 
 <!-- 
 <div class="ui two column grid">
