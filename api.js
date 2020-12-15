@@ -122,6 +122,13 @@ const getJobStats = async (req, res) => {
                 where: { is_selected: false }
             }], distinct: true, col: 'item_id'
         });
+        const toProcessItems = await Item.count({
+            where: { job_id: job.job_id },
+            include: [{
+                model: Candidate,
+                where: { is_selected: false }
+            }], distinct: true, col: 'item_id'
+        });
         const processedItems = await Item.count({ where: { job_id: job.job_id, is_processed: true } });
         const totalCandidates = await Candidate.count({ include: { model: Item, where: { job_id: job.job_id } } });
         const selectedCandidates = await Candidate.count({
@@ -131,6 +138,7 @@ const getJobStats = async (req, res) => {
         res.json({
             totalItems: totalItems,
             todoItems: todoItems,
+            toProcessItems: toProcessItems,
             processedItems: processedItems,
             totalCandidates: totalCandidates,
             selectedCandidates: selectedCandidates
