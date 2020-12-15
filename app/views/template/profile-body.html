@@ -83,6 +83,61 @@
 
 
     </div>
+
+    <div class="eight wide column">
+      <h4 class="ui dividing header">Le tue statistiche</h4>
+      <table class="ui very basic collapsing celled table">
+        <tbody>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="check squaree icon success-color"></i>
+                <div class="content">
+                  Azioni valide
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{userStats.validActions}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="step forward icon warning-color"></i>
+                <div class="content">
+                  Elementi saltati
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{userStats.skipActions}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="x icon danger-color"></i>
+                <div class="content">
+                  Scelte <i>NESSUN MATCH</i>
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{userStats.orphanActions}}
+            </td>
+          </tr>
+
+
+
+
+
+        </tbody>
+      </table>
+    </div>
   </div>
 
 </div>

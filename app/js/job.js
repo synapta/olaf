@@ -21,11 +21,11 @@ const enrichJobInfo = (info, user) => {
   const hasSource = Boolean(Array.isArray(info.Sources) && info.Sources.length > 0);
   
   const sources = info.Sources.map(source => ({
-    name: source.name,
-    path: source.source_config.path.path,
-    id  : source.source_id,
-    type: source.source_type,
-    icon: source.source_type === 'json' ? 'file code outline' : 'file alternate outline'
+    name : source.name,
+    path : source.source_config.path.path,
+    id   : source.source_id,
+    type : source.source_type,
+    icon : source.source_type === 'json' ? 'file code outline' : 'file alternate outline'
   }));
 
   return { ...info, type, typeIcon, lastUpdate, hasSource, sources, admin: user.isAdmin() };
@@ -93,9 +93,11 @@ const init = async () => {
   try {
     const jobInfo = await getJSON(`/api/v2/job/${alias}`);
     const enrichedInfo =  enrichJobInfo(jobInfo, user);
+
+    const jobStats = await getJSON(`/api/v2/job/${alias}/stats`);
     
     const template = await getText('/views/template/job-body.html');
-    const content = Mustache.render(template, enrichedInfo);
+    const content = Mustache.render(template, { ...enrichedInfo, jobStats });
   
     const jobContainer = document.getElementById('job-data');
     if (!jobContainer) {
@@ -103,6 +105,8 @@ const init = async () => {
     }
   
     jobContainer.innerHTML = content;
+
+    $('#job-progress-stats').progress();
   
     addSourceForm(jobContainer, alias, enrichedInfo.job_id, enrichedInfo.hasSource);
   

@@ -83,9 +83,6 @@
   margin-right: 1.5rem;
 }
 
-/* .scheduler-log pre:not(:last-child)::after {
-  display :block;
-  content: '';
-  width: 100%;
-  border-bottom: 1px solid rgba(var(--dark-rgb), .1);
-} */
+.job-progress {
+  margin: 3rem 0 4rem;
+}

@@ -185,6 +185,8 @@ class Matcher {
       return;
     }
 
+    console.log('fields', this.options.fields);
+
     // parse and clean data
     const cleanData = this.objectKeysMap(itemData, key => key.replace(/ /g, '_'));
     this.itemContainer.innerHTML = Mustache.render(this.itemTemplate, { ...cleanData, is_processed });
