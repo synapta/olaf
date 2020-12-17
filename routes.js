@@ -258,6 +258,14 @@ module.exports = function (app, passport) {
         }
     });
 
+    app.get('/api/v2/user/history', (req, res) => {
+        if (req.user) {
+            api.getUserHistory(req, res);
+        } else {
+            res.sendStatus(403);
+        }
+    });
+
     app.use((req, res) => {
       res.status(404).sendFile('404.html', { root: __dirname + '/app' });
     });
