@@ -31,6 +31,41 @@ const enrichJobInfo = (info, user) => {
   return { ...info, type, typeIcon, lastUpdate, hasSource, sources, admin: user.isAdmin() };
 };
 
+const bindReloadSourceInterface = () => {
+  const confirmReload = document.querySelector('.confirm-reload-source');
+
+  const cancelReload = document.querySelector('.cancel-reload-source');
+  cancelReload.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    $('.reload-source-modal').modal('hide');
+  });
+
+  const reloadButtons = document.querySelectorAll('.reload-source-button');
+  reloadButtons.forEach(btn => btn.addEventListener('click', e => {
+    const source_id = e.target.dataset.source_id;
+    $('.reload-source-modal').modal('show');   
+    confirmReload.dataset.source_id = source_id;
+  }));
+  
+  confirmReload.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const source_id = e.target.dataset.source_id;
+    e.target.classList.add('disabled', 'loading');
+
+    // TODO - solve async issue - sometimes source_id is undefined
+    
+    postJsonResText(`/api/v2/source/${source_id}/reload`)
+      .then(res => {
+        location.reload();
+      }).catch(err => {
+        alert("Non è stato possibile aggiornare la sorgente");
+        e.target.classList.remove('disabled', 'loading');
+      });
+  });
+};
+
 const bindDeleteSourceInterface = () => {
   const confirmDel = document.querySelector('.confirm-delete-source');
 
@@ -118,6 +153,7 @@ const init = async () => {
   
     startTransition('#job-data');
   
+    bindReloadSourceInterface();
     bindDeleteSourceInterface();
 
 

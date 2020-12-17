@@ -186,6 +186,14 @@
         {{#sources}}
           <div class="item">
             <div class="right floated content">
+              <a href="/api/v2/source/{{id}}/download">
+                <div class="ui icon basic button download-source-button">
+                  <i class="download icon"></i>
+                </div>
+              </a>
+              <div class="ui icon basic button reload-source-button" data-source_id="{{id}}">
+                <i class="redo icon"></i>
+              </div>
               <div class="ui icon red basic button delete-source-button" data-source_id="{{id}}">
                 <i class="trash icon"></i>
               </div>
@@ -263,6 +271,20 @@
 
 </div>
 
+<div class="ui mini modal reload-source-modal">
+  <div class="header">Aggiorna sorgente</div>
+  <div class="content">
+    <p>Sicuro di voler aggiornare manualmente questa sorgente?</p>
+  </div>
+  <div class="actions">
+    <div class="ui green button confirm-reload-source">
+      <i class="checkmark icon"></i>
+      Sì
+    </div>
+    <div class="ui red button cancel-reload-source">Annulla</div>
+  </div>
+</div>
+
 <div class="ui mini modal delete-source-modal">
   <div class="header">Elimina sorgente</div>
   <div class="content">
@@ -271,7 +293,7 @@
   <div class="actions">
     <div class="ui green button confirm-delete-source">
       <i class="checkmark icon"></i>
-      Si
+      Sì
     </div>
     <div class="ui red button cancel-delete-source">Annulla</div>
   </div>
