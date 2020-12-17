@@ -6,6 +6,9 @@ function parse(config) {
         throw new Error('Config must have a valid path!');
     }
 
+    // Skip invalid columns
+    config.strict = true;
+
     return fs.createReadStream(config.path).pipe(csv(config));
 }
 
