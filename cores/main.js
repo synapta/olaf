@@ -46,12 +46,20 @@ async function loadCandidates(item, job) {
     const candidates = await query.getCandidates(item.item_search);
 
     for (let candidate_body of candidates) {
+        let score = 1;
+
+        try {
+            score = parseInt(candidate_body.rank.value);
+        } catch {
+            // Pass
+        }
+
         await Candidate.create({
             item_id: item.item_id,
             source_id: item.source_id,
             candidate_uri: candidate_body.id.value,
             candidate_body: candidate_body,
-            score: 1,
+            score: score,
             last_update: new Date()
         });
     }
@@ -59,16 +67,29 @@ async function loadCandidates(item, job) {
     return candidates.length;
 }
 
-function nextItem(job) {
+async function nextItem(job) {
     const lock_limit = new Date();
     lock_limit.setHours(lock_limit.getHours() - 1);
-    return Item.findOne({
+    const item = await Item.findOne({
         where: {
             job_id: job.job_id,
             is_processed: false,
             [Op.or]: [{ lock_timestamp: { [Op.lte]: lock_limit } }, { lock_timestamp: { [Op.is]: null } }]
         },
         order: sequelize.random(),
+        include: [{
+            model: Candidate,
+            required: true
+        }]
+    });
+    // Sort candidates by score
+    return Item.findOne({
+        where: {
+            item_id: item.item_id
+        },
+        order: [
+            [Candidate, 'score', 'ASC']
+        ],
         include: [{
             model: Candidate,
             required: true

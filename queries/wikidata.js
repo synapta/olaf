@@ -5,6 +5,7 @@ function getSparql(values) {
   return `
     SELECT
         ?id
+        ?rank
         ?label
         ?description
         (SAMPLE(?immagine) as ?immagine)
@@ -18,11 +19,11 @@ function getSparql(values) {
             ?id rdfs:label ?label .
             ?id schema:description ?description .
         }
-        VALUES ?id {
+        VALUES (?id ?rank) {
             ${values.join(' ')}
         }
         OPTIONAL {
-            ?id wdt:P18 ?immagine
+            ?id wdt:P18 ?immagine .
         }
         OPTIONAL {
             ?itwikipedia schema:about ?id .
@@ -36,8 +37,14 @@ function getSparql(values) {
             ?luogoEntity rdfs:label ?luogo .
             FILTER (lang(?luogo) = 'it')
         }
+
+        FILTER NOT EXISTS { ?id wdt:P31 wd:Q4167410 }
+        FILTER NOT EXISTS { ?id wdt:P31 wd:Q4167836 }
+        FILTER NOT EXISTS { ?id wdt:P31 wd:Q11266439 }
+        FILTER NOT EXISTS { ?id wdt:P31 wd:Q13442814 }
     }
-    GROUP BY ?id ?label ?description`;
+    GROUP BY ?id ?label ?description ?rank
+    ORDER BY ?rank`;
 }
 
 async function runSearch(search) {
@@ -52,7 +59,7 @@ async function runSearch(search) {
   });
 
   if (body.query) {
-    return body.query.search.map(result => 'wd:' + result.title);
+    return body.query.search.map((result, index) => '(wd:' + result.title + ' ' + index + ')');
   } else {
     return [];
   }

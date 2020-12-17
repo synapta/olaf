@@ -267,7 +267,12 @@ const getItem = async (req, res) => {
     const itemUri = req.query.uri;
     if (itemUri != null) {
         // Get a specific item
-        const item = await Item.findOne({ where: { job_id: job.job_id, item_uri: itemUri }, include: Candidate });
+        const item = await Item.findOne({
+            where: { job_id: job.job_id, item_uri: itemUri }, include: Candidate,
+            order: [
+                [Candidate, 'score', 'ASC']
+            ]
+        });
         if (item == null) {
             res.sendStatus(404);
         } else {
