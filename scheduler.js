@@ -21,6 +21,7 @@ async function runJob(job) {
                 totalItems: 0,
                 errorItems: 0,
                 zeroItems: 0,
+                skipItems: 0,
                 validItems: 0,
                 validCandidates: 0,
                 errorCandidates: 0
@@ -46,6 +47,8 @@ async function runJob(job) {
                         } else if (numCandidates > 0) {
                             stats.validItems++;
                             stats.validCandidates += numCandidates;
+                        } else {
+                            stats.skipItems++;
                         }
                     } catch (e) {
                         console.error(e);

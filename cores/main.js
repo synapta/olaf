@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Item, Candidate, sequelize } = require('../database');
+const { Item, Candidate, Action, sequelize } = require('../database');
 
 async function loadItem(item_body, source, job) {
     const item_uri = job.job_config.item_uri || 'URI';
@@ -24,9 +24,22 @@ async function loadItem(item_body, source, job) {
 }
 
 async function loadCandidates(item, job) {
-    // Check there are not candidates
-    if (await Candidate.findOne({ where: { item_id: item.item_id } })) {
-        throw new Error('Item is duplicated in source');
+    const t = await sequelize.transaction();
+
+    try {
+        // Check if there are no actions
+        const actions = await Action.findAll({ where: { item_id: item.item_id, is_skipped: false } }, { transaction: t })
+        if (actions.length > 0) {
+            t.commit();
+            return -1;
+        } else {
+            // Delete all candidates, if any
+            await Candidate.destroy({ where: { item_id: item.item_id } }, { transaction: t });
+        }
+        await t.commit();
+    } catch (e) {
+        t.rollback();
+        throw e;
     }
 
     const query = require('../queries/wikidata');
