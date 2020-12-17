@@ -3,9 +3,11 @@ const init = async () => {
   
   const userStats = await getJSON('/api/v2/user/stats');
 
+  const userHistory = await getJSON('/api/v2/user/history');
+
   const template = await getText('/views/template/profile-body.html');
 
-  const content = Mustache.render(template, { admin: user.isAdmin(), name: user.getName(), email: user.getEmail(), userStats });
+  const content = Mustache.render(template, { admin: user.isAdmin(), name: user.getName(), email: user.getEmail(), userStats, userHistory });
 
   const profileContainer = document.getElementById('profile-data');
   if (!profileContainer) {

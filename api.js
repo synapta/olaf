@@ -562,7 +562,10 @@ const getUserHistory = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = parseInt(req.query.offset) || 0;
     try {
-        const actions = await Action.findAll({ where: { user_id: req.user.user_id }, order: [['timestamp', 'DESC']], limit: limit, offset: offset, include: [Item, Candidate] });
+        const actions = await Action.findAll({
+            where: { user_id: req.user.user_id }, order: [['timestamp', 'DESC']], limit: limit, offset: offset,
+            include: [{ model: Item, include: Job }]
+        });
         res.json(actions);
     } catch (e) {
         console.error(e);

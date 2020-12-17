@@ -140,4 +140,12 @@
     </div>
   </div>
 
+  <div class="row">
+    <ul>
+    {{#userHistory}}
+      <li><a href="/match/{{Item.Job.alias}}?uri={{Item.item_uri}}">{{Item.item_search}}</a></li>
+    {{/userHistory}}
+    </ul>
+  </div>
+
 </div>
