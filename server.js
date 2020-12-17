@@ -19,7 +19,8 @@ const SessionStore = require('express-session-sequelize')(expressSession.Store);
 const { sequelize } = require('./database');
 
 const sequelizeSessionStore = new SessionStore({
-    db: sequelize
+    db: sequelize,
+    expiration: 30 * 86400 * 1000
 });
 
 // Setting up express
