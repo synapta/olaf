@@ -6,12 +6,10 @@ function parse(config) {
         throw new Error('Config must have a valid path!');
     }
 
-    config.path = 'uploads/' + config.path;
-
     // Skip invalid columns
     config.strict = true;
 
-    return fs.createReadStream(config.path).pipe(csv(config));
+    return fs.createReadStream('uploads/' + config.path).pipe(csv(config));
 }
 
 module.exports = { parse };
