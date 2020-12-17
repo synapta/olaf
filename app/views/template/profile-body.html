@@ -1,11 +1,12 @@
 <h1 class="ui dividing header job-header">
-  <span>I tuoi dati</span>
+  <span>Profilo</span>
 </h1>
 
 <div class="ui grid" style="margin-top: 3rem;">
   <div class="row">
     <div class="eight wide column">
 
+      <h4 class="ui dividing header">I tuoi dati</h4>
       <table class="ui very basic collapsing celled table">
         <tbody>
           <tr>
@@ -70,21 +71,7 @@
 
         </tbody>
       </table>
-      
-      <div class="ui divider" style="margin: 3rem 0;"></div>
-      
-      <div>
 
-        <button class="ui button tertiary-bg bottom-logout-button">
-          <i class="sign-out icon"></i>
-          ESCI
-        </button>
-      </div>
-
-
-    </div>
-
-    <div class="eight wide column">
       <h4 class="ui dividing header">Le tue statistiche</h4>
       <table class="ui very basic collapsing celled table">
         <tbody>
@@ -131,21 +118,51 @@
             </td>
           </tr>
 
+        </tbody>
+      </table>
+      
+      <div class="ui divider" style="margin: 3rem 0;"></div>
+      
+      <div>
+        <button class="ui button tertiary-bg bottom-logout-button">
+          <i class="sign-out icon"></i>
+          ESCI
+        </button>
+      </div>
 
+    </div>
 
-
-
+    <div class="eight wide column">
+      <h4 class="ui dividing header">La tua cronologia</h4>
+      <table class="ui very basic collapsing celled table">
+        <thead>
+          <tr>
+            <th>Azione</th>
+            <th>Entità</th>
+            <th>Progetto</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+        {{#userHistory}}
+          <tr>
+            <td>{{#Candidate}}<h4 class="ui image header"><i class="check squaree icon success-color"></i></h4>{{/Candidate}}
+              {{#is_skipped}}<h4 class="ui image header"><i class="step forward icon warning-color"></i></h4>{{/is_skipped}}
+              {{#is_orphan}}<h4 class="ui image header"><i class="x icon danger-color"></i></h4>{{/is_orphan}}</td>
+            <td><a href="/match/{{Item.Job.alias}}?uri={{Item.item_uri}}">{{Item.item_search}}</a></td>
+            <td>{{Item.Job.name}}</td>
+            <td>{{timestamp}}</td>
+          </tr>
+        {{/userHistory}}
+        {{^userHistory}}
+          <tr>
+            <td colspan="4">Non hai ancora eseguito alcuna azione...</td>
+          </tr>
+        {{/userHistory}}
         </tbody>
       </table>
     </div>
-  </div>
 
-  <div class="row">
-    <ul>
-    {{#userHistory}}
-      <li><a href="/match/{{Item.Job.alias}}?uri={{Item.item_uri}}">{{Item.item_search}}</a></li>
-    {{/userHistory}}
-    </ul>
   </div>
 
 </div>

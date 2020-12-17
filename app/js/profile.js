@@ -5,6 +5,11 @@ const init = async () => {
 
   const userHistory = await getJSON('/api/v2/user/history');
 
+  for (let action of userHistory) {
+    action.timestamp = formatDateAndTime(action.timestamp)
+    action.Item.item_uri = encodeURIComponent(action.Item.item_uri);
+  }
+
   const template = await getText('/views/template/profile-body.html');
 
   const content = Mustache.render(template, { admin: user.isAdmin(), name: user.getName(), email: user.getEmail(), userStats, userHistory });

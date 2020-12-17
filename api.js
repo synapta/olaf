@@ -564,7 +564,7 @@ const getUserHistory = async (req, res) => {
     try {
         const actions = await Action.findAll({
             where: { user_id: req.user.user_id }, order: [['timestamp', 'DESC']], limit: limit, offset: offset,
-            include: [{ model: Item, include: Job }]
+            include: [{ model: Item, include: Job }, { model: Candidate }]
         });
         res.json(actions);
     } catch (e) {
