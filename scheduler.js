@@ -7,26 +7,20 @@ async function runJob(job) {
     for (let source of sources) {
         await Log.create({ job_id: job.job_id, description: { status: 'start', source: source.source_config, job: job.job_config } });
 
-        let data = null;
+        // This is a Promise
+        const data = parseSource(source);
+
+        const stats = {
+            totalItems: 0,
+            errorItems: 0,
+            zeroItems: 0,
+            skipItems: 0,
+            validItems: 0,
+            validCandidates: 0,
+            errorCandidates: 0
+        };
 
         try {
-            data = parseSource(source);
-        } catch (e) {
-            console.error(e);
-            await Log.create({ job_id: job.job_id, description: { status: 'error', type: 'source', message: e.toString() } });
-        }
-
-        if (data) {
-            const stats = {
-                totalItems: 0,
-                errorItems: 0,
-                zeroItems: 0,
-                skipItems: 0,
-                validItems: 0,
-                validCandidates: 0,
-                errorCandidates: 0
-            };
-
             for await (const item_body of data) {
                 let item = null;
 
@@ -57,9 +51,12 @@ async function runJob(job) {
                     }
                 }
             }
-
-            await Log.create({ job_id: job.job_id, description: { status: 'end', stats: stats } });
+        } catch (e) {
+            console.error(e);
+            await Log.create({ job_id: job.job_id, description: { status: 'error', type: 'source', message: e.toString() } });
         }
+
+        await Log.create({ job_id: job.job_id, description: { status: 'end', stats: stats } });
 
         // Update source
         source.last_update = new Date();

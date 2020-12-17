@@ -107,24 +107,6 @@ module.exports = function (app, passport) {
         }        
     });
 
-    app.get(['/get/:token/author/', '/get/:token/authorityfile/', '/get/:token/author/:authorId', '/get/:token/authorityfile/:authorId'], (request, response) => {
-        response.sendFile('author.html', { root: __dirname + '/app/views' });
-    });
-
-    app.get('/get/:token/login', (request, response) => {
-        response.sendFile('login.html', { root: __dirname + '/app/views' });
-    });
-
-    app.get('/get/:token/user-verification', (request, response) => {
-        response.sendFile('user-verification.html', { root: __dirname + '/app/views' });
-    });
-
-    app.get('/get/:token/author-list/', (request, response) => {
-        if (request.params.token === 'beweb') {
-            response.sendFile('author-list.html', { root: __dirname + '/app/views' });
-        }
-    });
-
     // Upload
     app.post('/api/v2/upload', rawParser, (req, res) => {
         if (req.user.role == 'admin') {
@@ -178,6 +160,22 @@ module.exports = function (app, passport) {
 
     app.get('/api/v2/source/:id', (req, res) => {
         api.getSource(req, res);
+    });
+
+    app.get('/api/v2/source/:id/download', (req, res) => {
+        if (req.user.role == 'admin') {
+            api.downloadSource(req, res);
+        } else {
+            res.sendStatus(403);
+        }
+    });
+
+    app.post('/api/v2/source/:id/reload', (req, res) => {
+        if (req.user.role == 'admin') {
+            api.reloadSource(req, res);
+        } else {
+            res.sendStatus(403);
+        }
     });
 
     app.delete('/api/v2/source/:id', (req, res) => {

@@ -1,8 +1,9 @@
 const isValidUTF8 = require('utf-8-validate');
 const fs = require('fs');
-const tmp = require('tmp');
+const fsPromises = fs.promises;
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const md5 = require('md5');
 const stringify = require('csv-stringify');
 const { Op } = require('sequelize');
 
@@ -14,10 +15,11 @@ const mailer = require('./mailer');
 const uploadFile = async (req, res) => {
     if (req.is('text/csv')) {
         if (isValidUTF8(req.body)) {
-            const file = tmp.fileSync();
-            fs.writeSync(file.fd, req.body);
-            fs.closeSync(file.fd);
-            res.json({ "path": file.name });
+            const path = md5(req.body);
+            const filehandle = await fsPromises.open('uploads/' + path, 'w');
+            await filehandle.write(req.body);
+            await filehandle.close();
+            res.json({ "path": path });
         } else {
             res.sendStatus(400);
         }
@@ -168,7 +170,52 @@ const getSource = async (req, res) => {
     }
 };
 
+const downloadSource = async (req, res) => {
+    const sourceId = parseInt(req.params.id);
+    if (isNaN(sourceId)) {
+        res.sendStatus(400);
+        return;
+    }
+    const source = await Source.findOne({ where: { source_id: sourceId } });
+    if (source === null) {
+        res.sendStatus(404);
+    } else {
+        try {
+            const file = await fsPromises.readFile('uploads/' + source.source_config.path);
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', 'attachment; filename=\"' + source.name + '\"');
+            res.send(file);
+        } catch {
+            res.sendStatus(500);
+        }
+    }
+};
+
+const reloadSource = async (req, res) => {
+    const sourceId = parseInt(req.params.id);
+    if (isNaN(sourceId)) {
+        res.sendStatus(400);
+        return;
+    }
+    const source = await Source.findOne({ where: { source_id: sourceId } });
+    if (source === null) {
+        res.sendStatus(404);
+    } else {
+        try {
+            source.last_update = null;
+            await source.save();
+            res.sendStatus(200);
+        } catch {
+            res.sendStatus(500);
+        }
+    }
+};
+
 const createSource = async (req, res) => {
+    if (!req.body || !req.body.source_config || !req.body.source_config.path || req.body.source_config.path.includes('/')) {
+        res.sendStatus(400);
+        return;
+    }
     try {
         const source = await Source.create(req.body);
         res.json(source);
@@ -193,6 +240,8 @@ const deleteSource = async (req, res) => {
         if (actions.length === 0) {
             await Candidate.destroy({ where: { source_id: sourceId } }, { transaction: t });
             await Item.destroy({ where: { source_id: sourceId } }, { transaction: t });
+            const source = await Source.findOne({ where: { source_id: sourceId } }, { transaction: t });
+            await fsPromises.unlink('uploads/' + source.source_config.path);
             await Source.destroy({ where: { source_id: sourceId } }, { transaction: t });
             await t.commit();
             res.sendStatus(200);
@@ -512,6 +561,8 @@ module.exports = {
     getJobLog,
     getJobStats,
     getSource,
+    downloadSource,
+    reloadSource,
     createSource,
     deleteSource,
     getItem,
