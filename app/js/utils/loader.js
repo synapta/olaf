@@ -1,5 +1,12 @@
 USER = new User();
 
+const showElements = userStatus => {
+  const selector = userStatus === 'anonymous' ? '.not-logged-element' : '.logged-element';
+  const els = document.querySelectorAll(selector);
+  els.forEach(el => el.classList.remove('d-none'));
+};
+
+
 const load = async () => {
 
   const user = await USER.getStatus();
@@ -12,6 +19,8 @@ const load = async () => {
       return;
     }
     
+    showElements(user.status);
+
     const bodyClass = user.status === 'anonymous' ? 'not-logged' : 'logged';
     document.body.classList.add(bodyClass);
   
@@ -19,9 +28,7 @@ const load = async () => {
     if (user.status !== 'anonymous' && !user.isVerified() && window.location.pathname !== '/verify') {
       window.location.href = '/verify';
     }
-  
-    // console.log({ logged: user.isLogged(), admin: user.isAdmin() });
-  
+    
     // TODO - use user status to render navbar
     const out = Mustache.render(template, { logged: user.isLogged(), admin: user.isAdmin(), name: user.getName(), email: user.getEmail() });
     navbarContainer.innerHTML = out;
