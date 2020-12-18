@@ -4,6 +4,10 @@ const showElements = userStatus => {
   const selector = userStatus === 'anonymous' ? '.not-logged-element' : '.logged-element';
   const els = document.querySelectorAll(selector);
   els.forEach(el => el.classList.remove('d-none'));
+  if (userStatus === 'admin') {
+    const adminEls = document.querySelectorAll('admin-element');
+    adminEls.forEach(el => el.classList.remove('d-none'));
+  }
 };
 
 
