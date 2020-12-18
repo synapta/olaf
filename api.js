@@ -65,7 +65,7 @@ const downloadJob = async (req, res) => {
 
         const items = await Item.findAll({
             where: { job_id: job.job_id, is_processed: true },
-            include: [{ model: Candidate, where: { is_selected: true } }]
+            include: [{ model: Candidate, where: { is_selected: true }, required: false }]
         });
 
         const stringifier = stringify({
@@ -79,8 +79,13 @@ const downloadJob = async (req, res) => {
         stringifier.pipe(res);
 
         for (let item of items) {
-            for (let candidate of item.Candidates) {
-                let row = { item_uri: item.item_uri, candidate_uri: candidate.candidate_uri, last_update: candidate.last_update.toISOString() };
+            if (item.Candidates.length > 0) {
+                for (let candidate of item.Candidates) {
+                    let row = { item_uri: item.item_uri, candidate_uri: candidate.candidate_uri, last_update: item.last_update.toISOString() };
+                    stringifier.write(row);
+                }
+            } else {
+                let row = { item_uri: item.item_uri, candidate_uri: null, last_update: item.last_update.toISOString() };
                 stringifier.write(row);
             }
         }
