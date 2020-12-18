@@ -9,7 +9,7 @@ const init = async () => {
   document.body.classList.add('logged');
 
   if (user.isAdmin()) {
-    document.querySelector('.new-job-project').classList.remove('d-none');
+    document.querySelector('.admin-element').classList.remove('d-none');
   }
 
   const jobs = await getJSON('/api/v2/job/_all');
