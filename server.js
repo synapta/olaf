@@ -9,6 +9,9 @@ async function runScheduler() {
 
 setTimeout(runScheduler, 10000);
 
+// 30 days
+const SESSION_TIMEOUT = 30 * 86400000;
+
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
@@ -20,7 +23,7 @@ const { sequelize } = require('./database');
 
 const sequelizeSessionStore = new SessionStore({
     db: sequelize,
-    expiration: 30 * 86400 * 1000
+    expiration: SESSION_TIMEOUT
 });
 
 // Setting up express
@@ -38,6 +41,15 @@ app.use(expressSession({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Set session cookie maxAge
+app.use(function (req, res, next) {
+    if (req.method == 'POST' && req.url == '/api/v2/user/login') {
+        req.session.cookie.maxAge = SESSION_TIMEOUT;
+        req.session.touch();
+    }
+    next();
+});
 
 require('./routes.js')(app, passport);
 
