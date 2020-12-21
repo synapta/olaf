@@ -1,5 +1,6 @@
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const express = require('express');
 const LocalStrategy = require('passport-local').Strategy;
 
 const api = require('./api');
@@ -106,6 +107,17 @@ module.exports = function (app, passport) {
           response.redirect('/login');
         }        
     });
+
+    // Frontend libraries
+    app.use('/libs/*', (req, res, next) => {
+        res.set('Cache-control', 'public, max-age=31536000');
+        next();
+    });
+
+    app.use('/libs/fontawesome', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free/js'));
+    app.use('/libs/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
+    app.use('/libs/mustache', express.static(__dirname + '/node_modules/mustache'));
+    app.use('/libs/semantic', express.static(__dirname + '/node_modules/semantic-ui-css'));
 
     // Upload
     app.post('/api/v2/upload', rawParser, (req, res) => {
