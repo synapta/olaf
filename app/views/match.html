@@ -26,7 +26,7 @@
 
   <!-- secondary navbar for match functions -->
   <div id="match-navbar">
-    
+
     <div class="navbar-placeholder">
       <div class="ui placeholder small-button-placeholder">
         <div class="image"></div>
@@ -45,7 +45,7 @@
 
     <div class="ui grid">
       <div class="five wide column item-column">
-        
+
         <div id="item-container" class="data-container"></div>
 
         <div id="item-placeholder" class="data-placeholder">
@@ -115,7 +115,37 @@
       Come funziona il processo di matching
     </div>
     <div class="content">
-      ...
+      <p>In questa pagina puoi <b>confrontare i dati</b> provenienti dal dataset sorgente con quelli che OLAF ottiene da
+        Wikidata, e <b>creare le associazioni</b> tra le entità dei due dataset.</p>
+
+      <p>La card <b>Entità</b> (in blu, sulla sinistra dello schermo) visualizza le informazioni provenienti dal
+        <b>dataset sorgente</b>. Consulta queste informazioni per capire di quale entità si tratta. Se hai bisogno di
+        più informazioni per la disambiguazione, clicca sul nome dell'entità per consultare una sua scheda descrittiva
+        (se presente nel dataset sorgente).</p>
+
+      <p>Le card <b>Candidati</b> (in rosso, sulla destra dello schermo) mostrano i candidati da <b>Wikidata</b> per
+        l'entity matching. Anche in questo caso, se hai bisogno di maggiori informazioni di contesto, clicca sul nome
+        del candidato per consultare la sua voce su Wikidata (o, se disponibile, clicca sul link alla sua pagina su
+        Wikipedia).</p>
+
+      <p>Se hai trovato il <b>candidato giusto</b> (se, in altre parole, <b>sei sicuro</b> che le entità dei due dataset
+        <b>rappresentano la stessa cosa</b>), clicca su <b>Seleziona il candidato</b> e poi su <b>Conferma match</b> per
+        salvare l'associazione tra le due entità: l'entity matching è fatto! (E l'associazione tra i codici
+        identificativi delle due entità viene subito memorizzata da OLAF).</p>
+
+      <p>Che cosa succede se tra i candidati da Wikidata sono presenti dei <b>duplicati</b>? In questo caso puoi
+        selezionare più di un elemento da associare, e confermare il match esattamente come descritto sopra.</p>
+
+      <p>Se, invece, <b>nessuno dei candidati trovati da OLAF è quello giusto</b>, clicca su <b>Nessun match</b>.
+        L'informazione sull'assenza di match viene salvata da OLAF, che da questo momento non ripropone più l'entità da
+        associare. Fai questa operazione <b>solo se sei sicuro che nessuno dei candidati è quello giusto</b>: l'entità
+        infatti non viene riproposta più a <b>nessuno</b> degli utenti.</p>
+
+      <p><b>Se non sei sicuro</b>, o se vuoi riprendere il "caso" in un secondo momento, clicca su <b>Salta</b> e passa
+        all'entità successiva: l'entità che hai saltato continuerà ad essere proposta agli altri utenti.</p>
+
+      <p>Ricordati che puoi consultare le statistiche sul tuo lavoro nella pagina di <b>Profilo</b>, e lo stato di
+        avanzamento di ogni progetto nella pagina del <b>Progetto</b>. Buon lavoro!</p>
     </div>
   </div>
 
