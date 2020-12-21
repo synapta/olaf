@@ -1,12 +1,30 @@
+require('dotenv').config();
 
-const express      = require('express');
-const morgan       = require('morgan');
-const bodyParser   = require('body-parser');
-const MongoClient  = require('mongodb').MongoClient;
-const session      = require('express-session');
-const schedule     = require('node-schedule');
-const passport     = require('passport');
-const flash        = require('connect-flash');
+const scheduler = require('./scheduler');
+
+async function runScheduler() {
+    await scheduler.run();
+    setTimeout(runScheduler, 60000);
+}
+
+setTimeout(runScheduler, 10000);
+
+// 30 days
+const SESSION_TIMEOUT = 30 * 86400000;
+
+const express = require('express');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const passport = require('passport');
+const expressSession = require('express-session');
+const SessionStore = require('express-session-sequelize')(expressSession.Store);
+
+const { sequelize } = require('./database');
+
+const sequelizeSessionStore = new SessionStore({
+    db: sequelize,
+    expiration: SESSION_TIMEOUT
+});
 
 // Setting up express
 const app = express();
@@ -15,24 +33,28 @@ const app = express();
 app.use(morgan('common'));
 app.use('/', express.static('./app'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(session({secret: 'synapta'}));
+app.use(expressSession({
+    secret: process.env.SESSION_SECRET || 'secret',
+    store: sequelizeSessionStore,
+    resave: false,
+    saveUninitialized: false
+}));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash());
 
-// Get routes
-MongoClient.connect("mongodb://localhost:27017/", (err, client) => {
-
-    if(err)
-        require('./routes.js')(app, passport);
-    else
-        require('./routes.js')(app, passport, client.db('arco'));
-
-    // Notify server uptime
-    let server = app.listen(3646, () => {
-        console.log('Server listening at http://localhost:%s', 3646);
-    });
-
+// Set session cookie maxAge
+app.use(function (req, res, next) {
+    if (req.method == 'POST' && req.url == '/api/v2/user/login') {
+        req.session.cookie.maxAge = SESSION_TIMEOUT;
+        req.session.touch();
+    }
+    next();
 });
 
+require('./routes.js')(app, passport);
+
+const server = app.listen(process.env.PORT || 3646, 'localhost', () => {
+    const host = server.address().address;
+    const port = server.address().port;
+    console.log('Server listening at http://%s:%s', host, port);
+});

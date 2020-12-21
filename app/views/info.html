@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OLAF | Info</title>
+
+  <link rel="icon" sizes="64x64" type="image/png" href="/img/favicon.png" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" type="text/css" href="/libs/semantic/semantic.css" />
+
+  <link rel="stylesheet" type="text/css" href="/css/theme.css" />
+  <link rel="stylesheet" type="text/css" href="/css/navbar.css" />
+  <link rel="stylesheet" type="text/css" href="/css/footer.css" />
+
+  <script type="text/javascript" src="/libs/fontawesome/all.min.js"></script>
+</head>
+
+<body>
+
+  <nav id="navbar"></nav>
+
+  <div class="ui container use-available-space" style="padding-top: 8rem; padding-bottom: 4rem;">
+    <h1 class="ui dividing header">Info su OLAF</h1>
+
+    <p>OLAF (Open Linked Authority File) è un'interfaccia di <b>entity matching</b>, che consente di creare associazioni
+      tra le entità di diverse tipologie di dataset e Wikidata. <a href="https://www.wikidata.org"
+        target="_black">Wikidata</a>
+      è un progetto della Wikimedia Foundation, una knowledge base libera e collaborativa che contiene milioni di
+      entità, appartenenti a qualsiasi dominio della
+      conoscenza.</p>
+
+    <p>È possibile configurare OLAF per fare entity matching di <b>diverse tipologie di entità</b>, come monumenti,
+      profili di artisti e opere. <b>OLAF usa le informazioni presenti nei dataset sorgente per interrogare Wikidata, e
+        trovare una lista di candidati per l'entity-matching.</b> L'interfaccia propone agli utenti di selezionare, tra
+      un ventaglio di uno o più candidati, l’entità di Wikidata più idonea all'associazione.</p>
+
+    <p>I risultati dell'entity matching sono salvati da OLAF, sotto forma di <b>relazioni tra codici identificativi</b>
+      (coppie di ID del dataset sorgente e Q di Wikidata). È possibile utilizzare questi risultati per diversi scopi.
+      Per esempio, per <b>arricchire</b> il dataset sorgente con i dati presenti su Wikidata. Oppure, come base di
+      partenza per un progetto di editing su Wikidata e per contribuire alla crescita della <b>conoscenza libera</b>!
+    </p>
+
+    <p>OLAF è sviluppato da Synapta, startup nata come spin-off del Centro Nexa del Politecnico di Torino, specializzata
+      in Linked Open Data.</p>
+
+  </div>
+
+  <footer id="footer"></footer>
+
+
+  <!-- Libraries -->
+  <script type="text/javascript" src="/libs/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/libs/mustache/mustache.min.js"></script>
+  <script type="text/javascript" src="/libs/semantic/semantic.min.js"></script>
+
+  <script type="text/javascript" src="/js/utils/request.js"></script>
+  <script type="text/javascript" src="/js/utils/dom.js"></script>
+  <script type="text/javascript" src="/js/utils/User.js"></script>
+  <script type="text/javascript" src="/js/utils/loader.js"></script>
+
+</body>
+
+</html>

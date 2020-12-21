@@ -1,5 +1,9 @@
+require('dotenv').config();
+
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('sqlite::memory:');
+const sequelize = new Sequelize(process.env.DATABASE_URI || 'sqlite:db.sqlite', { logging: false });
+
+const { JobTypes, SourceTypes } = require('./config');
 
 function getJsonDataType(name) {
     return {
@@ -32,26 +36,60 @@ const User = sequelize.define('User', {
         primaryKey: true,
         autoIncrement: true
     },
-    username: {
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+            isEmail: true
+        }
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    token: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
     },
     display_name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            notEmpty: true
+        }
     },
-    password: {
+    role: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        defaultValue: 'user',
+        validate: {
+            isIn: [['user', 'admin']]
+        }
     },
-    is_admin: {
+    is_verified: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
+    },
+    is_password_reset: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    registration_timestamp: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+    },
+    last_password_update: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
     }
 }, {
-    tableName: 'users',
+    tableName: 'Users',
     timestamps: false
 });
 
@@ -68,23 +106,38 @@ const Job = sequelize.define('Job', {
     alias: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
+        unique: true,
+        validate: {
+            is: /^[a-z0-9\-]+$/i
+        }
+    },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true
     },
     job_type: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            isJobType(value) {
+                const found = JobTypes.some(el => el.alias === value);
+                if (!found) {
+                    throw new Error('Job type is not valid!');
+                }
+            }
+        }
     },
     job_config: getJsonDataType('job_config'),
-    update_policy: {
-        type: DataTypes.STRING,
+    is_enabled: {
+        type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: 'once'
+        defaultValue: true
     },
     last_update: {
         type: DataTypes.DATE
     }
 }, {
-    tableName: 'jobs',
+    tableName: 'Jobs',
     timestamps: false
 });
 
@@ -98,21 +151,36 @@ const Source = sequelize.define('Source', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    source_type: {
+    name: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    source_type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+            isSourceType(value) {
+                const found = SourceTypes.some(el => el.alias === value);
+                if (!found) {
+                    throw new Error('Source type is not valid!');
+                }
+            }
+        }
     },
     source_config: getJsonDataType('source_config'),
     update_policy: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'once'
+        defaultValue: 'once',
+        validate: {
+            isIn: [['once', 'disabled']]
+        }
     },
     last_update: {
         type: DataTypes.DATE
     }
 }, {
-    tableName: 'sources',
+    tableName: 'Sources',
     timestamps: false
 });
 
@@ -134,12 +202,20 @@ const Item = sequelize.define('Item', {
         primaryKey: true,
         autoIncrement: true
     },
+    source_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
     job_id: {
         type: DataTypes.INTEGER,
         allowNull: false
     },
     item_uri: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+    item_search: {
+        type: DataTypes.TEXT,
         allowNull: false
     },
     item_body: getJsonDataType('item_body'),
@@ -151,17 +227,30 @@ const Item = sequelize.define('Item', {
         allowNull: false,
         defaultValue: false
     },
-    is_deleted: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-    },
     last_update: {
         type: DataTypes.DATE
     }
 }, {
-    tableName: 'items',
-    timestamps: false
+    tableName: 'Items',
+    timestamps: false,
+    indexes: [
+        {
+            unique: true,
+            fields: ['job_id', 'item_uri']
+        }
+    ]
+});
+
+Source.hasMany(Item, {
+    foreignKey: {
+        name: 'source_id'
+    }
+});
+
+Item.belongsTo(Source, {
+    foreignKey: {
+        name: 'source_id'
+    }
 });
 
 Job.hasMany(Item, {
@@ -186,8 +275,12 @@ const Candidate = sequelize.define('Candidate', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
+    source_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
     candidate_uri: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     candidate_body: getJsonDataType('candidate_body'),
@@ -201,17 +294,18 @@ const Candidate = sequelize.define('Candidate', {
         allowNull: false,
         defaultValue: false
     },
-    is_deleted: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-    },
     last_update: {
         type: DataTypes.DATE
     }
 }, {
-    tableName: 'candidates',
-    timestamps: false
+    tableName: 'Candidates',
+    timestamps: false,
+    indexes: [
+        {
+            unique: true,
+            fields: ['item_id', 'candidate_uri']
+        }
+    ]
 });
 
 Item.hasMany(Candidate, {
@@ -223,6 +317,18 @@ Item.hasMany(Candidate, {
 Candidate.belongsTo(Item, {
     foreignKey: {
         name: 'item_id'
+    }
+});
+
+Source.hasMany(Candidate, {
+    foreignKey: {
+        name: 'source_id'
+    }
+});
+
+Candidate.belongsTo(Source, {
+    foreignKey: {
+        name: 'source_id'
     }
 });
 
@@ -260,7 +366,7 @@ const Action = sequelize.define('Action', {
         defaultValue: DataTypes.NOW
     }
 }, {
-    tableName: 'actions',
+    tableName: 'Actions',
     timestamps: false
 });
 
@@ -300,6 +406,39 @@ Action.belongsTo(Candidate, {
     }
 });
 
+const Log = sequelize.define('Log', {
+    log_id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    job_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    description: getJsonDataType('description'),
+    timestamp: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+    }
+}, {
+    tableName: 'Logs',
+    timestamps: false
+});
+
+Job.hasMany(Log, {
+    foreignKey: {
+        name: 'job_id'
+    }
+});
+
+Log.belongsTo(Job, {
+    foreignKey: {
+        name: 'job_id'
+    }
+});
+
 (async () => {
     if (require.main === module) {
         // Create the database
@@ -314,5 +453,6 @@ module.exports = {
     Source,
     Item,
     Candidate,
-    Action
+    Action,
+    Log
 };

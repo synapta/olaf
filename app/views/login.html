@@ -1,87 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <!-- Styles -->
-    <link rel="stylesheet" type="text/css" href="/css/lib/semantic242.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/main.css" />
-    <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.js"></script>
-    <script src="https://kit.fontawesome.com/be7822736c.js"></script>
-    <script src="/js/lib/semantic242.js"></script>
-    <!-- Frontend rendering -->
-    <script type="text/javascript" src="/js/utils/url.js"></script>
-    <script type="text/javascript" src="/js/author/static.js"></script>
-    <script type="text/javascript" src="/js/author/rendering/static.js"></script>
-    <script type="text/javascript" src="/js/login/rendering/static.js"></script>
-    <script type="text/javascript" src="/js/login/static.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OLAF | Login</title>
+
+  <link rel="icon" sizes="64x64" type="image/png" href="/img/favicon.png" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" type="text/css" href="/libs/semantic/semantic.css" />
+
+  <link rel="stylesheet" type="text/css" href="/css/theme.css" />
+  <link rel="stylesheet" type="text/css" href="/css/navbar.css" />
+  <link rel="stylesheet" type="text/css" href="/css/footer.css" />
+
+  <link rel="stylesheet" type="text/css" href="/css/login.css" />
+
+  <script type="text/javascript" src="/libs/fontawesome/all.min.js"></script>
 </head>
+
 <body>
 
-    <div class="ui top fixed menu navbar"></div>
+  <nav id="navbar"></nav>
 
-    <div class="ui container">
+  <div class="ui container use-available-space" style="padding: 7rem 0;">
 
-        <h2 class="ui dividing header">Accedi a OLAF</h2>
-        <form id="login-form" class="ui form" action="/api/v1/arco/login" method="post">
+    <div class="form-container login-container">
+      <h2 class="ui dividing header">Accedi a OLAF</h2>
 
-            <div id="login-error" class="ui error message">
-                <div class="header"></div>
-            </div>
-
-            <div class="two fields">
-                <div class="field">
-                    <label>Indirizzo e-mail</label>
-                    <input type="text" name="email" placeholder="Inserisci il tuo indirizzo e-mail">
-                </div>
-                <div class="field">
-                    <label>Password</label>
-                    <input type="password" name="password" placeholder="Inserisci qui la password scelta">
-                </div>
-            </div>
-
-            <button class="ui button" type="submit">Submit</button>
-
-        </form>
-
-        <h2 class="ui dividing header">Registrazione</h2>
-        <form id="signup-form" class="ui form" action="/api/v1/arco/signup" method="post">
-
-            <div class="field">
-                <label>Indirizzo e-mail</label>
-                <input type="text" name="email" placeholder="Inserisci il tuo indirizzo e-mail">
-            </div>
-
-            <div class="two fields">
-                <div class="field">
-                    <label>Password</label>
-                    <input type="password" name="password" placeholder="Inserisci qui la password scelta">
-                </div>
-                <div class="field">
-                    <label>Ripeti password</label>
-                    <input type="password" name="retype-password" placeholder="Ripeti password">
-                </div>
-            </div>
-
-            <div class="field">
-                <label>Username</label>
-                <input type="text" name="username" placeholder="Scegli il tuo username">
-            </div>
-
-            <!--<div class="field">
-                <div class="ui checkbox">
-                    <input type="checkbox" tabindex="0" class="hidden">
-                    <label>I agree to the Terms and Conditions</label>
-                </div>
-            </div>-->
-            <button class="ui button" type="submit">Submit</button>
-            <div class="ui error message"></div>
-
-        </form>
-
+      <form id="login-form" class="ui form">
+        <div id="login-error" class="ui error message">
+          <div class="header"></div>
+        </div>
+        <div class="two fields">
+          <div class="field">
+            <label>Indirizzo e-mail</label>
+            <input type="email" name="email" autocomplete="email" placeholder="Inserisci il tuo indirizzo e-mail" required >
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" name="password" autocomplete="current-password" placeholder="Inserisci la tua password" required>
+          </div>
+        </div>
+        <div class="ui negative message status-msg d-none">
+          <div class="header">
+            Login non riuscito
+          </div>
+          <p>
+            Ricontrolla le tue credenziali e riprova. Se invece non hai ancora un account puoi crearne uno nuovo usanto il form qui sotto.
+          </p>
+        </div>
+        <div class="field">
+          <button class="ui button tertiary-bg border" type="submit">ACCEDI</button>
+          <a href="/password-reset">Password dimenticata?</a>
+        </div>
+      </form>
     </div>
 
+    <div class="form-container signup-container">
+      <h2 class="ui dividing header">Crea un nuovo account</h2>
+
+      <form id="signup-form" class="ui form">
+        <div class="field">
+          <label>Nome completo*</label>
+          <input type="text" name="display_name" placeholder="Inserisci il tuo nome e cognome"required >
+        </div>
+        <div class="field">
+          <label>E-mail*</label>
+          <input type="email" name="email" placeholder="Inserisci il tuo indirizzo e-mail" autocomplete="email" required >
+        </div>
+        <div class="two fields">
+          <div class="field">
+            <label>Password*</label>
+            <input type="password" name="password" placeholder="Inserisci qui la password scelta" autocomplete="new-password" required>
+          </div>
+          <div class="field">
+            <label>Ripeti password*</label>
+            <input type="password" name="retype_password" placeholder="Ripeti password" autocomplete="new-password" required >
+          </div>
+        </div>
+        <!--<div class="field">
+              <div class="ui checkbox">
+                  <input type="checkbox" tabindex="0" class="hidden">
+                  <label>I agree to the Terms and Conditions</label>
+              </div>
+          </div>-->
+          <div class="ui negative message status-msg d-none">
+            <div class="header">
+              Registrazione non riuscita
+            </div>
+            <p>
+              La mail che hai utilizzato risulta già nel nostro sistema. Prova ad effettuare il login con il form qui sopra.
+            </p>
+          </div>
+        <button class="ui button tertiary-bg border" type="submit">CREA</button>
+        <div class="ui error message"></div>
+      </form>
+    </div>
+  </div>
+
+  <footer id="footer"></footer>
+
+  <!-- Libraries -->
+  <script type="text/javascript" src="/libs/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/libs/mustache/mustache.min.js"></script>
+  <script type="text/javascript" src="/libs/semantic/semantic.min.js"></script>
+
+  <script type="text/javascript" src="/js/utils/request.js"></script>
+  <script type="text/javascript" src="/js/utils/dom.js"></script>
+  <script type="text/javascript" src="/js/utils/User.js"></script>
+  <script type="text/javascript" src="/js/utils/loader.js"></script>
+
+  <script type="text/javascript" src="/js/login.js"></script>
+
 </body>
+
 </html>

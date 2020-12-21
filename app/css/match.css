@@ -1,0 +1,119 @@
+#match-navbar {
+  position: fixed;
+  width: 100%;
+  margin-top: var(--navbar-h);
+  height: var(--match-navbar-h);
+  border-bottom: 1px solid rgba(var(--dark-rgb), .2);
+  box-shadow: 0px 2px 4px 0px rgba(34, 36, 38, 0.12);
+  /* background-color: rgba(var(--secondary-rgb), .2); */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  z-index: 100;
+  background-color: #fff;
+}
+
+.large-container {
+  padding-top: calc(var(--navbar-h) + var(--match-navbar-h) + 8rem);
+  padding-bottom: 5rem;
+}
+
+#item-container,
+#candidates-container {
+  display: none;
+  z-index: 1;
+}
+
+#item-container {
+  position: sticky;
+  top: calc(var(--match-navbar-h) + var(--navbar-h) + 1.5rem);
+}
+
+.item-column {
+  padding-right: 2.5rem !important;
+  border-right: 1px solid var(--medium);
+  /* background-color: rgba(var(--primary-rgb), .2); */
+}
+
+.candidates-column {
+  /* padding-top: 1rem !important; */
+  padding-left: 2.5rem !important;
+}
+
+.confirm-match-button {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.item-name {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 20px 0
+}
+
+.card-box {
+  margin: 1rem 0;
+  padding: 0 1rem;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.link-box {
+  word-break: break-all;
+}
+
+.button-placeholder {
+  width: 130px;
+  height: 36px;
+  border-radius: 3px;
+}
+
+.small-button-placeholder {
+  width: 65px;
+  height: 36px;
+  border-radius: 3px;
+}
+
+.select-candidate-button:after {
+  display: inline-block;
+  content: 'Seleziona candidato';
+}
+
+.select-candidate-button.selected {
+  background-color: var(--success) !important;
+}
+
+.select-candidate-button.selected:focus {
+  background-color: var(--success) !important;
+}
+
+.select-candidate-button.selected:after {
+  display: inline-block;
+  content: 'Deseleziona candidato';
+}
+
+.back {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.jobname {
+  font-weight: 900;
+  margin-left: 1rem;
+  /* text-decoration: underline; */
+  /* font-style: italic; */
+  font-size: 1.3rem;
+  color: var(--dark);
+}
+
+.processed-item {
+  border: 3px solid var(--secondary-shade) !important;
+  background-color: rgba(var(--secondary-rgb), .1) !important;
+}
+
+.selected-candidate {
+  border: 3px solid var(--success-shade) !important;
+  background-color: rgba(var(--success-rgb), .1) !important;
+}

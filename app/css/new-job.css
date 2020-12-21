@@ -1,0 +1,23 @@
+.new-job-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem !important;
+}
+
+.new-job-header > i {
+  color: var(--medium);
+  font-size: 18px;
+}
+
+.new-job-step {
+  display: none;
+  margin-bottom: 3rem;
+}
+
+.submit-buttons {
+  margin-top: 2rem;
+}
+
+.submit-buttons > button {
+  margin-right: 1rem !important;
+}

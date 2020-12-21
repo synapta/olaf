@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OLAF</title>
+
+  <link rel="icon" sizes="64x64" type="image/png" href="/img/favicon.png" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" type="text/css" href="/libs/semantic/semantic.css" />
+
+  <link rel="stylesheet" type="text/css" href="/css/theme.css" />
+  <link rel="stylesheet" type="text/css" href="/css/navbar.css" />
+  <link rel="stylesheet" type="text/css" href="/css/footer.css" />
+  <link rel="stylesheet" type="text/css" href="/css/home.css" />
+
+  <script type="text/javascript" src="/libs/fontawesome/all.min.js"></script>
+</head>
+
+<body>
+
+  <nav id="navbar"></nav>
+
+  <div class="ui vertical masthead center aligned segment">
+    <div class="ui text container">
+      <h1 class="ui header">
+        Benvenuto in OLAF
+      </h1>
+      <h2>Open Linked Authority Files</h2>
+
+      <a class="ui huge secondary-bg button cta-btn admin-element d-none" href="/new-job">
+        <span>CREA UN NUOVO PROGETTO</span> <i class="plus icon"></i>
+      </a>
+
+      <a class="ui huge secondary-bg button cta-btn not-logged-element d-none" href="/login">
+        <span>ENTRA</span> <i class="arrow right icon"></i>
+      </a>
+
+    </div>
+  </div>
+  
+  <div id="jobs" class="ui container logged-element"></div>
+
+  <footer id="footer"></footer>
+
+  <!-- Libraries -->
+  <script type="text/javascript" src="/libs/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/libs/mustache/mustache.min.js"></script>
+  <script type="text/javascript" src="/libs/semantic/semantic.min.js"></script>
+
+  <script type="text/javascript" src="/js/utils/request.js"></script>
+  <script type="text/javascript" src="/js/utils/User.js"></script>
+  <script type="text/javascript" src="/js/utils/loader.js"></script>
+  <script type="text/javascript" src="/js/home.js"></script>
+
+  
+</body>
+
+</html>

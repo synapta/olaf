@@ -1,0 +1,41 @@
+<h2 class="ui header">
+  ENTITÀ
+  {{#is_processed}}(<i>processato</i>){{/is_processed}}
+</h2>
+
+<div class="ui raised segment {{#is_processed}}processed-item{{/is_processed}}">
+
+    <a class="ui blue ribbon label"><i class="tag icon"></i> Nome</a>
+
+    <p class="item-name">
+      {{#URI}}
+      <a target="_blank" href="{{URI}}">
+        <i class="fas fa-external-link-alt"></i> {{Nome}}
+      </a>
+      {{/URI}}
+      {{^URI}}
+      {{Nome}}
+      {{/URI}}
+    </p>
+
+    {{#Descrizione}}
+    <a class="ui blue ribbon label"><i class="paragraph icon"></i> Descrizione</a>
+    <div class="card-box">
+      {{Descrizione}}
+    </div>
+    {{/Descrizione}}
+    
+    {{#Indirizzo}}
+    <a class="ui blue ribbon label"><i class="map marker alternate icon"></i> Indirizzo</a>
+    <div class="card-box">
+      {{Indirizzo}}
+    </div>
+    {{/Indirizzo}}
+
+    {{#Comune}}
+    <a class="ui blue ribbon label"><i class="dot circle icon"></i> Comune</a>
+    <div class="card-box">
+      {{Comune}}
+    </div>
+    {{/Comune}}
+</div>

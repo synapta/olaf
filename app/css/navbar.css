@@ -1,0 +1,151 @@
+body > .ui.container {
+  margin-top: 6em;
+}
+
+#navbar .navbar-logo {
+  width: 25px !important;
+  height: auto !important;
+  margin-right: 5px !important;
+}
+
+/* Nav */
+#navbar .ui.fixed.borderless.menu {
+  background-color: var(--primary);
+  height: var(--navbar-h);
+}
+
+#navbar .ui .computer.only .item {
+  color: #fff;
+}
+
+#navbar .ui .computer.only .item:hover {
+  background: var(--primary-shade) !important;
+  color: var(--primary-contrast) !important;
+}
+
+#navbar .ui .computer .item.active {
+  background: var(--secondary);
+  color: #fff;
+}
+
+#navbar .ui.dropdown.item .menu {
+  background-color: var(--primary) !important;
+}
+
+#navbar .ui.menu .ui.dropdown .menu > .item {
+  color: #fff !important;
+}
+
+#navbar .ui.menu .ui.dropdown .menu > .item.active {
+  background-color: var(--secondary) !important;
+  color: #fff !important;
+  border-bottom: 1px solid #fff;
+}
+
+#navbar .ui.menu .ui.dropdown .menu > .item:hover {
+  background-color: var(--primary-shade) !important;
+  color: #fff !important;
+}
+
+#navbar .ui.fixed.borderless.menu .row > a.header.item {
+  font-size: 1.2em;
+}
+
+/* Mobile */
+#navbar .tablet.mobile.only .header,
+#navbar .ui.icon.button > .icon {
+  color: #fff;
+}
+
+#navbar .tablet.mobile.only .header:hover {
+  background-color: var(--primary-shade) !important;
+  color: #fff !important;
+}
+
+#navbar .ui.basic.button:hover {
+  background: var(--primary-shade) !important;
+  color: #fff !important;
+}
+
+#navbar .ui.vertical.menu {
+  display: none;
+  border: none;
+  box-shadow: none;
+  background-color: var(--primary);
+}
+
+#navbar .ui.vertical.menu > .item {
+  padding-left: 1.428em;
+  color: #fff;
+}
+
+#navbar .ui.vertical.menu > .item.active {
+  padding-left: 1.428em;
+  background-color: var(--secondary) !important;
+  color: #fff !important;
+  border-bottom: 1px solid #fff;
+}
+
+#navbar .ui.vertical.menu .item .title {
+  color: #fff;
+}
+
+#navbar .ui.vertical.menu .item .title .dropdown.icon {
+  float: none;
+  color: #fff;
+}
+
+#navbar .ui.vertical.menu .item .content .item {
+  padding: 0.5em 1em;
+  color: #fff;
+}
+
+#navbar .ui.vertical.menu .item .content .item:hover {
+  padding: 0.5em 1em;
+  background-color: var(--primary-shade) !important;
+  color: #fff !important;
+}
+
+#navbar .ui.vertical.menu .item .content .item.active {
+  padding: 0.5em 1em;
+  background-color: var(--secondary) !important;
+  color: #fff !important;
+}
+
+#navbar .ui.vertical.menu .header.item {
+  text-transform: uppercase;
+  color: #fff;
+}
+/* Nav */
+
+#navbar .ui.message {
+  background-color: rga(238, 238, 238);
+  box-shadow: none;
+  padding: 5em 4em;
+}
+
+#navbar .ui.message h1.ui.header {
+  font-size: 4.5em;
+  color: var(--primary);
+}
+
+#navbar .ui.message p.lead {
+  font-size: 1.3em;
+  color: #333333;
+  line-height: 1.4;
+  font-weight: 300;
+}
+
+#navbar .ui.purple.button {
+  background-color: var(--primary);
+}
+
+#navbar .ui .computer.only .item.login-btn {
+  background-color: var(--secondary);
+  color: var(--secondary-contrast) !important;
+  /* padding: .5rem .8rem; */
+}
+
+#navbar .ui .computer.only .item.login-btn:hover {
+  background-color: var(--secondary-shade) !important;
+}

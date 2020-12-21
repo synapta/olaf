@@ -1,0 +1,7 @@
+body {
+  background-color: rgba(var(--light-rgb), .6);
+}
+
+.form-container {
+  margin-top: 4rem;
+}

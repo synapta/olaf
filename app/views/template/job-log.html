@@ -1,0 +1,22 @@
+<pre class="{{description.status}}">
+{{time}} - <span style="font-weight: 900;text-decoration: underline;">{{description.status}}{{#errorLog}} ({{description.type}}){{/errorLog}}</span>
+{{#startLog}}
+
+source path: {{description.source.path}}
+separator: {{description.source.separator}}, quote: {{description.source.escape}}, escape: {{description.source.escape}}
+{{/startLog}}
+{{#endLog}}
+
+STATS
+totalItems: {{description.stats.totalItems}}
+errorItems: {{description.stats.errorItems}}
+errorCandidates: {{description.stats.errorCandidates}}
+validCandidates: {{description.stats.validCandidates}}
+validItems: {{description.stats.validItems}}
+zeroItems: {{description.stats.zeroItems}}
+{{/endLog}}
+{{#errorLog}}
+
+{{description.message}}
+{{/errorLog}}
+</pre>

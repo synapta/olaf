@@ -1,0 +1,88 @@
+#job-data {
+  display: none;
+}
+
+.job-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 0 !important;
+}
+
+.last-update-span {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin-bottom: 3rem !important;
+}
+
+.job-desc {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(var(--dark-rgb), .1);
+}
+
+.source,
+.log {
+  width: 100%;
+  border: 1px solid rgba(var(--dark-rgb), .1);
+  border-radius: 5px;
+  background-color: var( --light);
+  padding: 1rem;
+}
+
+.log {
+  margin-top: 3rem;
+}
+
+.sources-list {
+  border-bottom: 1px solid rgba(var(--dark-rgb), .1);
+  padding: .5rem 0 !important;
+  margin-bottom: .5rem;
+}
+
+.ui.placeholder.transp-placeholder,
+.ui.placeholder.transp-placeholder .image.header:after,
+.ui.placeholder.transp-placeholder .line,
+.ui.placeholder.transp-placeholder .line:after,
+.ui.placeholder.transp-placeholder > :before {
+  background-color: var( --light);
+}
+
+.scheduler-log pre {
+  position: relative;
+  width: 100%;
+  padding: 1.3rem;
+  background-color: rgba(var(--dark-rgb), .8);
+  border-radius: 5px;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  color: var(--light);
+}
+
+.scheduler-log pre.start,
+.scheduler-log pre.end {
+  color: var(--success);
+}
+
+.scheduler-log pre.warning {
+  color: var(--warning);
+}
+
+.scheduler-log pre.error {
+  color: var(--danger-tint);
+}
+
+.commands {
+  margin-top: 3rem;
+  display: flex;
+}
+
+.commands a {
+  margin-right: 1.5rem;
+}
+
+.job-progress {
+  margin: 3rem 0 4rem;
+}

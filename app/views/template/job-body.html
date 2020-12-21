@@ -1,0 +1,302 @@
+<h1 class="ui dividing header job-header">
+  <span>Progetto {{name}} <i class="medium-color">[ID: {{job_id}}]</i></span>
+  {{#is_enabled}}
+  <a class="ui teal tag label">Attivo</a>
+  {{/is_enabled}}
+  {{^is_enabled}}
+  <a class="ui red tag label">Non Attivo</a>
+  {{/is_enabled}}
+</h1>
+
+<span class="last-update-span">
+  {{#lastUpdate}}
+  <i>Ultimo aggiornamento: {{lastUpdate}}</i>
+  {{/lastUpdate}}
+  {{^lastUpdate}}
+  <i>nessun aggiornamento</i>
+  {{/lastUpdate}}
+</span>
+
+<div class="ui grid">
+  <div class="row">
+    <div class="eight wide column">
+
+      {{#description}}
+      <div class="job-desc">
+        <p>{{description}}</p>
+      </div>
+      {{/description}}
+
+      <table class="ui very basic collapsing celled table">
+        <!-- <thead>
+          <tr>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead> -->
+        <tbody>
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="tag icon"></i>
+                <div class="content">
+                  Alias
+                  <!-- <div class="sub header">Human Resources</div> -->
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{alias}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="{{typeIcon}} icon"></i>
+                <div class="content">
+                  Tipo
+                  <!-- <div class="sub header">Entertainment</div> -->
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{type}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="globe icon"></i>
+                <div class="content">
+                  Campo URI
+                  <!-- <div class="sub header">Executive</div> -->
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{job_config.item_uri}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="search icon"></i>
+                <div class="content">
+                  Campo search
+                  <!-- <div class="sub header">Executive</div> -->
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{job_config.item_search}}
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <div class="ui divider"></div>
+
+      <div class="job-progress">
+        <h4 class="ui header">Statistiche</h4>
+        <ul>
+          <li>
+            <i>TOTALE ENTITÀ ESTRATTE - </i>
+            <b>{{jobStats.totalItems}}</b>
+            <span data-tooltip="Totale delle entità estratte dalla sorgente">
+              <i class="question circle icon medium-color"></i>
+            </span>
+          </li>
+          <li>
+            <i>TOTALE ENTITÀ DA PROCESSARE - </i>
+            <b>{{jobStats.toProcessItems}}</b>
+            <span data-tooltip="Totale delle entità che hanno almeno un candidato da associare">
+              <i class="question circle icon medium-color"></i>
+            </span>
+          </li>
+          <li>
+            <i>TOTALE CANDIDATI POSSIBILI - </i>
+            <b>{{jobStats.totalCandidates}}</b>
+            <span data-tooltip="Totale dei candidati estratti, da associare alle entità">
+              <i class="question circle icon medium-color"></i>
+            </span>
+          </li>
+        </ul>
+
+        <h4 class="ui header">Progresso delle entità processate</h4>
+        <div id="job-progress-stats" class="ui teal progress" data-value="{{jobStats.processedItems}}" data-total="{{jobStats.toProcessItems}}">
+          <div class="bar">
+            <div class="progress"></div>
+          </div>
+          <div class="label">
+            {{jobStats.processedItems}} su {{jobStats.toProcessItems}} (<i>{{jobStats.selectedCandidates}} candidati selezionati</i>)
+            <span
+              data-tooltip="Fino a questo momento sono state processate {{jobStats.processedItems}} entità. Durante questo procedimento sono stati selezionati {{jobStats.selectedCandidates}} candidati come validi">
+              <i class="question circle icon medium-color"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui divider"></div>
+
+      <div class="commands">
+
+        {{#hasSource}}
+        <a href="/match/{{alias}}">
+          <button class="ui button secondary-bg border start-task">
+            INIZIA IL TASK
+          </button>
+        </a>
+        {{/hasSource}}
+
+        {{^hasSource}}
+        <div data-tooltip="Per poter inziare il task è necessario che un admin aggiunga una sorgente" data-position="top left">
+          <button class="ui button secondary-bg start-task disabled">
+            INIZIA IL TASK
+          </button>
+        </div>
+        {{/hasSource}}
+
+        {{#admin}}
+        <a href="/api/v2/job/{{alias}}/download">
+          <button class="ui button tertiary-bg border download-job">
+            <i class="download icon"></i>
+            SCARICA GLI ABBINAMENTI
+          </button>
+        </a>
+        {{/admin}}
+
+
+      </div>
+
+
+
+    </div>
+
+    {{#admin}}
+    <div class="six wide right floated column">
+      <div class="source">
+        <h3 class="ui dividing header">SORGENTI</h3>
+        {{#hasSource}}
+        <div class="ui tiny middle aligned divided list sources-list">
+        {{#sources}}
+          <div class="item">
+            <div class="right floated content">
+              <a href="/api/v2/source/{{id}}/download">
+                <div class="ui icon basic button download-source-button">
+                  <i class="download icon"></i>
+                </div>
+              </a>
+              <div class="ui icon basic button reload-source-button" data-source_id="{{id}}">
+                <i class="redo icon"></i>
+              </div>
+              <div class="ui icon red basic button delete-source-button" data-source_id="{{id}}">
+                <i class="trash icon"></i>
+              </div>
+            </div>
+            
+            <div class="content">                         
+              <h3 style="padding-top:.5rem;">
+                <i class="{{icon}} icon"></i>                         
+                {{#name}}
+                  {{name}}
+                {{/name}}
+                {{^name}}
+                  file
+                {{/name}}
+              </h3>
+            </div>
+          </div>
+        {{/sources}}
+        </div>
+
+        <div class="ui accordion source-accordion">
+          <div class="title">
+            <div class="ui button">
+              <i class="ui icon plus"></i>
+              Aggiungi sorgente
+            </div>
+          </div>
+          <div class="content">
+            <div class="source-upload">
+              <div class="ui placeholder source-placeholder">
+                <div class="header">
+                  <div class="full line"></div>
+                  <div class="full line"></div>
+                  <div class="full line"></div>
+                  <div class="full line"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{/hasSource}}
+
+        {{^hasSource}}
+        <h4>Aggiungi una sorgente</h4>
+        <div class="source-upload">
+          <div class="ui placeholder transp-placeholder">
+            <div class="header">
+              <div class="full line"></div>
+              <div class="full line"></div>
+              <div class="full line"></div>
+              <div class="full line"></div>
+            </div>
+          </div>
+        </div>
+        {{/hasSource}}
+
+      </div>
+      <div class="log">
+        <h3 class="ui dividing header">SCHEDULER LOG</h3>
+        <div class="scheduler-log">
+          <div class="ui placeholder transp-placeholder">
+            <div class="header">
+              <div class="full line"></div>
+              <div class="full line"></div>
+              <div class="full line"></div>
+              <div class="full line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/admin}}
+
+  </div>
+
+</div>
+
+<div class="ui mini modal reload-source-modal">
+  <div class="header">Aggiorna sorgente</div>
+  <div class="content">
+    <p>Sicuro di voler aggiornare manualmente questa sorgente?</p>
+  </div>
+  <div class="actions">
+    <div class="ui green button confirm-reload-source">
+      <i class="checkmark icon"></i>
+      Sì
+    </div>
+    <div class="ui red button cancel-reload-source">Annulla</div>
+  </div>
+</div>
+
+<div class="ui mini modal delete-source-modal">
+  <div class="header">Elimina sorgente</div>
+  <div class="content">
+    <p>Sicuro di voler eliminare questa sorgente dal progetto?</p>
+  </div>
+  <div class="actions">
+    <div class="ui green button confirm-delete-source">
+      <i class="checkmark icon"></i>
+      Sì
+    </div>
+    <div class="ui red button cancel-delete-source">Annulla</div>
+  </div>
+</div>
+
+<div class="ui basic modal csv-help-modal"></div>
