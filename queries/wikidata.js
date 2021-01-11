@@ -20,7 +20,7 @@ function getSparql(values) {
             ?id schema:description ?description .
         }
         VALUES (?id ?rank) {
-            ${values.join(' ')}
+            ${values.map((item, index) => '(wd:' + item + ' ' + index + ')').join(' ')}
         }
         OPTIONAL {
             ?id wdt:P18 ?immagine .
@@ -42,9 +42,14 @@ function getSparql(values) {
         FILTER NOT EXISTS { ?id wdt:P31 wd:Q4167836 }
         FILTER NOT EXISTS { ?id wdt:P31 wd:Q11266439 }
         FILTER NOT EXISTS { ?id wdt:P31 wd:Q13442814 }
+
+        FILTER NOT EXISTS { ?id wdt:P31 wd:Q5 }
+        FILTER NOT EXISTS { ?id wdt:P31 wd:Q3863 }
+        FILTER NOT EXISTS { ?id wdt:P31 wd:Q15944511 }
     }
     GROUP BY ?id ?label ?description ?rank
-    ORDER BY ?rank`;
+    ORDER BY ?rank
+    LIMIT 10`;
 }
 
 async function runSearch(search) {
@@ -53,13 +58,14 @@ async function runSearch(search) {
       action: 'query',
       list: 'search',
       srsearch: search,
+      srlimit: 25,
       format: 'json'
     },
     responseType: 'json'
   });
 
   if (body.query) {
-    return body.query.search.map((result, index) => '(wd:' + result.title + ' ' + index + ')');
+    return body.query.search.map((result) => result.title);
   } else {
     return [];
   }
@@ -93,8 +99,14 @@ async function runSparql(values) {
   }
 }
 
-async function getCandidates(search) {
-  const values = await runSearch(search);
+async function getCandidates(search, extra) {
+  let values = await runSearch(search);
+
+  if (extra) {
+    const values_extra = await runSearch(search + ' ' + extra);
+    values = [...new Set([...values_extra, ...values])];
+  }
+
   if (values.length > 0) {
     return runSparql(values);
   } else {
