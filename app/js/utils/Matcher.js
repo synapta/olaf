@@ -138,11 +138,10 @@ class Matcher {
   }
 
   render(data) {
-    console.log('rendering data', data);
     return new Promise(async (resolve, reject) => {
       try {
         this.currentItemId = data.item_id; 
-        this.renderNavbar({ is_processed: data.is_processed });
+        this.renderNavbar({ is_processed: data.is_processed, last_update: formatDateAndTime(data.last_update) });
         this.renderItem(data.item_body, data.is_processed);
         this.renderCandidates(data.Candidates, { is_processed: data.is_processed });
         await this.showContainers();

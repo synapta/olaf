@@ -10,6 +10,10 @@
   </a>
 
   <span class="jobname">{{job_name}}</span>
+  {{^task_finished}}
+  <span class="last-update-span">{{#is_processed}}Selezione candidati:{{/is_processed}}
+    {{^is_processed}}Ultimo aggiornamento:{{/is_processed}} {{last_update}}</span>
+  {{/task_finished}}
 
 </div>
 
