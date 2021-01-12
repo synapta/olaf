@@ -1,0 +1,31 @@
+<div class="header">
+  Crea un nuovo candidato su Wikidata
+</div>
+<div class="content">
+  <form id="create-candidate-form" class="ui form">
+    <div class="field">
+      <label>Label</label>
+      <input type="text" name="candidate-label" value="{{Nome}}" required>
+    </div>
+    <div class="field">
+      <label>Indirizzo</label>
+      <input type="text" name="candidate-address" value="{{Indirizzo}}">
+    </div>
+    <div class="field">
+      <label>Comune</label>
+      <input type="text" name="candidate-located" value="{{Comune}}">
+    </div>
+    <button id="create-quickstatements-button" class="ui button teal border">CREA CON QUICKSTATEMENTS</button>
+    <button id="create-wikidata-button" class="ui button grey border">CREA MANUALMENTE</button>
+  </form>
+
+  <div class="ui divider"></div>
+
+  <form id="save-candidate-form" class="ui form">
+    <div class="field">
+      <label>Entità creata</label>
+      <input type="text" name="candidate-entity" placeholder="Q42" required>
+    </div>
+    <button id="save-entity-button" class="ui button success-bg border">CONFERMA MATCH</button>
+  </form>
+</div>

@@ -12,6 +12,7 @@ const init = async () => {
 
   // get DOM elements
   const navbarContainer = document.getElementById('match-navbar');
+  const createContainer = document.getElementById('create-modal');
   const containers = document.querySelectorAll('.data-container');
   const placeholders = document.querySelectorAll('.data-placeholder');
 
@@ -22,6 +23,7 @@ const init = async () => {
   const matcherOptions = {
     alias,
     navbarContainer,
+    createContainer,
     placeholders,
     containers,
     job_name       : jobInfo.name,

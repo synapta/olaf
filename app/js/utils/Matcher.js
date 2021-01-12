@@ -10,7 +10,7 @@ class Matcher {
 
     this.selectedCandidates = [];
 
-    this.navbarPlacheolder = `
+    this.navbarPlaceholder = `
       <div class="navbar-placeholder">
         <div class="ui placeholder small-button-placeholder">
           <div class="image"></div>
@@ -46,7 +46,8 @@ class Matcher {
         // load templates
         this.navbarTemplate = await getText(`/views/template/match-navbar.html`);
         this.itemTemplate = await getText(`/views/template/${this.options.job_type || 'main'}/item.html`);
-        this.candidateTemplate = await getText(`/views/template/${this.options.job_type || 'main'}/candidate.html`);     
+        this.candidateTemplate = await getText(`/views/template/${this.options.job_type || 'main'}/candidate.html`);
+        this.createTemplate = await getText(`/views/template/${this.options.job_type || 'main'}/create.html`);     
         // get first item
         this.next(true)
           .then(item => resolve(item))
@@ -144,6 +145,7 @@ class Matcher {
         this.renderNavbar({ is_processed: data.is_processed, last_update: formatDateAndTime(data.last_update) });
         this.renderItem(data.item_body, data.is_processed);
         this.renderCandidates(data.Candidates, { is_processed: data.is_processed, createCandidate: options.createCandidate });
+        this.renderCreate(data.item_body);
         await this.showContainers();
         resolve();
       } catch (error) {
@@ -241,6 +243,57 @@ class Matcher {
 
       this.renderNavbar();
     }));
+
+    const createButton = document.getElementById('create-button');
+    createButton.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      $('#create-modal').modal('show');
+    });
+  
+  }
+
+  renderCreate(itemData) {
+    if (!this.createTemplate) {
+      console.error('[Matcher] Missing Create template - abording render');
+      return;
+    }
+
+    const cleanData = Object.entries(this.options.fields).reduce((acc, curr) => {
+      acc[curr[1].label] = itemData[curr[0]]
+      return acc;
+    }, {});
+
+    this.options.createContainer.innerHTML = Mustache.render(this.createTemplate, cleanData);
+
+    const createQuickButton = document.getElementById('create-quickstatements-button');
+    createQuickButton.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const label = $("input[name='candidate-label']").val();
+      const address = $("input[name='candidate-address']").val();
+      const located = $("input[name='candidate-located']").val();
+      let qsCode = 'CREATE||LAST|Lit|"' + label + '"';
+      if (address) {
+        qsCode += '||LAST|P6375|"' + address + '"';
+      }
+      window.open('https://quickstatements.toolforge.org/#v1=' + encodeURIComponent(qsCode));
+    });
+
+    const createWikidataButton = document.getElementById('create-wikidata-button');
+    createWikidataButton.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const label = $("input[name='candidate-label']").val();
+      window.open('https://www.wikidata.org/w/index.php?title=Special:NewItem&lang=it&label=' + label);
+    });
+
+    const saveEntityButton = document.getElementById('save-entity-button');
+    saveEntityButton.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  
   }
 
   objectMap(object, mapFn) {
@@ -261,7 +314,7 @@ class Matcher {
     return new Promise(async (resolve, reject) => {
       try {
         // navbar
-        this.options.navbarContainer.innerHTML = this.navbarPlacheolder;
+        this.options.navbarContainer.innerHTML = this.navbarPlaceholder;
 
         // item and candidates
         const t1 = startTransition(this.itemContainer, { duration: '300ms' });
