@@ -145,7 +145,9 @@ class Matcher {
         this.renderNavbar({ is_processed: data.is_processed, last_update: formatDateAndTime(data.last_update) });
         this.renderItem(data.item_body, data.is_processed);
         this.renderCandidates(data.Candidates, { is_processed: data.is_processed, createCandidate: options.createCandidate });
-        this.renderCreate(data.item_body);
+        if (options.createCandidate) {
+          this.renderCreate(data.item_body);
+        }
         await this.showContainers();
         resolve();
       } catch (error) {
@@ -245,11 +247,13 @@ class Matcher {
     }));
 
     const createButton = document.getElementById('create-button');
-    createButton.addEventListener('click', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      $('#create-modal').modal('show');
-    });
+    if (createButton) {
+      createButton.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        $('#create-modal').modal('show');
+      });
+    }
   
   }
 
