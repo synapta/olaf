@@ -84,6 +84,7 @@ async function nextItem(job) {
         where: {
             job_id: job.job_id,
             is_processed: false,
+            is_removed: false,
             [Op.or]: [{ lock_timestamp: { [Op.lte]: lock_limit } }, { lock_timestamp: { [Op.is]: null } }]
         },
         order: sequelize.random(),

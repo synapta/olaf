@@ -20,7 +20,7 @@ const enrichJobInfo = (info, user) => {
       createCandidate = 'Disabilitato';
   }
 
-  const lastUpdate = formatDate(info.last_update);
+  const lastUpdate = formatDateAndTime(info.last_update);
 
   const hasSource = Boolean(Array.isArray(info.Sources) && info.Sources.length > 0);
   

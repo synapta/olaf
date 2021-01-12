@@ -230,6 +230,11 @@ const Item = sequelize.define('Item', {
         allowNull: false,
         defaultValue: false
     },
+    is_removed: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
     last_update: {
         type: DataTypes.DATE
     }
@@ -354,6 +359,11 @@ const Action = sequelize.define('Action', {
         allowNull: false
     },
     is_skipped: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    is_removed: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false

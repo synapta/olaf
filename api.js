@@ -64,7 +64,7 @@ const downloadJob = async (req, res) => {
         }
 
         const items = await Item.findAll({
-            where: { job_id: job.job_id, is_processed: true },
+            where: { job_id: job.job_id, is_processed: true, is_removed: false },
             include: [{ model: Candidate, where: { is_selected: true }, required: false }]
         });
 
@@ -122,29 +122,23 @@ const getJobStats = async (req, res) => {
             return;
         }
         const totalItems = await Item.count({ where: { job_id: job.job_id } });
-        const todoItems = await Item.count({
-            where: { job_id: job.job_id, is_processed: false },
-            include: [{
-                model: Candidate,
-                where: { is_selected: false }
-            }], distinct: true, col: 'item_id'
-        });
+        const removedItems = await Item.count({ where: { job_id: job.job_id, is_removed: true } });
         const toProcessItems = await Item.count({
-            where: { job_id: job.job_id },
+            where: { job_id: job.job_id, is_removed: false },
             include: [{
                 model: Candidate,
                 where: { is_selected: { [Op.ne]: null } }
             }], distinct: true, col: 'item_id'
         });
-        const processedItems = await Item.count({ where: { job_id: job.job_id, is_processed: true } });
-        const totalCandidates = await Candidate.count({ include: { model: Item, where: { job_id: job.job_id } } });
+        const processedItems = await Item.count({ where: { job_id: job.job_id, is_processed: true, is_removed: false } });
+        const totalCandidates = await Candidate.count({ include: { model: Item, where: { job_id: job.job_id, is_removed: false } } });
         const selectedCandidates = await Candidate.count({
             where: { is_selected: true },
-            include: { model: Item, where: { job_id: job.job_id } }
+            include: { model: Item, where: { job_id: job.job_id, is_removed: false } }
         });
         res.json({
             totalItems: totalItems,
-            todoItems: todoItems,
+            removedItems: removedItems,
             toProcessItems: toProcessItems,
             processedItems: processedItems,
             totalCandidates: totalCandidates,
@@ -378,7 +372,7 @@ const saveItem = async (req, res) => {
     }
 };
 
-const skipItem = async (req, res) => {
+const skipOrRemoveItem = async (req, res, isRemoved) => {
     // Create a transaction
     const t = await sequelize.transaction();
 
@@ -402,13 +396,25 @@ const skipItem = async (req, res) => {
             return;
         }
 
-        await Action.create({
+        const action = {
             item_id: item.item_id,
-            user_id: req.user.user_id,
-            is_skipped: true
-        }, { transaction: t });
+            user_id: req.user.user_id
+        };
+
+        if (isRemoved) {
+            action.is_removed = true;
+        } else {
+            action.is_skipped = true;
+        }
+
+        await Action.create(action, { transaction: t });
 
         // Update the item
+        if (isRemoved) {
+            item.is_processed = true;
+            item.is_removed = true;
+            item.last_update = new Date();
+        }
         item.lock_timestamp = null;
         await item.save({ transaction: t });
 
@@ -552,10 +558,12 @@ const getUserStats = async (req, res) => {
         const validActions = await Action.count({ where: { user_id: req.user.user_id, candidate_id: { [Op.not]: null } } });
         const orphanActions = await Action.count({ where: { user_id: req.user.user_id, is_orphan: true } });
         const skipActions = await Action.count({ where: { user_id: req.user.user_id, is_skipped: true } });
+        const removeActions = await Action.count({ where: { user_id: req.user.user_id, is_removed: true } });
         res.json({
             validActions: validActions,
             orphanActions: orphanActions,
-            skipActions: skipActions
+            skipActions: skipActions,
+            removeActions: removeActions
         });
     } catch (e) {
         console.error(e);
@@ -592,7 +600,7 @@ module.exports = {
     deleteSource,
     getItem,
     saveItem,
-    skipItem,
+    skipOrRemoveItem,
     createUser,
     sendVerifyEmail,
     verifyEmail,

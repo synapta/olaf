@@ -91,6 +91,18 @@ class Matcher {
     }, 'OLAF | Match', newUrl);
   }
 
+  removeItem(item_id) {
+    return new Promise(async (resolve, reject) => {
+      await this.showPlaceholders();
+      postJSON(`/api/v2/item/${this.options.alias}/${item_id}/remove`)
+        .then(async res => {
+          await this.next(false);
+        }).catch(err => {
+          console.error(err);
+        });
+    });
+  }
+
   skipItem(item_id) {
     return new Promise(async (resolve, reject) => {
       await this.showPlaceholders();
@@ -155,6 +167,14 @@ class Matcher {
     const infoButton = this.options.navbarContainer.querySelector('.info-button');
     if (infoButton) { 
       infoButton.addEventListener('click', e => $('.match-help-modal').modal('show'));
+    }
+
+    const removeButton = this.options.navbarContainer.querySelector('.remove-button');
+    if (removeButton) {
+      removeButton.addEventListener('click', e => {
+        const item_id = e.target.dataset.item_id;
+        this.removeItem(item_id);
+      });
     }
 
     const skipButton = this.options.navbarContainer.querySelector('.skip-button');

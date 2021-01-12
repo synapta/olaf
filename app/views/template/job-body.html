@@ -131,7 +131,14 @@
             </span>
           </li>
           <li>
-            <i>TOTALE ENTITÀ DA PROCESSARE - </i>
+            <i>TOTALE ENTITÀ ESCLUSE - </i>
+            <b>{{jobStats.removedItems}}</b>
+            <span data-tooltip="Totale delle entità escluse manualmente">
+              <i class="question circle icon medium-color"></i>
+            </span>
+          </li>
+          <li>
+            <i>TOTALE ENTITÀ CON CANDIDATI - </i>
             <b>{{jobStats.toProcessItems}}</b>
             <span data-tooltip="Totale delle entità che hanno almeno un candidato da associare">
               <i class="question circle icon medium-color"></i>
@@ -146,7 +153,7 @@
           </li>
         </ul>
 
-        <h4 class="ui header">Progresso delle entità processate</h4>
+        <h4 class="ui header">Progresso delle entità con candidati</h4>
         <div id="job-progress-stats" class="ui teal progress" data-value="{{jobStats.processedItems}}" data-total="{{jobStats.toProcessItems}}">
           <div class="bar">
             <div class="progress"></div>
@@ -154,7 +161,7 @@
           <div class="label">
             {{jobStats.processedItems}} su {{jobStats.toProcessItems}} (<i>{{jobStats.selectedCandidates}} candidati selezionati</i>)
             <span
-              data-tooltip="Fino a questo momento sono state processate {{jobStats.processedItems}} entità. Durante questo procedimento sono stati selezionati {{jobStats.selectedCandidates}} candidati come validi">
+              data-tooltip="Fino a questo momento sono state processate {{jobStats.processedItems}} entità. Durante questo procedimento sono stati selezionati {{jobStats.selectedCandidates}} candidati come validi.">
               <i class="question circle icon medium-color"></i>
             </span>
           </div>

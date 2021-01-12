@@ -207,8 +207,12 @@ module.exports = function (app, passport) {
         api.saveItem(req, res);
     });
 
+    app.post('/api/v2/item/:alias/:id/remove', (req, res) => {
+        api.skipOrRemoveItem(req, res, true);
+    });
+
     app.post('/api/v2/item/:alias/:id/skip', (req, res) => {
-        api.skipItem(req, res);
+        api.skipOrRemoveItem(req, res, false);
     });
 
     // User
