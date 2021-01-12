@@ -28,35 +28,13 @@
       {{/description}}
 
       <table class="ui very basic collapsing celled table">
-        <!-- <thead>
-          <tr>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead> -->
         <tbody>
           <tr>
             <td>
               <h4 class="ui image header">
-                <i class="tag icon"></i>
-                <div class="content">
-                  Alias
-                  <!-- <div class="sub header">Human Resources</div> -->
-                </div>
-              </h4>
-            </td>
-            <td>
-              {{alias}}
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              <h4 class="ui image header">
-                <i class="{{typeIcon}} icon"></i>
+                <i class="file icon"></i>
                 <div class="content">
                   Tipo
-                  <!-- <div class="sub header">Entertainment</div> -->
                 </div>
               </h4>
             </td>
@@ -68,10 +46,23 @@
           <tr>
             <td>
               <h4 class="ui image header">
+                <i class="tag icon"></i>
+                <div class="content">
+                  Alias
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{alias}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
                 <i class="globe icon"></i>
                 <div class="content">
                   Campo URI
-                  <!-- <div class="sub header">Executive</div> -->
                 </div>
               </h4>
             </td>
@@ -85,13 +76,42 @@
               <h4 class="ui image header">
                 <i class="search icon"></i>
                 <div class="content">
-                  Campo search
-                  <!-- <div class="sub header">Executive</div> -->
+                  Campo SEARCH
                 </div>
               </h4>
             </td>
             <td>
               {{job_config.item_search}}
+            </td>
+          </tr>
+
+          {{#job_config.item_search_extra}}
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="search plus icon"></i>
+                <div class="content">
+                  Campo EXTRA
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{job_config.item_search_extra}}
+            </td>
+          </tr>
+          {{/job_config.item_search_extra}}
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="save icon"></i>
+                <div class="content">
+                  Crea candidato
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{createCandidate}}
             </td>
           </tr>
 

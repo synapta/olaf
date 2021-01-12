@@ -19,8 +19,10 @@ const completeFirstStep = async e => {
   const job_type = e.target.querySelector('select[name="job-type"]').value;
 
   const job_config = {
-    item_uri: e.target.querySelector('input[name="job-uri"]').value || 'URI',
-    item_search: e.target.querySelector('input[name="job-search"]').value || 'Search'
+    item_uri: e.target.querySelector('input[name="job-uri"]').value,
+    item_search: e.target.querySelector('input[name="job-search"]').value,
+    item_search_extra: e.target.querySelector('input[name="job-search-extra"]').value,
+    create_candidate: e.target.querySelector('select[name="job-create-candidate"]').value
   };
 
   toggleLoading(submitButton);
