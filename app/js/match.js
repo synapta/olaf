@@ -30,6 +30,10 @@ const init = async () => {
     uriQueryString : queryStrings.uri,
   };
 
+  if (jobInfo.job_config.create_candidate === 'wikidata') {
+    matcherOptions.createCandidate = true;
+  }
+
   // instantiate matcher
   const matcher = new Matcher(matcherOptions);
 

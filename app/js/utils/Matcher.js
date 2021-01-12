@@ -73,7 +73,7 @@ class Matcher {
       getJSON(url)
         .then(async item => {
           this.updateBrowserHistory(item.item_uri);
-          await this.render(item);
+          await this.render(item, this.options);
           resolve(item);      
         }).catch(async err => {
           if (err.status === 404) {
@@ -137,13 +137,13 @@ class Matcher {
     });
   }
 
-  render(data) {
+  render(data, options) {
     return new Promise(async (resolve, reject) => {
       try {
         this.currentItemId = data.item_id; 
         this.renderNavbar({ is_processed: data.is_processed, last_update: formatDateAndTime(data.last_update) });
         this.renderItem(data.item_body, data.is_processed);
-        this.renderCandidates(data.Candidates, { is_processed: data.is_processed });
+        this.renderCandidates(data.Candidates, { is_processed: data.is_processed, createCandidate: options.createCandidate });
         await this.showContainers();
         resolve();
       } catch (error) {

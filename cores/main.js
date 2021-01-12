@@ -80,6 +80,13 @@ async function loadCandidates(item, job) {
 async function nextItem(job) {
     const lock_limit = new Date();
     lock_limit.setHours(lock_limit.getHours() - 1);
+
+    // Create candidate
+    let isRequired = true;
+    if (job.job_config.create_candidate === 'wikidata') {
+        isRequired = false;
+    }
+
     const item = await Item.findOne({
         where: {
             job_id: job.job_id,
@@ -90,7 +97,7 @@ async function nextItem(job) {
         order: sequelize.random(),
         include: [{
             model: Candidate,
-            required: true
+            required: isRequired
         }]
     });
     // Sort candidates by score
@@ -103,7 +110,7 @@ async function nextItem(job) {
         ],
         include: [{
             model: Candidate,
-            required: true
+            required: isRequired
         }]
     });
 }
