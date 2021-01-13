@@ -273,12 +273,30 @@ class Matcher {
       return acc;
     }, {});
 
+    this.options.createContainer.innerHTML = Mustache.render(this.createTemplate, cleanData);
+
+    $('#search-comune')
+      .search({
+        apiSettings: {
+          url: '/api/v2/suggestion?q={query}'
+        },
+        fields: {
+          title: 'titlesnippet',
+          description: 'snippet'
+        },
+        minCharacters : 3,
+        onSelect: function(res, resp) {
+          $("input[name='candidate-located']").val(res.title);
+        },
+        onSearchQuery: function(query) {
+          $("input[name='candidate-located']").val('');
+        }
+      });
+
     const typeData = Object.entries(this.options.fields).reduce((acc, curr) => {
       acc[curr[1].label] = curr[1].type
       return acc;
     }, {});
-
-    this.options.createContainer.innerHTML = Mustache.render(this.createTemplate, cleanData);
 
     const createQuickButton = document.getElementById('create-quickstatements-button');
     createQuickButton.addEventListener('click', e => {
@@ -295,7 +313,7 @@ class Matcher {
       }
       const located = $("input[name='candidate-located']").val();
       if (typeData['Comune'] && located) {
-        qsCode += '||LAST|' + typeData['Comune'] + '|"' + located + '"';
+        qsCode += '||LAST|' + typeData['Comune'] + '|' + located;
       }
       const uri = $("input[name='candidate-uri']").val();
       if (typeData['URI'] && uri) {

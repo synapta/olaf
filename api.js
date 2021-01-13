@@ -2,6 +2,7 @@ const isValidUTF8 = require('utf-8-validate');
 const fs = require('fs');
 const fsPromises = fs.promises;
 const bcrypt = require('bcrypt');
+const got = require('got');
 const crypto = require('crypto');
 const md5 = require('md5');
 const stringify = require('csv-stringify');
@@ -586,6 +587,35 @@ const getUserHistory = async (req, res) => {
     }
 };
 
+const searchWikidata = async (req, res) => {
+    const search = req.query.q;
+    if (!search) {
+        res.sendStatus(400);
+    }
+    try {
+        const { body } = await got.get('https://www.wikidata.org/w/api.php', {
+            searchParams: {
+                uselang: 'it',
+                action: 'query',
+                list: 'search',
+                srsearch: search,
+                srlimit: 7,
+                srprop: 'size|wordcount|timestamp|snippet|titlesnippet',
+                format: 'json'
+            },
+            responseType: 'json'
+        });
+        if (body && body.query && body.query.search) {
+            res.json({ results: body.query.search });
+        } else {
+            res.json({ results: [] });
+        }
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
+    }
+};
+
 module.exports = {
     uploadFile,
     createJob,
@@ -609,5 +639,6 @@ module.exports = {
     resetPassword,
     checkEmail,
     getUserStats,
-    getUserHistory
+    getUserHistory,
+    searchWikidata
 };

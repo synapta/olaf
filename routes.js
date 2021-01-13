@@ -282,6 +282,15 @@ module.exports = function (app, passport) {
         }
     });
 
+    // Utils
+    app.get('/api/v2/suggestion', (req, res) => {
+        if (req.user) {
+            api.searchWikidata(req, res);
+        } else {
+            res.sendStatus(403);
+        }
+    });
+
     app.use((req, res) => {
       res.status(404).sendFile('404.html', { root: __dirname + '/app' });
     });

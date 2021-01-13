@@ -13,7 +13,18 @@
     </div>
     <div class="field">
       <label>Comune</label>
-      <input type="text" name="candidate-located" value="{{Comune}}">
+      <div class="ui grid">
+        <div class="ten wide column">
+          <div id="search-comune" class="ui search">
+            <div class="ui input">
+              <input class="prompt" type="text" value="{{Comune}}">
+            </div>
+          </div>
+        </div>
+        <div class="six wide column">
+          <input type="text" name="candidate-located" readonly>
+        </div>
+      </div>
     </div>
     <div class="field">
       <label>URI</label>
