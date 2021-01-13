@@ -264,7 +264,17 @@ class Matcher {
     }
 
     const cleanData = Object.entries(this.options.fields).reduce((acc, curr) => {
-      acc[curr[1].label] = itemData[curr[0]]
+      if (curr[1].regex) {
+        const re = new RegExp(curr[1].regex);
+        acc[curr[1].label] = itemData[curr[0]].replace(re, "$1");
+      } else {
+        acc[curr[1].label] = itemData[curr[0]]
+      }
+      return acc;
+    }, {});
+
+    const typeData = Object.entries(this.options.fields).reduce((acc, curr) => {
+      acc[curr[1].label] = curr[1].type
       return acc;
     }, {});
 
@@ -274,12 +284,22 @@ class Matcher {
     createQuickButton.addEventListener('click', e => {
       e.preventDefault();
       e.stopPropagation();
+      let qsCode = 'CREATE';
       const label = $("input[name='candidate-label']").val();
+      if (typeData['Nome'] && label) {
+        qsCode += '||LAST|' + typeData['Nome'] + '|"' + label + '"';
+      }
       const address = $("input[name='candidate-address']").val();
+      if (typeData['Indirizzo'] && address) {
+        qsCode += '||LAST|' + typeData['Indirizzo'] + '|"' + address + '"';
+      }
       const located = $("input[name='candidate-located']").val();
-      let qsCode = 'CREATE||LAST|Lit|"' + label + '"';
-      if (address) {
-        qsCode += '||LAST|P6375|"' + address + '"';
+      if (typeData['Comune'] && located) {
+        qsCode += '||LAST|' + typeData['Comune'] + '|"' + located + '"';
+      }
+      const uri = $("input[name='candidate-uri']").val();
+      if (typeData['URI'] && uri) {
+        qsCode += '||LAST|' + typeData['URI'] + '|"' + uri + '"';
       }
       window.open('https://quickstatements.toolforge.org/#v1=' + encodeURIComponent(qsCode));
     });

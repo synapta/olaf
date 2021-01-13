@@ -15,6 +15,10 @@
       <label>Comune</label>
       <input type="text" name="candidate-located" value="{{Comune}}">
     </div>
+    <div class="field">
+      <label>URI</label>
+      <input type="text" name="candidate-uri" value="{{URI}}" readonly>
+    </div>
     <button id="create-quickstatements-button" class="ui button teal border">CREA CON QUICKSTATEMENTS</button>
     <button id="create-wikidata-button" class="ui button grey border">CREA MANUALMENTE</button>
   </form>
@@ -23,7 +27,7 @@
 
   <form id="save-candidate-form" class="ui form">
     <div class="field">
-      <label>Entità creata</label>
+      <label>Candidato su Wikidata</label>
       <input type="text" name="candidate-entity" placeholder="Q42" required>
     </div>
     <button id="save-entity-button" class="ui button success-bg border">CONFERMA MATCH</button>
