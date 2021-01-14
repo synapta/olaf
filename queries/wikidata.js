@@ -100,6 +100,11 @@ async function runSparql(values) {
 }
 
 async function getCandidates(search, extra) {
+  // Ignore items without name
+  if (search === '') {
+    return [];
+  }
+
   let values = await runSearch(search);
 
   if (extra) {
