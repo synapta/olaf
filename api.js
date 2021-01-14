@@ -332,9 +332,25 @@ const saveItem = async (req, res) => {
         } else {
             // For all the candidates
             for (let candidateId of req.body) {
-                // Update the candidate
-                const candidate = await Candidate.findOne({ where: { candidate_id: candidateId, item_id: item.item_id } }, { transaction: t });
-
+                let candidate = null;
+                let isCreated = false;
+                if (typeof candidateId === 'string' && candidateId.startsWith('Q')) {
+                    const uri = 'http://www.wikidata.org/entity/' + candidateId;
+                    // Create the candidate
+                    candidate = await Candidate.create({
+                        item_id: item.item_id,
+                        source_id: item.source_id,
+                        candidate_uri: uri,
+                        candidate_body: { id: { value: uri }, label: { value: candidateId } },
+                        score: -1,
+                        is_selected: true,
+                        last_update: new Date()
+                    }, { transaction: t });
+                    isCreated = true;
+                } else {
+                    // Update the candidate
+                    candidate = await Candidate.findOne({ where: { candidate_id: candidateId, item_id: item.item_id } }, { transaction: t });
+                }
                 // Invalid candidate
                 if (candidate == null) {
                     await t.rollback();
@@ -351,6 +367,7 @@ const saveItem = async (req, res) => {
                     item_id: item.item_id,
                     candidate_id: candidate.candidate_id,
                     user_id: req.user.user_id,
+                    is_created: isCreated
                 }, { transaction: t });
 
                 core.saveCandidate(job, item, candidate);
@@ -556,15 +573,17 @@ const checkEmail = async (req, res) => {
 
 const getUserStats = async (req, res) => {
     try {
-        const validActions = await Action.count({ where: { user_id: req.user.user_id, candidate_id: { [Op.not]: null } } });
+        const validActions = await Action.count({ where: { user_id: req.user.user_id, is_created: false, candidate_id: { [Op.not]: null } } });
+        const createActions = await Action.count({ where: { user_id: req.user.user_id, is_created: true, candidate_id: { [Op.not]: null } } });
         const orphanActions = await Action.count({ where: { user_id: req.user.user_id, is_orphan: true } });
         const skipActions = await Action.count({ where: { user_id: req.user.user_id, is_skipped: true } });
         const removeActions = await Action.count({ where: { user_id: req.user.user_id, is_removed: true } });
         res.json({
-            validActions: validActions,
-            orphanActions: orphanActions,
-            skipActions: skipActions,
-            removeActions: removeActions
+            validActions,
+            createActions,
+            orphanActions,
+            skipActions,
+            removeActions
         });
     } catch (e) {
         console.error(e);

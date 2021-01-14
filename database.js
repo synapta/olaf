@@ -368,6 +368,11 @@ const Action = sequelize.define('Action', {
         allowNull: false,
         defaultValue: false
     },
+    is_created: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
     is_orphan: {
         type: DataTypes.BOOLEAN,
         allowNull: false,

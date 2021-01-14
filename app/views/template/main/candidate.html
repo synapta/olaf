@@ -68,15 +68,20 @@
   </div>
   {{/candidates}}
 
+  {{^is_processed}}
   {{#createCandidate}}
   <div class="column">
-
-    <div class="ui raised segment">
+    <div class="ui placeholder segment">
+      <div class="ui icon header">
+        <i class="plus icon teal"></i>
+      </div>
+  
       <button id="create-button" class="ui fluid button teal">Crea su Wikidata</button>
     </div>
 
   </div>
   {{/createCandidate}}
+  {{/is_processed}}
 
 </div>
 {{/task_finished}}

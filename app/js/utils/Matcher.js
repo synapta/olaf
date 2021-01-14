@@ -47,11 +47,11 @@ class Matcher {
         this.navbarTemplate = await getText(`/views/template/match-navbar.html`);
         this.itemTemplate = await getText(`/views/template/${this.options.job_type || 'main'}/item.html`);
         this.candidateTemplate = await getText(`/views/template/${this.options.job_type || 'main'}/candidate.html`);
-        this.createTemplate = await getText(`/views/template/${this.options.job_type || 'main'}/create.html`);     
+        this.createTemplate = await getText(`/views/template/${this.options.job_type || 'main'}/create.html`);
         // get first item
         this.next(true)
           .then(item => resolve(item))
-          .catch(err => {reject(err)});
+          .catch(err => { reject(err) });
       } catch (error) {
         console.error(error);
         reject(error);
@@ -75,7 +75,7 @@ class Matcher {
         .then(async item => {
           this.updateBrowserHistory(item.item_uri);
           await this.render(item, this.options);
-          resolve(item);      
+          resolve(item);
         }).catch(async err => {
           if (err.status === 404) {
             await this.renderNoItems();
@@ -141,7 +141,7 @@ class Matcher {
   render(data, options) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.currentItemId = data.item_id; 
+        this.currentItemId = data.item_id;
         this.renderNavbar({ is_processed: data.is_processed, last_update: formatDateAndTime(data.last_update) });
         this.renderItem(data.item_body, data.is_processed);
         this.renderCandidates(data.Candidates, { is_processed: data.is_processed, createCandidate: options.createCandidate });
@@ -160,15 +160,15 @@ class Matcher {
   renderNavbar(options = {}) {
     this.options.navbarContainer.innerHTML = Mustache.render(this.navbarTemplate, {
       ...options,
-      item_id            : this.currentItemId,
-      singleItem         : this.singleItem,
-      alias              : this.options.alias,
-      job_name           : this.options.job_name,
-      selectedCandidates : this.selectedCandidates
+      item_id: this.currentItemId,
+      singleItem: this.singleItem,
+      alias: this.options.alias,
+      job_name: this.options.job_name,
+      selectedCandidates: this.selectedCandidates
     });
 
     const infoButton = this.options.navbarContainer.querySelector('.info-button');
-    if (infoButton) { 
+    if (infoButton) {
       infoButton.addEventListener('click', e => $('.match-help-modal').modal('show'));
     }
 
@@ -214,7 +214,7 @@ class Matcher {
     const cleanData = Object.entries(this.options.fields).reduce((acc, curr) => {
       acc[curr[1].label] = itemData[curr[0]]
       return acc;
-      }, {});
+    }, {});
 
     // parse and clean data
     // const cleanData = this.objectKeysMap(itemData, key => key.replace(/ /g, '_'));
@@ -254,7 +254,7 @@ class Matcher {
         $('#create-modal').modal('show');
       });
     }
-  
+
   }
 
   renderCreate(itemData) {
@@ -273,7 +273,7 @@ class Matcher {
       return acc;
     }, {});
 
-    this.options.createContainer.innerHTML = Mustache.render(this.createTemplate, cleanData);
+    this.options.createContainer.innerHTML = Mustache.render(this.createTemplate, { ...cleanData, item_id: this.currentItemId });
 
     $('#search-comune')
       .search({
@@ -284,11 +284,11 @@ class Matcher {
           title: 'titlesnippet',
           description: 'snippet'
         },
-        minCharacters : 3,
-        onSelect: function(res, resp) {
+        minCharacters: 3,
+        onSelect: function (res, resp) {
           $("input[name='candidate-located']").val(res.title);
         },
-        onSearchQuery: function(query) {
+        onSearchQuery: function (query) {
           $("input[name='candidate-located']").val('');
         }
       });
@@ -334,8 +334,17 @@ class Matcher {
     saveEntityButton.addEventListener('click', e => {
       e.preventDefault();
       e.stopPropagation();
+      const item_id = e.target.dataset.item_id;
+      const entity = $("input[name='candidate-entity']").val();
+      const match = /.*(Q\d+).*/.exec(entity);
+      if (match) {
+        $('#create-modal').modal('hide');
+        this.confirmMatch(item_id, [match[1]]);
+      } else {
+        $('#save-candidate-form .field').addClass('error');
+      }
     });
-  
+
   }
 
   objectMap(object, mapFn) {

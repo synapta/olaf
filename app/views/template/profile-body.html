@@ -81,12 +81,26 @@
               <h4 class="ui image header">
                 <i class="check squaree icon success-color"></i>
                 <div class="content">
-                  Entità valide
+                  Entità abbinate
                 </div>
               </h4>
             </td>
             <td>
               {{userStats.validActions}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="save icon teal"></i>
+                <div class="content">
+                  Entità create
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{userStats.createActions}}
             </td>
           </tr>
 
@@ -160,7 +174,8 @@
         <tbody>
         {{#userHistory}}
           <tr>
-            <td>{{#Candidate}}<h4 class="ui image header"><i class="check squaree icon success-color"></i></h4>{{/Candidate}}
+            <td>{{#Candidate}}{{^is_created}}<h4 class="ui image header"><i class="check squaree icon success-color"></i></h4>{{/is_created}}{{/Candidate}}
+              {{#is_created}}<h4 class="ui image header"><i class="save icon teal"></i></h4>{{/is_created}}
               {{#is_skipped}}<h4 class="ui image header"><i class="step forward icon warning-color"></i></h4>{{/is_skipped}}
               {{#is_orphan}}<h4 class="ui image header"><i class="x icon danger-color"></i></h4>{{/is_orphan}}
               {{#is_removed}}<h4 class="ui image header"><i class="trash icon black"></i></h4>{{/is_removed}}</td>
