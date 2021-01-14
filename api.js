@@ -599,7 +599,7 @@ const searchWikidata = async (req, res) => {
                 action: 'query',
                 list: 'search',
                 srsearch: search,
-                srlimit: 7,
+                srlimit: 5,
                 srprop: 'size|wordcount|timestamp|snippet|titlesnippet',
                 format: 'json'
             },
