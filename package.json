@@ -20,6 +20,7 @@
   "homepage": "https://github.com/synapta/olaf#readme",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
+    "@sentry/node": "^6.0.2",
     "bcrypt": "^5.0.0",
     "csv-parser": "^2.3.3",
     "csv-stringify": "^5.5.3",
