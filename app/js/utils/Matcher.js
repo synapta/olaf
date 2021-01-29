@@ -309,7 +309,7 @@ class Matcher {
       }
       const address = $("input[name='candidate-address']").val();
       if (typeData['Indirizzo'] && address) {
-        qsCode += '||LAST|' + typeData['Indirizzo'] + '|"' + address + '"';
+        qsCode += '||LAST|' + typeData['Indirizzo'] + '|it:"' + address + '"';
       }
       const located = $("input[name='candidate-located']").val();
       if (typeData['Comune'] && located) {
