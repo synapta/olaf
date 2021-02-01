@@ -146,7 +146,7 @@ class Matcher {
         this.renderItem(data.item_body, data.is_processed);
         this.renderCandidates(data.Candidates, { is_processed: data.is_processed, createCandidate: options.createCandidate });
         if (options.createCandidate) {
-          this.renderCreate(data.item_body);
+          this.renderCreate(data.item_body, options.useQuickStatements);
         }
         await this.showContainers();
         resolve();
@@ -257,23 +257,25 @@ class Matcher {
 
   }
 
-  renderCreate(itemData) {
+  renderCreate(itemData, useQuickStatements) {
     if (!this.createTemplate) {
       console.error('[Matcher] Missing Create template - abording render');
       return;
     }
 
     const cleanData = Object.entries(this.options.fields).reduce((acc, curr) => {
-      if (curr[1].regex) {
-        const re = new RegExp(curr[1].regex);
-        acc[curr[1].label] = itemData[curr[0]].replace(re, "$1");
-      } else {
-        acc[curr[1].label] = itemData[curr[0]]
+      if (curr[1].type) {
+        if (curr[1].regex) {
+          const re = new RegExp(curr[1].regex);
+          acc[curr[1].label] = itemData[curr[0]].replace(re, "$1");
+        } else {
+          acc[curr[1].label] = itemData[curr[0]]
+        }
       }
       return acc;
     }, {});
 
-    this.options.createContainer.innerHTML = Mustache.render(this.createTemplate, { ...cleanData, item_id: this.currentItemId });
+    this.options.createContainer.innerHTML = Mustache.render(this.createTemplate, { ...cleanData, item_id: this.currentItemId, useQuickStatements });
 
     $('#search-comune')
       .search({
@@ -299,28 +301,30 @@ class Matcher {
     }, {});
 
     const createQuickButton = document.getElementById('create-quickstatements-button');
-    createQuickButton.addEventListener('click', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      let qsCode = 'CREATE';
-      const label = $("input[name='candidate-label']").val();
-      if (typeData['Nome'] && label) {
-        qsCode += '||LAST|' + typeData['Nome'] + '|"' + label + '"';
-      }
-      const address = $("input[name='candidate-address']").val();
-      if (typeData['Indirizzo'] && address) {
-        qsCode += '||LAST|' + typeData['Indirizzo'] + '|it:"' + address + '"';
-      }
-      const located = $("input[name='candidate-located']").val();
-      if (typeData['Comune'] && located) {
-        qsCode += '||LAST|' + typeData['Comune'] + '|' + located;
-      }
-      const uri = $("input[name='candidate-uri']").val();
-      if (typeData['URI'] && uri) {
-        qsCode += '||LAST|' + typeData['URI'] + '|"' + uri + '"';
-      }
-      window.open('https://quickstatements.toolforge.org/#v1=' + encodeURIComponent(qsCode));
-    });
+    if (createQuickButton) {
+      createQuickButton.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        let qsCode = 'CREATE';
+        const label = $("input[name='candidate-label']").val();
+        if (typeData['Nome'] && label) {
+          qsCode += '||LAST|' + typeData['Nome'] + '|"' + label + '"';
+        }
+        const address = $("input[name='candidate-address']").val();
+        if (typeData['Indirizzo'] && address) {
+          qsCode += '||LAST|' + typeData['Indirizzo'] + '|it:"' + address + '"';
+        }
+        const located = $("input[name='candidate-located']").val();
+        if (typeData['Comune'] && located) {
+          qsCode += '||LAST|' + typeData['Comune'] + '|' + located;
+        }
+        const uri = $("input[name='candidate-uri']").val();
+        if (typeData['URI'] && uri) {
+          qsCode += '||LAST|' + typeData['URI'] + '|"' + uri + '"';
+        }
+        window.open('https://quickstatements.toolforge.org/#v1=' + encodeURIComponent(qsCode));
+      });
+    }
 
     const createWikidataButton = document.getElementById('create-wikidata-button');
     createWikidataButton.addEventListener('click', e => {

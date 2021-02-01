@@ -104,6 +104,20 @@
           <tr>
             <td>
               <h4 class="ui image header">
+                <i class="random icon"></i>
+                <div class="content">
+                  Senza candidati
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{#job_config.show_empty}}Mostra{{/job_config.show_empty}}{{^job_config.show_empty}}Nascondi{{/job_config.show_empty}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
                 <i class="save icon"></i>
                 <div class="content">
                   Crea candidato

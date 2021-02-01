@@ -16,6 +16,9 @@ const enrichJobInfo = (info, user) => {
     case 'wikidata':
       createCandidate = 'Su Wikidata';
       break;
+    case 'wikidataqs':
+      createCandidate = 'Con QuickStatements';
+      break;
     default:
       createCandidate = 'Disabilitato';
   }

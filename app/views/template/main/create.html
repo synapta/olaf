@@ -7,10 +7,13 @@
       <label>Label</label>
       <input type="text" name="candidate-label" value="{{Nome}}" required>
     </div>
+    {{#Indirizzo}}
     <div class="field">
       <label>Indirizzo</label>
       <input type="text" name="candidate-address" value="{{Indirizzo}}">
     </div>
+    {{/Indirizzo}}
+    {{#Comune}}
     <div class="field">
       <label>Comune</label>
       <div class="ui grid">
@@ -26,11 +29,16 @@
         </div>
       </div>
     </div>
+    {{/Comune}}
+    {{#URI}}
     <div class="field">
       <label>URI</label>
       <input type="text" name="candidate-uri" value="{{URI}}" readonly>
     </div>
+    {{/URI}}
+    {{#useQuickStatements}}
     <button id="create-quickstatements-button" class="ui button teal border">CREA CON QUICKSTATEMENTS</button>
+    {{/useQuickStatements}}
     <button id="create-wikidata-button" class="ui button grey border">CREA MANUALMENTE</button>
   </form>
 

@@ -81,9 +81,9 @@ async function nextItem(job) {
     const lock_limit = new Date();
     lock_limit.setHours(lock_limit.getHours() - 1);
 
-    // Create candidate
+    // Show items with no candidates
     let isRequired = true;
-    if (job.job_config.create_candidate === 'wikidata') {
+    if (job.job_config.show_empty === true) {
         isRequired = false;
     }
 

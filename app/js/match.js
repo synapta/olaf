@@ -34,6 +34,9 @@ const init = async () => {
 
   if (jobInfo.job_config.create_candidate === 'wikidata') {
     matcherOptions.createCandidate = true;
+  } else if (jobInfo.job_config.create_candidate === 'wikidataqs') {
+    matcherOptions.createCandidate = true;
+    matcherOptions.useQuickStatements = true;
   }
 
   // instantiate matcher
