@@ -123,7 +123,8 @@
       <p>La card <b>Entità</b> (in blu, sulla sinistra dello schermo) visualizza le informazioni provenienti dal
         <b>dataset sorgente</b>. Consulta queste informazioni per capire di quale entità si tratta. Se hai bisogno di
         più informazioni per la disambiguazione, clicca sul nome dell'entità per consultare una sua scheda descrittiva
-        (se presente nel dataset sorgente).</p>
+        (se presente nel dataset sorgente).
+      </p>
 
       <p>Le card <b>Candidati</b> (in rosso, sulla destra dello schermo) mostrano i candidati da <b>Wikidata</b> per
         l'entity matching. Anche in questo caso, se hai bisogno di maggiori informazioni di contesto, clicca sul nome
@@ -133,18 +134,34 @@
       <p>Se hai trovato il <b>candidato giusto</b> (se, in altre parole, <b>sei sicuro</b> che le entità dei due dataset
         <b>rappresentano la stessa cosa</b>), clicca su <b>Seleziona il candidato</b> e poi su <b>Conferma match</b> per
         salvare l'associazione tra le due entità: l'entity matching è fatto! (E l'associazione tra i codici
-        identificativi delle due entità viene subito memorizzata da OLAF).</p>
+        identificativi delle due entità viene subito memorizzata da OLAF).
+      </p>
 
       <p>Che cosa succede se tra i candidati da Wikidata sono presenti dei <b>duplicati</b>? In questo caso puoi
         selezionare più di un elemento da associare, e confermare il match esattamente come descritto sopra.</p>
 
-      <p>Se, invece, <b>nessuno dei candidati trovati da OLAF è quello giusto</b>, clicca su <b>Nessun match</b>.
-        L'informazione sull'assenza di match viene salvata da OLAF, che da questo momento non ripropone più l'entità da
-        associare. Fai questa operazione <b>solo se sei sicuro che nessuno dei candidati è quello giusto</b>: l'entità
-        infatti non viene riproposta più a <b>nessuno</b> degli utenti.</p>
+      <p><b>Se non hai trovato il candidato giusto, hai tre opzioni</b>:
+      <dl>
+        <dt><b>Ignora entità</b></dt>
+        <dd>Nessuna decisione viene presa, e si passa all'entità successiva. Usa questa opzione <b>se non sei
+            sicuro</b>, o se vuoi riprendere il "caso" in un secondo momento: l'entità che hai saltato continuerà ad
+          essere <b>proposta agli altri utenti</b>.</dd>
+        <dt><b>Nessun match</b></dt>
+        <dd>Salva in OLAF l'informazione che l'entità non ha candidati da Wikidata da associare. Fai questa operazione
+          <b>solo se sei sicuro che nessuno dei candidati è quello giusto</b>: l'entità infatti non viene riproposta più
+          a <b>nessuno</b> degli utenti.</dd>
+        <dt><b>Escludi entità</b></dt>
+        <dd>Elimina da OLAF ogni riferimento all'entità, che non solo non viene più riproposta agli altri utenti, ma
+          viene esclusa anche dalle statistiche sulle entità del dataset sorgente che non hanno un match. Usa questa
+          opzione per escludere dal progetto le entità <i>out of scope</i>.</dd>
+      </dl>
+      </p>
 
-      <p><b>Se non sei sicuro</b>, o se vuoi riprendere il "caso" in un secondo momento, clicca su <b>Salta</b> e passa
-        all'entità successiva: l'entità che hai saltato continuerà ad essere proposta agli altri utenti.</p>
+      <p>Se non ci sono candidati validi provenienti da Wikidata, clicca su <b>crea su Wikidata</b> per aggiungere una
+        nuova voce usando il tool QuickStatements (disponibile solo se il dataset sorgente è distribuito con licenza
+        CC0) o l'interfaccia di creazione manuale di Wikidata. Quando hai finito di editare Wikidata, <b>ricordati di
+          incollare il codice identificativo dell'item Wikidata</b> (per esempio Q42) dentro il form di OLAF e clicca su
+        <b>Conferma match</b> per salvare dentro OLAF l'informazione sul nuovo match.</p>
 
       <p>Ricordati che puoi consultare le statistiche sul tuo lavoro nella pagina di <b>Profilo</b>, e lo stato di
         avanzamento di ogni progetto nella pagina del <b>Progetto</b>. Buon lavoro!</p>
