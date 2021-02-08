@@ -4,20 +4,30 @@ const { Item, Candidate, Action, sequelize } = require('../database');
 async function loadItem(item_body, source, job) {
     const item_uri = job.job_config.item_uri || 'URI';
     const item_search = job.job_config.item_search || 'Search';
+    const item_search_extra = job.job_config.item_search_extra;
 
     let item;
 
     item = await Item.findOne({ where: { job_id: job.job_id, item_uri: item_body[item_uri] } });
 
     if (item == null) {
+        // Create item
         item = await Item.create({
             source_id: source.source_id,
             job_id: job.job_id,
             item_uri: item_body[item_uri],
             item_search: item_body[item_search],
+            item_search_extra: item_search_extra ? item_body[item_search_extra] : null,
             item_body: item_body,
             last_update: new Date()
         });
+    } else {
+        // Update item
+        item.item_search = item_body[item_search];
+        item.item_search_extra = item_search_extra ? item_body[item_search_extra] : null;
+        item.item_body = item_body;
+        item.last_update = new Date();
+        await item.save();
     }
 
     return item;
@@ -43,7 +53,7 @@ async function loadCandidates(item, job) {
     }
 
     const query = require('../queries/wikidata');
-    const candidates = await query.getCandidates(item.item_search);
+    const candidates = await query.getCandidates(item.item_search, item.item_search_extra);
 
     for (let candidate_body of candidates) {
         let score = 1;
@@ -70,16 +80,24 @@ async function loadCandidates(item, job) {
 async function nextItem(job) {
     const lock_limit = new Date();
     lock_limit.setHours(lock_limit.getHours() - 1);
+
+    // Show items with no candidates
+    let isRequired = true;
+    if (job.job_config.show_empty === true) {
+        isRequired = false;
+    }
+
     const item = await Item.findOne({
         where: {
             job_id: job.job_id,
             is_processed: false,
+            is_removed: false,
             [Op.or]: [{ lock_timestamp: { [Op.lte]: lock_limit } }, { lock_timestamp: { [Op.is]: null } }]
         },
         order: sequelize.random(),
         include: [{
             model: Candidate,
-            required: true
+            required: isRequired
         }]
     });
     // Sort candidates by score
@@ -92,7 +110,7 @@ async function nextItem(job) {
         ],
         include: [{
             model: Candidate,
-            required: true
+            required: isRequired
         }]
     });
 }

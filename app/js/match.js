@@ -12,6 +12,7 @@ const init = async () => {
 
   // get DOM elements
   const navbarContainer = document.getElementById('match-navbar');
+  const createContainer = document.getElementById('create-modal');
   const containers = document.querySelectorAll('.data-container');
   const placeholders = document.querySelectorAll('.data-placeholder');
 
@@ -22,6 +23,7 @@ const init = async () => {
   const matcherOptions = {
     alias,
     navbarContainer,
+    createContainer,
     placeholders,
     containers,
     job_name       : jobInfo.name,
@@ -29,6 +31,13 @@ const init = async () => {
     job_type       : jobInfo.job_type,
     uriQueryString : queryStrings.uri,
   };
+
+  if (jobInfo.job_config.create_candidate === 'wikidata') {
+    matcherOptions.createCandidate = true;
+  } else if (jobInfo.job_config.create_candidate === 'wikidataqs') {
+    matcherOptions.createCandidate = true;
+    matcherOptions.useQuickStatements = true;
+  }
 
   // instantiate matcher
   const matcher = new Matcher(matcherOptions);

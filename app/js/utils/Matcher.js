@@ -10,7 +10,7 @@ class Matcher {
 
     this.selectedCandidates = [];
 
-    this.navbarPlacheolder = `
+    this.navbarPlaceholder = `
       <div class="navbar-placeholder">
         <div class="ui placeholder small-button-placeholder">
           <div class="image"></div>
@@ -46,11 +46,12 @@ class Matcher {
         // load templates
         this.navbarTemplate = await getText(`/views/template/match-navbar.html`);
         this.itemTemplate = await getText(`/views/template/${this.options.job_type || 'main'}/item.html`);
-        this.candidateTemplate = await getText(`/views/template/${this.options.job_type || 'main'}/candidate.html`);     
+        this.candidateTemplate = await getText(`/views/template/${this.options.job_type || 'main'}/candidate.html`);
+        this.createTemplate = await getText(`/views/template/${this.options.job_type || 'main'}/create.html`);
         // get first item
         this.next(true)
           .then(item => resolve(item))
-          .catch(err => {reject(err)});
+          .catch(err => { reject(err) });
       } catch (error) {
         console.error(error);
         reject(error);
@@ -73,8 +74,8 @@ class Matcher {
       getJSON(url)
         .then(async item => {
           this.updateBrowserHistory(item.item_uri);
-          await this.render(item);
-          resolve(item);      
+          await this.render(item, this.options);
+          resolve(item);
         }).catch(async err => {
           if (err.status === 404) {
             await this.renderNoItems();
@@ -89,6 +90,18 @@ class Matcher {
     window.history.replaceState({
       urlPath: newUrl
     }, 'OLAF | Match', newUrl);
+  }
+
+  removeItem(item_id) {
+    return new Promise(async (resolve, reject) => {
+      await this.showPlaceholders();
+      postJSON(`/api/v2/item/${this.options.alias}/${item_id}/remove`)
+        .then(async res => {
+          await this.next(false);
+        }).catch(err => {
+          console.error(err);
+        });
+    });
   }
 
   skipItem(item_id) {
@@ -125,14 +138,16 @@ class Matcher {
     });
   }
 
-  render(data) {
-    console.log('rendering data', data);
+  render(data, options) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.currentItemId = data.item_id; 
-        this.renderNavbar({ is_processed: data.is_processed });
+        this.currentItemId = data.item_id;
+        this.renderNavbar({ is_processed: data.is_processed, last_update: formatDateAndTime(data.last_update) });
         this.renderItem(data.item_body, data.is_processed);
-        this.renderCandidates(data.Candidates, { is_processed: data.is_processed });
+        this.renderCandidates(data.Candidates, { is_processed: data.is_processed, createCandidate: options.createCandidate });
+        if (options.createCandidate) {
+          this.renderCreate(data.item_body, options.useQuickStatements);
+        }
         await this.showContainers();
         resolve();
       } catch (error) {
@@ -145,16 +160,24 @@ class Matcher {
   renderNavbar(options = {}) {
     this.options.navbarContainer.innerHTML = Mustache.render(this.navbarTemplate, {
       ...options,
-      item_id            : this.currentItemId,
-      singleItem         : this.singleItem,
-      alias              : this.options.alias,
-      job_name           : this.options.job_name,
-      selectedCandidates : this.selectedCandidates
+      item_id: this.currentItemId,
+      singleItem: this.singleItem,
+      alias: this.options.alias,
+      job_name: this.options.job_name,
+      selectedCandidates: this.selectedCandidates
     });
 
     const infoButton = this.options.navbarContainer.querySelector('.info-button');
-    if (infoButton) { 
+    if (infoButton) {
       infoButton.addEventListener('click', e => $('.match-help-modal').modal('show'));
+    }
+
+    const removeButton = this.options.navbarContainer.querySelector('.remove-button');
+    if (removeButton) {
+      removeButton.addEventListener('click', e => {
+        const item_id = e.target.dataset.item_id;
+        this.removeItem(item_id);
+      });
     }
 
     const skipButton = this.options.navbarContainer.querySelector('.skip-button');
@@ -191,7 +214,7 @@ class Matcher {
     const cleanData = Object.entries(this.options.fields).reduce((acc, curr) => {
       acc[curr[1].label] = itemData[curr[0]]
       return acc;
-      }, {});
+    }, {});
 
     // parse and clean data
     // const cleanData = this.objectKeysMap(itemData, key => key.replace(/ /g, '_'));
@@ -222,6 +245,110 @@ class Matcher {
 
       this.renderNavbar();
     }));
+
+    const createButton = document.getElementById('create-button');
+    if (createButton) {
+      createButton.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        $('#create-modal').modal('show');
+      });
+    }
+
+  }
+
+  renderCreate(itemData, useQuickStatements) {
+    if (!this.createTemplate) {
+      console.error('[Matcher] Missing Create template - abording render');
+      return;
+    }
+
+    const cleanData = Object.entries(this.options.fields).reduce((acc, curr) => {
+      if (curr[1].type) {
+        if (curr[1].regex) {
+          const re = new RegExp(curr[1].regex);
+          acc[curr[1].label] = itemData[curr[0]].replace(re, "$1");
+        } else {
+          acc[curr[1].label] = itemData[curr[0]]
+        }
+      }
+      return acc;
+    }, {});
+
+    this.options.createContainer.innerHTML = Mustache.render(this.createTemplate, { ...cleanData, item_id: this.currentItemId, useQuickStatements });
+
+    $('#search-comune')
+      .search({
+        apiSettings: {
+          url: '/api/v2/suggestion?q={query}'
+        },
+        fields: {
+          title: 'titlesnippet',
+          description: 'snippet'
+        },
+        minCharacters: 3,
+        onSelect: function (res, resp) {
+          $("input[name='candidate-located']").val(res.title);
+        },
+        onSearchQuery: function (query) {
+          $("input[name='candidate-located']").val('');
+        }
+      });
+
+    const typeData = Object.entries(this.options.fields).reduce((acc, curr) => {
+      acc[curr[1].label] = curr[1].type
+      return acc;
+    }, {});
+
+    const createQuickButton = document.getElementById('create-quickstatements-button');
+    if (createQuickButton) {
+      createQuickButton.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        let qsCode = 'CREATE';
+        const label = $("input[name='candidate-label']").val();
+        if (typeData['Nome'] && label) {
+          qsCode += '||LAST|' + typeData['Nome'] + '|"' + label + '"';
+        }
+        const address = $("input[name='candidate-address']").val();
+        if (typeData['Indirizzo'] && address) {
+          qsCode += '||LAST|' + typeData['Indirizzo'] + '|it:"' + address + '"';
+        }
+        const located = $("input[name='candidate-located']").val();
+        if (typeData['Comune'] && located) {
+          qsCode += '||LAST|' + typeData['Comune'] + '|' + located;
+        }
+        const uri = $("input[name='candidate-uri']").val();
+        if (typeData['URI'] && uri) {
+          qsCode += '||LAST|' + typeData['URI'] + '|"' + uri + '"';
+        }
+        window.open('https://quickstatements.toolforge.org/#v1=' + encodeURIComponent(qsCode));
+      });
+    }
+
+    const createWikidataButton = document.getElementById('create-wikidata-button');
+    createWikidataButton.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const label = $("input[name='candidate-label']").val();
+      window.open('https://www.wikidata.org/w/index.php?title=Special:NewItem&lang=it&label=' + label);
+    });
+
+    const saveEntityButton = document.getElementById('save-entity-button');
+    saveEntityButton.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const item_id = e.target.dataset.item_id;
+      const entity = $("input[name='candidate-entity']").val();
+      const match = /.*(Q\d+).*/.exec(entity);
+      if (match) {
+        $('#create-modal').modal('hide');
+        this.confirmMatch(item_id, [match[1]]);
+      } else {
+        $('#save-candidate-form .field').addClass('error');
+      }
+    });
+
   }
 
   objectMap(object, mapFn) {
@@ -242,7 +369,7 @@ class Matcher {
     return new Promise(async (resolve, reject) => {
       try {
         // navbar
-        this.options.navbarContainer.innerHTML = this.navbarPlacheolder;
+        this.options.navbarContainer.innerHTML = this.navbarPlaceholder;
 
         // item and candidates
         const t1 = startTransition(this.itemContainer, { duration: '300ms' });

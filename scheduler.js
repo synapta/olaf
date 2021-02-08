@@ -63,9 +63,11 @@ async function runJob(job) {
         await source.save();
     }
 
-    // Update job
-    job.last_update = new Date();
-    await job.save();
+    if (sources.length > 0) {
+        // Update job
+        job.last_update = new Date();
+        await job.save();
+    }
 }
 
 function parseSource(source) {

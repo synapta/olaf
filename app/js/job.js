@@ -1,22 +1,29 @@
 const enrichJobInfo = (info, user) => {
   let type;
-  let typeIcon;
   switch (info.job_type) {
     case 'monument':
       type = 'Monumenti';
-      typeIcon = 'university';
       break;
     case 'author':
       type = 'Autori';
-      typeIcon = 'user';
       break;
     default:
       type = 'Progetto generico';
-      typeIcon = 'user';
-      break;
   }
 
-  const lastUpdate = formatDate(info.last_update);
+  let createCandidate;
+  switch (info.job_config.create_candidate) {
+    case 'wikidata':
+      createCandidate = 'Su Wikidata';
+      break;
+    case 'wikidataqs':
+      createCandidate = 'Con QuickStatements';
+      break;
+    default:
+      createCandidate = 'Disabilitato';
+  }
+
+  const lastUpdate = formatDateAndTime(info.last_update);
 
   const hasSource = Boolean(Array.isArray(info.Sources) && info.Sources.length > 0);
   
@@ -28,7 +35,7 @@ const enrichJobInfo = (info, user) => {
     icon : source.source_type === 'json' ? 'file code outline' : 'file alternate outline'
   }));
 
-  return { ...info, type, typeIcon, lastUpdate, hasSource, sources, admin: user.isAdmin() };
+  return { ...info, type, createCandidate, lastUpdate, hasSource, sources, admin: user.isAdmin() };
 };
 
 const bindReloadSourceInterface = () => {

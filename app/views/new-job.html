@@ -57,35 +57,42 @@
         <div class="field">
           <label>Nome*</label>
           <input type="text" name="job-name" placeholder="Scegli un nome" required>
-          <label class="bottom-label">Ad esempio <i>Il Mio Progetto</i></label>
+          <label class="bottom-label">Il nome del progetto, ad esempio <i>Il Mio Progetto</i>.</label>
         </div>
         <div class="field">
           <label>Alias*</label>
           <input type="text" name="job-alias" placeholder="Inserisci un alias per il progetto" required>
           <label class="error-label alias-error">L'alias che hai inserito non è valido!</label>
           <label class="error-label alias-taken">È già presente un progetto con questo alias. Usane un altro!</label>
-          <label class="bottom-label">Usa solo caratteri alfanumerici e trattini. Ad esempio <i>il-mio-progetto</i></label>
+          <label class="bottom-label">Usa solo caratteri alfanumerici e trattini, ad esempio <i>il-mio-progetto</i>.</label>
         </div>
         <div class="field">
           <label>Descrizione</label>
           <textarea rows="2" name="job-description" placeholder="Se necessario, descrivi brevemente il progetto"></textarea>
         </div>
         <div class="field">
-          <label>Campo URI</label>
-          <input type="text" name="job-uri" placeholder="Inserisci il nome del campo URI" >
-          <label class="bottom-label">Lascia vuoto per usare il valore predefinito <i>URI</i></label>
+          <label>Campo URI*</label>
+          <input type="text" name="job-uri" placeholder="Inserisci il nome del campo URI" required>
+          <label class="bottom-label">Il nome della colonna che identifica ogni elemento in modo univoco.</label>
         </div>
         <div class="field">
-          <label>Campo search</label>
-          <input type="text" name="job-search" placeholder="Inserisci il nome del campo search" >
-          <label class="bottom-label">Lascia vuoto per usare il valore predefinito <i>Search</i></label>
+          <label>Campo SEARCH*</label>
+          <input type="text" name="job-search" placeholder="Inserisci il nome del campo SEARCH" required>
+          <label class="bottom-label">Il nome della colonna utilizzata per effettuare la ricerca.</label>
         </div>
-        <!-- <div class="field">
-          <div class="ui checkbox">
-            <input type="checkbox" tabindex="0" class="hidden">
-            <label>I agree to the Terms and Conditions</label>
-          </div>
-        </div> -->
+        <div class="field">
+          <label>Campo EXTRA</label>
+          <input type="text" name="job-search-extra" placeholder="Inserisci il nome del campo EXTRA" >
+          <label class="bottom-label">Il nome della colonna utilizzata in combinazione con la precedente per effettuare una ricerca più precisa.</label>
+        </div>
+        <div class="field">
+          <label>Crea candidato</label>
+          <select id="job-create-candidate-select" class="ui fluid search dropdown" name="job-create-candidate">
+            <option value="disabled">Disabilitato</option>
+            <option value="wikidata">Su Wikidata</option>
+          </select>
+          <label class="bottom-label">Se non ci sono candidati validi, l'utente può creare manualmente un nuovo candidato ed abbinarlo all'elemento.</label>
+        </div>
         <button class="ui button tertiary-bg border" type="submit">
           AVANTI
           <i class="arrow right icon"></i>
@@ -94,7 +101,7 @@
     </div>
 
     <div class="new-job-step step-2">
-      <h3 class="ui dividing header" style="margin-bottom: 2rem !important;">Carica la sorgente (formato csv)</h3>
+      <h3 class="ui dividing header" style="margin-bottom: 2rem !important;">Carica la sorgente (formato CSV)</h3>
       <div class="source-upload">
         <div class="ui fluid placeholder">
           <div class="header">
@@ -105,46 +112,6 @@
           </div>
         </div>
       </div>
-
-      <!-- <form class="ui form new-job-form" data-step="2">
-        <div class="field">
-          <input type="file" name="job-source" id="jobSourceFileInput">
-          <label class="error-label file-error">Il file che hai selezionanto non è un CSV</label>
-        </div>
-        <div class="field">
-          <label>Separatore CSV</label>
-          <input type="text" name="job-source-separator" placeholder="Inserisci il carattere separatore" maxlength="1" value=','>
-          <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>,</i> o <i>|</i></label>
-        </div>
-        <div class="field">
-          <label>Qualificatore CSV (quote)</label>
-          <input type="text" name="job-source-quote" placeholder="Inserisci il carattere qualificatore" maxlength="1" value='"'>
-          <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i>. Puoi anche lasciare il campo vuoto.</label>
-        </div>
-        <div class="field">
-          <label>Escape CSV</label>
-          <input type="text" name="job-source-escape" placeholder="Inserisci il carattere escape" maxlength="1" value='"'>
-          <label class="bottom-label">Inserisci un solo carattere, ad esempio <i>"</i> o <i>'</i>. Puoi anche lasciare il campo vuoto.</label>
-        </div>
-        <div class="submiasfdast-buttons">
-          <button class="ui negative basic button back-button" data-stepcurrent="2" data-stepto="1">
-            <i class="arrow left icon"></i>
-            INDIETRO
-          </button>
-          <button class="ui button tertiary-bg border disabled upload-button" type="submit">
-            <i class="ui upload icon"></i>
-            CARICA
-          </button>
-          <button class="ui button skip-button"
-            data-tooltip="Puoi saltare questo passaggio per ora e caricare un file in seguito dalla pagina del progetto"
-            data-position="top left">
-            SALTA
-          </button>
-          <button class="ui basic black button borderless csv-help-button d-none">
-            <span style="margin-right: 5px;">Serve aiuto</span> <i class="question circle icon"></i>
-          </button>
-        </div>
-      </form> -->
 
     </div>
 

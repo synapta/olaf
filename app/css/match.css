@@ -108,6 +108,13 @@
   color: var(--dark);
 }
 
+.last-update-span {
+  margin-left: 1rem;
+  font-style: italic;
+  font-size: 1.3rem;
+  color: var(--dark);
+}
+
 .processed-item {
   border: 3px solid var(--secondary-shade) !important;
   background-color: rgba(var(--secondary-rgb), .1) !important;

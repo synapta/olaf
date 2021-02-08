@@ -15,6 +15,7 @@ const SESSION_TIMEOUT = 30 * 86400000;
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const Sentry = require('@sentry/node');
 const passport = require('passport');
 const expressSession = require('express-session');
 const SessionStore = require('express-session-sequelize')(expressSession.Store);
@@ -28,6 +29,8 @@ const sequelizeSessionStore = new SessionStore({
 
 // Setting up express
 const app = express();
+
+Sentry.init({ dsn: process.env.SENTRY });
 
 // Setting up additional components
 app.use(morgan('common'));
@@ -51,7 +54,11 @@ app.use(function (req, res, next) {
     next();
 });
 
+app.use(Sentry.Handlers.requestHandler());
+
 require('./routes.js')(app, passport);
+
+app.use(Sentry.Handlers.errorHandler());
 
 const server = app.listen(process.env.PORT || 3646, 'localhost', () => {
     const host = server.address().address;

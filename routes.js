@@ -207,8 +207,12 @@ module.exports = function (app, passport) {
         api.saveItem(req, res);
     });
 
+    app.post('/api/v2/item/:alias/:id/remove', (req, res) => {
+        api.skipOrRemoveItem(req, res, true);
+    });
+
     app.post('/api/v2/item/:alias/:id/skip', (req, res) => {
-        api.skipItem(req, res);
+        api.skipOrRemoveItem(req, res, false);
     });
 
     // User
@@ -273,6 +277,15 @@ module.exports = function (app, passport) {
     app.get('/api/v2/user/history', (req, res) => {
         if (req.user) {
             api.getUserHistory(req, res);
+        } else {
+            res.sendStatus(403);
+        }
+    });
+
+    // Utils
+    app.get('/api/v2/suggestion', (req, res) => {
+        if (req.user) {
+            api.searchWikidata(req, res);
         } else {
             res.sendStatus(403);
         }

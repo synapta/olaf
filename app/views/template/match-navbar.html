@@ -4,12 +4,16 @@
     <button class="ui vertical animated button">
       <div class="hidden content">Progetto</div>
       <div class="visible content">
-        <i class="building outline icon"></i>
+        <i class="home icon"></i>
       </div>
     </button>
   </a>
 
   <span class="jobname">{{job_name}}</span>
+  {{^task_finished}}
+  <span class="last-update-span">{{#is_processed}}Selezione candidati:{{/is_processed}}
+    {{^is_processed}}Ultimo aggiornamento:{{/is_processed}} {{last_update}}</span>
+  {{/task_finished}}
 
 </div>
 
@@ -23,24 +27,32 @@
   </button>
 
   {{#task_finished}}
-    <span style="margin: 0 1rem">TASK COMPLETATO!</span>
+    <span style="margin: 0 1rem">PROGETTO COMPLETATO!</span>
   {{/task_finished}}
-    
+
   {{^task_finished}}
   {{#is_processed}}
   <a href="/match/{{alias}}">
     <button class="ui button success-bg border">
-      VAI AD UN NUOVO ELEMENTO
+      NUOVA ENTITÀ
     </button>
   </a>
   {{/is_processed}}
 
   {{^is_processed}}
+  <button
+    class="ui button black border remove-button {{#selectedCandidates.length}}disabled{{/selectedCandidates.length}}"
+    data-item_id="{{item_id}}"
+    data-tooltip="Rimuovi questa entità dal progetto"
+    data-position="bottom left"
+  >
+    ESCLUDI ENTITÀ
+  </button>
 
   <button
     class="ui button danger-bg border no-match-button {{#selectedCandidates.length}}disabled{{/selectedCandidates.length}}"
     data-item_id="{{item_id}}"
-    data-tooltip="Nessuno dei candidati corrisponde all'elemento"
+    data-tooltip="Nessuno dei candidati corrisponde all'entità"
     data-position="bottom left"
   >
     NESSUN MATCH
@@ -50,7 +62,7 @@
   <button
     class="ui button success-bg border confirm-match-button"
     data-item_id="{{item_id}}"
-    data-tooltip="Conferma gli elementi scelti"
+    data-tooltip="Conferma i candidati scelti"
     data-position="bottom left"
   >
     CONFERMA MATCH
@@ -58,8 +70,13 @@
   {{/selectedCandidates.length}}
 
   {{^selectedCandidates.length}}
-  <button class="ui button warning-bg border skip-button" data-item_id="{{item_id}}">
-    SALTA ELEMENTO
+  <button
+    class="ui button warning-bg border skip-button"
+    data-item_id="{{item_id}}"
+    data-tooltip="Ignora temporaneamente questa entità"
+    data-position="bottom right"
+  >
+    IGNORA ENTITÀ
   </button>
   {{/selectedCandidates.length}}
   {{/is_processed}}

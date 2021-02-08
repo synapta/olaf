@@ -218,11 +218,19 @@ const Item = sequelize.define('Item', {
         type: DataTypes.TEXT,
         allowNull: false
     },
+    item_search_extra: {
+        type: DataTypes.TEXT
+    },
     item_body: getJsonDataType('item_body'),
     lock_timestamp: {
         type: DataTypes.DATE
     },
     is_processed: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    is_removed: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
@@ -351,6 +359,16 @@ const Action = sequelize.define('Action', {
         allowNull: false
     },
     is_skipped: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    is_removed: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    is_created: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false

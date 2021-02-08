@@ -81,7 +81,7 @@
               <h4 class="ui image header">
                 <i class="check squaree icon success-color"></i>
                 <div class="content">
-                  Azioni valide
+                  Entità abbinate
                 </div>
               </h4>
             </td>
@@ -93,9 +93,23 @@
           <tr>
             <td>
               <h4 class="ui image header">
+                <i class="save icon teal"></i>
+                <div class="content">
+                  Entità create
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{userStats.createActions}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
                 <i class="step forward icon warning-color"></i>
                 <div class="content">
-                  Elementi saltati
+                  Entità ignorate
                 </div>
               </h4>
             </td>
@@ -109,12 +123,26 @@
               <h4 class="ui image header">
                 <i class="x icon danger-color"></i>
                 <div class="content">
-                  Scelte <i>NESSUN MATCH</i>
+                  Entità senza match
                 </div>
               </h4>
             </td>
             <td>
               {{userStats.orphanActions}}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h4 class="ui image header">
+                <i class="trash icon black"></i>
+                <div class="content">
+                  Entità escluse
+                </div>
+              </h4>
+            </td>
+            <td>
+              {{userStats.removeActions}}
             </td>
           </tr>
 
@@ -140,15 +168,17 @@
             <th>Azione</th>
             <th>Entità</th>
             <th>Progetto</th>
-            <th>Data</th>
+            <th>Data e ora</th>
           </tr>
         </thead>
         <tbody>
         {{#userHistory}}
           <tr>
-            <td>{{#Candidate}}<h4 class="ui image header"><i class="check squaree icon success-color"></i></h4>{{/Candidate}}
+            <td>{{#Candidate}}{{^is_created}}<h4 class="ui image header"><i class="check squaree icon success-color"></i></h4>{{/is_created}}{{/Candidate}}
+              {{#is_created}}<h4 class="ui image header"><i class="save icon teal"></i></h4>{{/is_created}}
               {{#is_skipped}}<h4 class="ui image header"><i class="step forward icon warning-color"></i></h4>{{/is_skipped}}
-              {{#is_orphan}}<h4 class="ui image header"><i class="x icon danger-color"></i></h4>{{/is_orphan}}</td>
+              {{#is_orphan}}<h4 class="ui image header"><i class="x icon danger-color"></i></h4>{{/is_orphan}}
+              {{#is_removed}}<h4 class="ui image header"><i class="trash icon black"></i></h4>{{/is_removed}}</td>
             <td><a href="/match/{{Item.Job.alias}}?uri={{Item.item_uri}}">{{Item.item_search}}</a></td>
             <td>{{Item.Job.name}}</td>
             <td>{{timestamp}}</td>
